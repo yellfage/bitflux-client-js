@@ -4,12 +4,12 @@ const DEFAULT_ATTEMPTS_AFTER_DELAY = 0
 export class ReconnectionContext {
   public attemptDelayIndex: number
   public attemptsAfterDelays: number
-  public abortController: AbortController | null
+  public abortController: AbortController
 
-  public constructor() {
+  public constructor(abortController: AbortController) {
     this.attemptDelayIndex = DEFAULT_ATTEMPT_DELAY_INDEX
     this.attemptsAfterDelays = DEFAULT_ATTEMPTS_AFTER_DELAY
-    this.abortController = null
+    this.abortController = abortController
   }
 
   public reset(): void {

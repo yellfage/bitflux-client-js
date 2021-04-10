@@ -1,7 +1,9 @@
+/* eslint-disable import/no-named-as-default */
 /* eslint-disable node/no-callback-literal */
 
 import { v4 as uuid4 } from 'uuid'
 import delay from 'delay'
+import AbortController from 'abort-controller'
 
 import { IClient } from '../i-client'
 import { EventHandlerStore } from './event-handler-store'
@@ -166,7 +168,7 @@ export class Client implements IClient {
       (protocol) => protocol.name
     )
 
-    this.reconnectionContext = new ReconnectionContext()
+    this.reconnectionContext = new ReconnectionContext(new AbortController())
     this.notifiableInvocationHandlers = {}
     this.pendingRegularInvocationDescriptors = []
     this.suspendedRegularInvocationDescriptors = new Set()
@@ -280,7 +282,7 @@ export class Client implements IClient {
     this.pendingRegularInvocationDescriptors.push(descriptor)
 
     this.registerRegularInvocationAbortionHandler(descriptor)
-    this.runRegularInvocationRejectionTimer(descriptor)
+    this.runRegularInvocationRejectionTimeout(descriptor)
 
     if (!setup.abortController.signal.aborted) {
       if (this.isConnected) {
@@ -397,7 +399,7 @@ export class Client implements IClient {
       return
     }
 
-    if (!this.reconnectionContext.abortController) {
+    if (this.reconnectionContext.abortController.signal.aborted) {
       this.reconnectionContext.abortController = new AbortController()
     }
 
@@ -441,9 +443,7 @@ export class Client implements IClient {
   private abortReconnection(): void {
     this.reconnectionContext.reset()
 
-    this.reconnectionContext.abortController?.abort()
-
-    this.reconnectionContext.abortController = null
+    this.reconnectionContext.abortController.abort()
   }
 
   private transmitMessage(message: OutgoingMessage): void {
@@ -461,7 +461,7 @@ export class Client implements IClient {
 
     this.transmitMessage(message)
 
-    this.runRegularInvocationAttemptRejectionTimer(descriptor)
+    this.runRegularInvocationAttemptRejectionTimeout(descriptor)
   }
 
   private performNotifiableInvocation(
@@ -493,7 +493,7 @@ export class Client implements IClient {
 
   private suspendPendingRegularInvocations(): void {
     this.pendingRegularInvocationDescriptors.forEach((descriptor) => {
-      this.clearRegularInvocationAttemptRejectionTimer(descriptor.context)
+      this.clearRegularInvocationAttemptRejectionTimeout(descriptor.context)
 
       this.suspendedRegularInvocationDescriptors.add(descriptor)
     })
@@ -509,7 +509,7 @@ export class Client implements IClient {
     )
   }
 
-  private runRegularInvocationRejectionTimer(
+  private runRegularInvocationRejectionTimeout(
     descriptor: RegularInvocationDescriptor
   ): void {
     const { rejectionDelay } = descriptor.setup
@@ -518,13 +518,13 @@ export class Client implements IClient {
       return
     }
 
-    descriptor.context.rejectionTimer = setTimeout(
+    descriptor.context.rejectionTimeoutId = (setTimeout(
       async () => await this.finishRegularInvocationDueToTimeout(descriptor),
       rejectionDelay
-    )
+    ) as unknown) as number
   }
 
-  private runRegularInvocationAttemptRejectionTimer(
+  private runRegularInvocationAttemptRejectionTimeout(
     descriptor: RegularInvocationDescriptor
   ): void {
     const { attemptRejectionDelay } = descriptor.setup
@@ -533,26 +533,22 @@ export class Client implements IClient {
       return
     }
 
-    descriptor.context.attemptRejectionTimer = setTimeout(
+    descriptor.context.attemptRejectionTimeoutId = (setTimeout(
       async () => await this.finishRegularInvocationDueToTimeout(descriptor),
       attemptRejectionDelay
-    )
+    ) as unknown) as number
   }
 
-  private clearRegularInvocationRejectionTimer(
+  private clearRegularInvocationRejectionTimeout(
     context: RegularInvocationContext
   ): void {
-    clearTimeout(context.rejectionTimer!)
-
-    context.rejectionTimer = null
+    clearTimeout(context.rejectionTimeoutId)
   }
 
-  private clearRegularInvocationAttemptRejectionTimer(
+  private clearRegularInvocationAttemptRejectionTimeout(
     context: RegularInvocationContext
   ): void {
-    clearTimeout(context.attemptRejectionTimer!)
-
-    context.attemptRejectionTimer = null
+    clearTimeout(context.attemptRejectionTimeoutId)
   }
 
   private clearSuspendedRegularInvocationDescriptors(): void {
@@ -600,9 +596,11 @@ export class Client implements IClient {
     return {
       id: uuid4(),
       deferredPromise: new DeferredPromise(),
-      rejectionTimer: null,
-      attemptRejectionTimer: null,
-      abortionHandler: null
+      rejectionTimeoutId: 0,
+      attemptRejectionTimeoutId: 0,
+      abortionHandler: () => {
+        throw new Error('An abortion handler cannot be called manually')
+      }
     }
   }
 
@@ -653,8 +651,8 @@ export class Client implements IClient {
     descriptor: RegularInvocationDescriptor,
     result: InvocationResult
   ): Promise<void> {
-    this.clearRegularInvocationRejectionTimer(descriptor.context)
-    this.clearRegularInvocationAttemptRejectionTimer(descriptor.context)
+    this.clearRegularInvocationRejectionTimeout(descriptor.context)
+    this.clearRegularInvocationAttemptRejectionTimeout(descriptor.context)
 
     await this.emitInvocationCompletionEvent(result, descriptor.setup)
 
