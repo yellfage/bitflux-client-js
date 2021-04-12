@@ -931,7 +931,7 @@ export class Client implements IClient {
     }
 
     if (
-      !this.reconnectionSettings.approveAttempt({
+      !this.reconnectionSettings.confirm({
         closeStatus: event.status,
         closeStatusDescription: event.statusDescription
       })
