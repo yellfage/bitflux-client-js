@@ -13,9 +13,7 @@ const PATH_TS_CONFIG = path.resolve(PATH_ROOT, 'tsconfig.json')
 module.exports = {
   mode: NODE_ENV,
   entry: {
-    index: PATH_SRC,
-    communication: `${PATH_SRC}/communication`,
-    settings: `${PATH_SRC}/settings`
+    index: PATH_SRC
   },
   output: {
     filename: '[name].js',

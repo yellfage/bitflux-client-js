@@ -1,3 +1,6 @@
+export * from './communication'
+export * from './settings'
+
 export * from './i-client'
 export * from './client-builder'
 export * from './client-options'
