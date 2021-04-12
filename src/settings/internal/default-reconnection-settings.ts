@@ -4,6 +4,17 @@ import { Callback } from '../../internal/callback'
 import { ReconnectionSettings } from '../reconnection-settings'
 import { ReconnectionConfirmationContext } from '../reconnection-confirmation-context'
 
+const NON_RETRYABLE_CLOSE_STATUSES: WebSocketCloseStatus[] = [
+  WebSocketCloseStatus.NormalClosure,
+  WebSocketCloseStatus.EndpointUnavailable,
+  WebSocketCloseStatus.ProtocolError,
+  WebSocketCloseStatus.InvalidMessageType,
+  WebSocketCloseStatus.Empty,
+  WebSocketCloseStatus.InvalidPayloadData,
+  WebSocketCloseStatus.PolicyViolation,
+  WebSocketCloseStatus.MessageTooBig
+]
+
 export class DefaultReconnectionSettings implements ReconnectionSettings {
   public attemptsDelays: number[]
   public minAttemptDelayAddition: number
@@ -16,19 +27,7 @@ export class DefaultReconnectionSettings implements ReconnectionSettings {
     this.minAttemptDelayAddition = 0
     this.maxAttemptDelayAddition = 0
     this.maxAttemptsAfterDelays = -1
-    this.confirm = this.confirmDefault
-  }
-
-  private confirmDefault(context: ReconnectionConfirmationContext) {
-    return (
-      context.closeStatus !== WebSocketCloseStatus.NormalClosure &&
-      context.closeStatus !== WebSocketCloseStatus.EndpointUnavailable &&
-      context.closeStatus !== WebSocketCloseStatus.ProtocolError &&
-      context.closeStatus !== WebSocketCloseStatus.InvalidMessageType &&
-      context.closeStatus !== WebSocketCloseStatus.Empty &&
-      context.closeStatus !== WebSocketCloseStatus.InvalidPayloadData &&
-      context.closeStatus !== WebSocketCloseStatus.PolicyViolation &&
-      context.closeStatus !== WebSocketCloseStatus.MessageTooBig
-    )
+    this.confirm = (context) =>
+      !NON_RETRYABLE_CLOSE_STATUSES.includes(context.closeStatus!)
   }
 }
