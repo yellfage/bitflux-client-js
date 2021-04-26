@@ -21,7 +21,7 @@ import { DefaultRegularInvocationSettings } from './settings/internal/default-re
 export class ClientBuilder {
   public build(uri: string): IClient
   public build(uri: string, options: ClientOptions): IClient
-  public build(uri: string, options?: ClientOptions): IClient {
+  public build(uri: string, options: ClientOptions = {}): IClient {
     if (!StringHelper.isString(uri)) {
       throw new TypeError('Invalid uri type. Expected type: string')
     }
