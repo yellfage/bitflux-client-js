@@ -644,7 +644,7 @@ export class Client implements IClient {
     descriptor: RegularInvocationDescriptor,
     error: Error
   ): Promise<void> {
-    await this.processRegularInvocationResult(descriptor, { payload: error })
+    await this.processRegularInvocationResult(descriptor, { data: error })
   }
 
   private async processRegularInvocationResult(
@@ -656,10 +656,10 @@ export class Client implements IClient {
 
     await this.emitInvocationCompletionEvent(result, descriptor.setup)
 
-    if (result.payload instanceof Error) {
-      descriptor.context.deferredPromise.reject(result.payload)
+    if (result.data instanceof Error) {
+      descriptor.context.deferredPromise.reject(result.data)
     } else {
-      descriptor.context.deferredPromise.resolve(result.payload)
+      descriptor.context.deferredPromise.resolve(result.data)
     }
 
     descriptor.setup.abortController.signal.removeEventListener(
@@ -684,9 +684,9 @@ export class Client implements IClient {
     let result: InvocationResult
 
     if (this.isSuccessRegularInvocationCompletionMessage(message)) {
-      result = { payload: message.payload }
+      result = { data: message.data }
     } else if (this.isFailedRegularInvocationCompletionMessage(message)) {
-      result = { payload: new InvalidInvocationError(message.error || '') }
+      result = { data: new InvalidInvocationError(message.error || '') }
     } else {
       throw new InvalidOperationError(
         'Unable to process an incoming regular ' +

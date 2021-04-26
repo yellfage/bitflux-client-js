@@ -1,3 +1,3 @@
-export type InvocationResult<TPayload = any> = {
-  payload: TPayload
+export type InvocationResult<TData = any> = {
+  data: TData
 }
