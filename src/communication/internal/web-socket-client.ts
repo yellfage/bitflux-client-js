@@ -10,7 +10,7 @@ import { DeferredPromise } from '../../internal/deferred-promise'
 import { InvalidOperationError } from '../../invalid-operation-error'
 
 export class WebSocketClient implements IWebSocketClient {
-  public uri: string
+  public url: string
 
   public get state(): WebSocketState {
     return this.webSocket?.readyState || WebSocketState.Created
@@ -31,8 +31,8 @@ export class WebSocketClient implements IWebSocketClient {
   private deferredOpeningPromise: DeferredPromise<void> | null
   private deferredClosingPromise: DeferredPromise<void> | null
 
-  public constructor(uri: string, subProtocols: string[]) {
-    this.uri = uri
+  public constructor(url: string, subProtocols: string[]) {
+    this.url = url
     this.subProtocols = subProtocols
 
     this.onopen = null
@@ -45,12 +45,12 @@ export class WebSocketClient implements IWebSocketClient {
     this.deferredClosingPromise = null
   }
 
-  public start(uri = this.uri): Promise<void> {
+  public start(url = this.url): Promise<void> {
     if (this.state !== WebSocketState.Created) {
       throw new InvalidOperationError('The WebSocket has already been started')
     }
 
-    this.webSocket = new WebSocket(uri, this.subProtocols)
+    this.webSocket = new WebSocket(url, this.subProtocols)
 
     this.webSocket.onopen = this.handleOpenEvent
     this.webSocket.onclose = this.handleCloseEvent
@@ -87,7 +87,7 @@ export class WebSocketClient implements IWebSocketClient {
   }
 
   private handleOpenEvent = async (): Promise<void> => {
-    this.uri = this.webSocket!.url
+    this.url = this.webSocket!.url
 
     if (this.onopen) {
       await Promise.resolve(this.onopen({}))

@@ -19,7 +19,7 @@ import { NotifiableInvocationSetupCallback } from './notifiable-invocation-setup
 import { ClientState } from './client-state'
 
 export interface IClient {
-  readonly uri: string
+  readonly url: string
   readonly state: ClientState
 
   readonly starting: IEventHandlerStore<StartingEventHandler>
@@ -45,7 +45,7 @@ export interface IClient {
   readonly isDisconnected: boolean
   readonly isTerminated: boolean
 
-  start(uri?: string): Promise<void>
+  start(url?: string): Promise<void>
   stop(): Promise<void>
 
   onNotification(

@@ -19,11 +19,11 @@ import { DefaultRegularInvocationSettings } from './settings/internal/default-re
 
 // TODO: validate options
 export class ClientBuilder {
-  public build(uri: string): IClient
-  public build(uri: string, options: ClientOptions): IClient
-  public build(uri: string, options: ClientOptions = {}): IClient {
-    if (!StringHelper.isString(uri)) {
-      throw new TypeError('Invalid uri type. Expected type: string')
+  public build(url: string): IClient
+  public build(url: string, options: ClientOptions): IClient
+  public build(url: string, options: ClientOptions = {}): IClient {
+    if (!StringHelper.isString(url)) {
+      throw new TypeError('Invalid url type. Expected type: string')
     }
 
     if (!ObjectHelper.isPlainObject(options)) {
@@ -53,7 +53,7 @@ export class ClientBuilder {
     const webSocketClientFactory = new WebSocketClientFactory()
 
     return new Client(
-      uri,
+      url,
       options.reconnection as ReconnectionSettings,
       options.communication as CommunicationSettings,
       options.invocation as InvocationSettings,

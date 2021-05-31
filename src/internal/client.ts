@@ -70,7 +70,7 @@ import { RegularInvocationSetup } from '../regular-invocation-setup'
 import { NotifiableInvocationSetup } from '../notifiable-invocation-setup'
 
 export class Client implements IClient {
-  public uri: string
+  public url: string
   public state: ClientState
 
   public readonly starting: EventHandlerStore<StartingEventHandler>
@@ -136,14 +136,14 @@ export class Client implements IClient {
   private webSocketClientFactory: IWebSocketClientFactory
 
   public constructor(
-    uri: string,
+    url: string,
     reconnectionSettings: ReconnectionSettings,
     communicationSettings: CommunicationSettings,
     invocationSettings: InvocationSettings,
     webSocketClientFactory: IWebSocketClientFactory,
     logger: ILogger
   ) {
-    this.uri = uri
+    this.url = url
     this.state = ClientState.Terminated
 
     this.starting = new EventHandlerStore()
@@ -177,9 +177,9 @@ export class Client implements IClient {
     this.webSocketClientFactory = webSocketClientFactory
   }
 
-  public async start(uri = this.uri): Promise<void> {
-    if (!StringHelper.isString(uri)) {
-      throw new TypeError('Invalid uri type. Expected type: string')
+  public async start(url = this.url): Promise<void> {
+    if (!StringHelper.isString(url)) {
+      throw new TypeError('Invalid url type. Expected type: string')
     }
 
     if (!this.isTerminated) {
@@ -197,7 +197,7 @@ export class Client implements IClient {
       throw new UnableStartupError('The client was terminated during startup')
     }
 
-    await this.connect(uri)
+    await this.connect(url)
 
     if (!this.isConnected) {
       throw new UnableStartupError(
@@ -332,7 +332,7 @@ export class Client implements IClient {
     this.emitTerminatedEvent(reason)
   }
 
-  private async connect(uri: string): Promise<void> {
+  private async connect(url: string): Promise<void> {
     this.state = ClientState.Connecting
 
     await this.emitConnectingEvent()
@@ -343,7 +343,7 @@ export class Client implements IClient {
     }
 
     this.webSocketClient = this.webSocketClientFactory.create(
-      uri,
+      url,
       this.subProtocolNames
     )
 
@@ -394,7 +394,7 @@ export class Client implements IClient {
     }
 
     if (Number.isNaN(attemptDelay) || attemptDelay <= 0) {
-      await this.connect(this.uri)
+      await this.connect(this.url)
 
       return
     }
@@ -408,7 +408,7 @@ export class Client implements IClient {
         signal: this.reconnectionContext.abortController.signal
       })
 
-      await this.connect(this.uri)
+      await this.connect(this.url)
     } catch {}
   }
 
@@ -453,11 +453,12 @@ export class Client implements IClient {
   private performRegularInvocation(
     descriptor: RegularInvocationDescriptor
   ): void {
-    const message: OutgoingRegularInvocationMessage = new OutgoingRegularInvocationMessage(
-      descriptor.setup.handlerName,
-      descriptor.setup.args,
-      descriptor.context.id
-    )
+    const message: OutgoingRegularInvocationMessage =
+      new OutgoingRegularInvocationMessage(
+        descriptor.setup.handlerName,
+        descriptor.setup.args,
+        descriptor.context.id
+      )
 
     this.transmitMessage(message)
 
@@ -518,10 +519,10 @@ export class Client implements IClient {
       return
     }
 
-    descriptor.context.rejectionTimeoutId = (setTimeout(
+    descriptor.context.rejectionTimeoutId = setTimeout(
       async () => await this.finishRegularInvocationDueToTimeout(descriptor),
       rejectionDelay
-    ) as unknown) as number
+    ) as unknown as number
   }
 
   private runRegularInvocationAttemptRejectionTimeout(
@@ -533,10 +534,10 @@ export class Client implements IClient {
       return
     }
 
-    descriptor.context.attemptRejectionTimeoutId = (setTimeout(
+    descriptor.context.attemptRejectionTimeoutId = setTimeout(
       async () => await this.finishRegularInvocationDueToTimeout(descriptor),
       attemptRejectionDelay
-    ) as unknown) as number
+    ) as unknown as number
   }
 
   private clearRegularInvocationRejectionTimeout(
@@ -887,7 +888,7 @@ export class Client implements IClient {
   }
 
   private handleWebSocketOpenEvent = async (): Promise<void> => {
-    this.uri = this.webSocketClient!.uri
+    this.url = this.webSocketClient!.url
 
     this.protocol = this.resolveNegotiatedProtocol()
 

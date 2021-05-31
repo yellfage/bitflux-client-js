@@ -6,7 +6,7 @@ import { WebSocketCloseEventHandler } from './web-socket-close-event-handler'
 import { WebSocketMessageEventHandler } from './web-socket-message-event-handler'
 
 export interface IWebSocketClient {
-  uri: string
+  url: string
   readonly state: WebSocketState
   readonly subProtocol: string | undefined
 
@@ -14,7 +14,7 @@ export interface IWebSocketClient {
   onclose: WebSocketCloseEventHandler | null
   onmessage: WebSocketMessageEventHandler | null
 
-  start(uri?: string): Promise<void>
+  start(url?: string): Promise<void>
   stop(status?: WebSocketCloseStatus, statusDescription?: string): Promise<void>
   send(data: string | ArrayBufferLike | Blob | ArrayBufferView): void
 }
