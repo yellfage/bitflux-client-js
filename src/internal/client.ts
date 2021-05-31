@@ -331,7 +331,7 @@ export class Client implements IClient {
   private async connect(): Promise<void> {
     this.state = ClientState.Connecting
 
-    await this.emitConnectingEvent()
+    await this.emitConnectingEvent(this.url)
 
     // Check if a "connecting" event handler has called stop()
     if (!this.isConnecting) {
@@ -766,12 +766,12 @@ export class Client implements IClient {
     await this.promisfyCallbacks(this.starting.handlers, {})
   }
 
-  private async emitConnectingEvent(): Promise<void> {
+  private async emitConnectingEvent(url: URL): Promise<void> {
     if (!this.connecting.handlers.length) {
       return
     }
 
-    await this.promisfyCallbacks(this.connecting.handlers, {})
+    await this.promisfyCallbacks(this.connecting.handlers, { url })
   }
 
   private async emitConnectedEvent(): Promise<void> {
