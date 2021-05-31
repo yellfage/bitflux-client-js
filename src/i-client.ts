@@ -45,7 +45,7 @@ export interface IClient {
   readonly isDisconnected: boolean
   readonly isTerminated: boolean
 
-  start(url?: string): Promise<void>
+  start(): Promise<void>
   stop(): Promise<void>
 
   onNotification(

@@ -177,11 +177,7 @@ export class Client implements IClient {
     this.webSocketClientFactory = webSocketClientFactory
   }
 
-  public async start(url = this.url): Promise<void> {
-    if (!StringHelper.isString(url)) {
-      throw new TypeError('Invalid url type. Expected type: string')
-    }
-
+  public async start(): Promise<void> {
     if (!this.isTerminated) {
       throw new InvalidOperationError(
         "The client cannot be started because it is not in the 'Terminated' state"
@@ -197,7 +193,7 @@ export class Client implements IClient {
       throw new UnableStartupError('The client was terminated during startup')
     }
 
-    await this.connect(url)
+    await this.connect()
 
     if (!this.isConnected) {
       throw new UnableStartupError(
@@ -332,7 +328,7 @@ export class Client implements IClient {
     this.emitTerminatedEvent(reason)
   }
 
-  private async connect(url: string): Promise<void> {
+  private async connect(): Promise<void> {
     this.state = ClientState.Connecting
 
     await this.emitConnectingEvent()
@@ -343,7 +339,7 @@ export class Client implements IClient {
     }
 
     this.webSocketClient = this.webSocketClientFactory.create(
-      url,
+      this.url,
       this.subProtocolNames
     )
 
@@ -394,7 +390,7 @@ export class Client implements IClient {
     }
 
     if (Number.isNaN(attemptDelay) || attemptDelay <= 0) {
-      await this.connect(this.url)
+      await this.connect()
 
       return
     }
@@ -408,7 +404,7 @@ export class Client implements IClient {
         signal: this.reconnectionContext.abortController.signal
       })
 
-      await this.connect(this.url)
+      await this.connect()
     } catch {}
   }
 
@@ -888,8 +884,6 @@ export class Client implements IClient {
   }
 
   private handleWebSocketOpenEvent = async (): Promise<void> => {
-    this.url = this.webSocketClient!.url
-
     this.protocol = this.resolveNegotiatedProtocol()
 
     this.performSuspendedRegularInvocations()
