@@ -70,7 +70,7 @@ import { RegularInvocationSetup } from '../regular-invocation-setup'
 import { NotifiableInvocationSetup } from '../notifiable-invocation-setup'
 
 export class Client implements IClient {
-  public url: string
+  public url: URL
   public state: ClientState
 
   public readonly starting: EventHandlerStore<StartingEventHandler>
@@ -143,7 +143,7 @@ export class Client implements IClient {
     webSocketClientFactory: IWebSocketClientFactory,
     logger: ILogger
   ) {
-    this.url = url
+    this.url = new URL(url)
     this.state = ClientState.Terminated
 
     this.starting = new EventHandlerStore()
@@ -339,7 +339,7 @@ export class Client implements IClient {
     }
 
     this.webSocketClient = this.webSocketClientFactory.create(
-      this.url,
+      this.url.toString(),
       this.subProtocolNames
     )
 

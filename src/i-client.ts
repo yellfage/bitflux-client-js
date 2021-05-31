@@ -19,7 +19,7 @@ import { NotifiableInvocationSetupCallback } from './notifiable-invocation-setup
 import { ClientState } from './client-state'
 
 export interface IClient {
-  readonly url: string
+  readonly url: URL
   readonly state: ClientState
 
   readonly starting: IEventHandlerStore<StartingEventHandler>
