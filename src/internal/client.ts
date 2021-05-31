@@ -317,7 +317,7 @@ export class Client implements IClient {
       this.webSocketClient.onmessage = null
 
       if (this.webSocketClient.state === WebSocketState.Open) {
-        await this.stop()
+        await this.webSocketClient.stop()
       }
     }
 
