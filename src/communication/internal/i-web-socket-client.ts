@@ -6,7 +6,7 @@ import { WebSocketCloseEventHandler } from './web-socket-close-event-handler'
 import { WebSocketMessageEventHandler } from './web-socket-message-event-handler'
 
 export interface IWebSocketClient {
-  url: string
+  readonly url: string
   readonly state: WebSocketState
   readonly subProtocol: string | undefined
 
