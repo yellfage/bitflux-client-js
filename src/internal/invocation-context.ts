@@ -1,3 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
-
-export type InvocationContext = {}
+export type InvocationContext = {
+  readonly id: string
+}

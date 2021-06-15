@@ -449,12 +449,11 @@ export class Client implements IClient {
   private performRegularInvocation(
     descriptor: RegularInvocationDescriptor
   ): void {
-    const message: OutgoingRegularInvocationMessage =
-      new OutgoingRegularInvocationMessage(
-        descriptor.setup.handlerName,
-        descriptor.setup.args,
-        descriptor.context.id
-      )
+    const message = new OutgoingRegularInvocationMessage(
+      descriptor.context.id,
+      descriptor.setup.handlerName,
+      descriptor.setup.args
+    )
 
     this.transmitMessage(message)
 
@@ -465,6 +464,7 @@ export class Client implements IClient {
     descriptor: NotifiableInvocationDescriptor
   ): void {
     const message = new OutgoingNotifiableInvocationMessage(
+      descriptor.context.id,
       descriptor.setup.handlerName,
       descriptor.setup.args
     )
@@ -586,17 +586,16 @@ export class Client implements IClient {
   private createRegularInvocationDescriptor(
     setup: RegularInvocationSetup
   ): RegularInvocationDescriptor {
-    return { setup, context: this.createRegularInvocationContext() }
-  }
-
-  private createRegularInvocationContext(): RegularInvocationContext {
     return {
-      id: uuid4(),
-      deferredPromise: new DeferredPromise(),
-      rejectionTimeoutId: 0,
-      attemptRejectionTimeoutId: 0,
-      abortionHandler: () => {
-        throw new Error('An abortion handler cannot be called manually')
+      setup,
+      context: {
+        id: uuid4(),
+        deferredPromise: new DeferredPromise(),
+        rejectionTimeoutId: 0,
+        attemptRejectionTimeoutId: 0,
+        abortionHandler: () => {
+          throw new Error('An abortion handler cannot be called manually')
+        }
       }
     }
   }
@@ -604,7 +603,7 @@ export class Client implements IClient {
   private createNotifiableInvocationDescriptor(
     setup: NotifiableInvocationSetup
   ): NotifiableInvocationDescriptor {
-    return { setup, context: {} }
+    return { setup, context: { id: uuid4() } }
   }
 
   private registerRegularInvocationAbortionHandler(
