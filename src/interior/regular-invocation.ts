@@ -46,6 +46,12 @@ export class RegularInvocation {
   }
 
   public perform(): Promise<any> {
+    if (this.shape.abortController.signal.aborted) {
+      throw new Error(
+        'Unable to perform regular invocation: The AbortController is already aborted'
+      )
+    }
+
     this.registerWebSocketHandlers()
 
     this.registerAbortionHandler()
