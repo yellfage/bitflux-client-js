@@ -1,3 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
-
-export type ReconnectedEvent = {}
+export interface ReconnectedEvent {
+  readonly attempts: number
+}

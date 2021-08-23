@@ -1,35 +1,61 @@
-import { ClientBuilder } from '../../../src'
-
-const client = new ClientBuilder().build('wss://localhost:5001/ws', {
-  reconnection: {
-    attemptsDelays: [1000, 2000, 3000],
-    maxAttemptsAfterDelays: 0
-  }
-})
-
-client.starting.add(() => console.log('Starting'))
-client.connecting.add(() => console.log('Connecting'))
-client.connected.add(() => console.log('Connected'))
-client.reconnecting.add(() => console.log('Reconnecting'))
-client.disconnected.add(() => console.log('Disconnected'))
-client.terminated.add(() => console.log('Terminated'))
-client.started.add(() => console.log('Started'))
-client.reconnected.add(() => console.log('Reconnected'))
-client.invocation.add(() => console.log('Invocation'))
-client.invocationCompletion.add(() => console.log('Invocation completion'))
-client.incomingInvocation.add(() => console.log('Incoming invocation'))
-
-client.onNotification('Echo', (message: string) =>
-  console.log(`Incoming notification message: ${message}`)
-)
-
+import {
+  WstClientFactory,
+  DefaultReconnectionPolicy,
+  JsonProtocol
+} from '../../../src'
 //
 ;(async () => {
+  const client = new WstClientFactory().create(
+    'wss://localhost:5001/ws',
+    (options) => {
+      options.communication.protocols.push(new JsonProtocol())
+
+      options.reconnection.policy = new DefaultReconnectionPolicy({
+        delays: [],
+        maxAttemptsAfterDelays: -1
+      })
+    }
+  )
+
+  client.on('connecting', (event) => console.log('Connecting', event))
+  client.on('connected', (event) => console.log('Connected', event))
+  client.on('reconnecting', (event) => console.log('Reconnecting', event))
+  client.on('disconnected', (event) => console.log('Disconnected', event))
+  client.on('terminating', (event) => console.log('Terminating', event))
+  client.on('terminated', (event) => console.log('Terminated', event))
+  client.on('reconnected', (event) => console.log('Reconnected', event))
+
+  client.map('Notify', (message: string) => {
+    console.log(`The incoming message: ${message}`)
+  })
+
+  client.notifyCarelessly('Notify', {
+    message: 'The lost notifiable invocation message'
+  })
+
+  client.notify('Notify', {
+    message: 'The cached notifiable invocation message'
+  })
+
   await client.start()
 
-  const result = await client.invoke<string>('Echo', 'Message')
+  await client.invoke('Authenticate')
 
-  console.log(`Invocation result: ${result}`)
+  const result = await client.invoke<string>('Echo', {
+    message: 'The regular invocation message'
+  })
 
-  await client.notify('Echo', 'Notification message')
+  console.log(`The invocation result: ${result}`)
+
+  client.notify('Notify', {
+    message: 'The notifiable invocation message #1'
+  })
+
+  client.notify('Notify', {
+    message: 'The notifiable invocation message #2'
+  })
+
+  client.notify('Notify', {
+    message: 'The notifiable invocation message #3'
+  })
 })()

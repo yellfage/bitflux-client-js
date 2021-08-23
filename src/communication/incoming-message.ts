@@ -1,5 +1,5 @@
 import { IncomingMessageType } from './incoming-message-type'
 
-export type IncomingMessage = {
+export interface IncomingMessage {
   readonly type: IncomingMessageType
 }

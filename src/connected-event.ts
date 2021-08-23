@@ -1,3 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
-
-export type ConnectedEvent = {}
+export interface ConnectedEvent {
+  readonly url: string
+}

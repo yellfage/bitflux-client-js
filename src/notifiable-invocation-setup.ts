@@ -1,6 +1,10 @@
 import { InvocationSetup } from './invocation-setup'
 
-export type NotifiableInvocationSetup<
+export class NotifiableInvocationSetup<
   THandlerName extends string = string,
   TArgs extends any[] = any[]
-> = InvocationSetup<THandlerName, TArgs>
+> extends InvocationSetup<THandlerName, TArgs> {
+  public static validate(setup: NotifiableInvocationSetup): void {
+    InvocationSetup.validate(setup)
+  }
+}

@@ -1,20 +1,17 @@
-import { IProtocol } from './i-protocol'
+import { Protocol } from './protocol'
 
-import { IncomingMessage } from './incoming-message'
-import { OutgoingMessage } from './outgoing-message'
-
-export class JsonProtocol implements IProtocol {
+export class JsonProtocol implements Protocol {
   public readonly name: string
 
   public constructor() {
-    this.name = 'yellfage.wst.json'
+    this.name = 'json'
   }
 
-  public serialize(message: OutgoingMessage): string {
+  public serialize<TMessage>(message: TMessage): string {
     return JSON.stringify(message)
   }
 
-  public deserialize(data: string): IncomingMessage {
-    return JSON.parse(data) as IncomingMessage
+  public deserialize<TMessage>(data: string): TMessage {
+    return JSON.parse(data)
   }
 }

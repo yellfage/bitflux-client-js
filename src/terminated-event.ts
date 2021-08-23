@@ -1,3 +1,3 @@
-export type TerminatedEvent = {
+export interface TerminatedEvent {
   readonly reason: string
 }

@@ -1,6 +1,6 @@
-import { WebSocketCloseStatus } from './web-socket-close-status'
+import { DisconnectionCode } from './communication'
 
-export type DisconnectedEvent = {
-  readonly status?: WebSocketCloseStatus
-  readonly statusDescription?: string
+export interface DisconnectedEvent {
+  readonly code: DisconnectionCode
+  readonly reason: string
 }

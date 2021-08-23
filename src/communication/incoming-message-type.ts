@@ -1,5 +1,5 @@
 export enum IncomingMessageType {
   NotifiableInvocation,
-  SuccessRegularInvocationCompletion,
-  FailedRegularInvocationCompletion
+  SuccessfulRegularInvocationResult,
+  FailedRegularInvocationResult
 }

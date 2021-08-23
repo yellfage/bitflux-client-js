@@ -5,21 +5,21 @@ const path = require('path')
 
 const { NODE_ENV } = process.env
 
-const PATH_ROOT = path.resolve(__dirname, './')
-const PATH_SRC = path.resolve(PATH_ROOT, 'src')
-const PATH_OUTPUT = path.resolve(PATH_ROOT, 'dist')
-const PATH_TS_CONFIG = path.resolve(PATH_ROOT, 'tsconfig.json')
+const SRC_PATH = path.resolve(__dirname, 'src')
+const OUTPUT_PATH = path.resolve(__dirname, 'dist')
+const TS_CONFIG_PATH = path.resolve(__dirname, 'tsconfig.json')
 
 module.exports = {
   mode: NODE_ENV,
   entry: {
-    index: PATH_SRC
+    index: SRC_PATH
   },
   output: {
     filename: '[name].js',
-    path: PATH_OUTPUT,
+    path: OUTPUT_PATH,
     libraryTarget: 'commonjs2'
   },
+  externals: ['abort-controller/polyfill', 'isomorphic-ws'],
   resolve: {
     extensions: ['.ts', '.js']
   },
@@ -29,7 +29,7 @@ module.exports = {
     rules: [
       {
         test: /\.ts$/,
-        include: [PATH_SRC],
+        include: [SRC_PATH],
         use: [
           {
             loader: 'babel-loader',
@@ -57,7 +57,7 @@ module.exports = {
   },
   plugins: [
     new ForkTsCheckerPlugin({
-      typescript: { configFile: PATH_TS_CONFIG }
+      typescript: { configFile: TS_CONFIG_PATH }
     }),
     new DefinePlugin({
       DEVELOPMENT: NODE_ENV === 'development'

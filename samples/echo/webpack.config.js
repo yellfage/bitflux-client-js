@@ -4,21 +4,18 @@ const { SourceMapDevToolPlugin } = require('webpack')
 const ForkTsCheckerPlugin = require('fork-ts-checker-webpack-plugin')
 const HtmlPlugin = require('html-webpack-plugin')
 
-const { NODE_ENV } = process.env
-
-const PATH_SRC = path.resolve(__dirname, 'src')
-const PATH_OUTPUT = path.resolve(__dirname, 'dist')
-const PATH_TS_CONFIG = path.resolve(__dirname, '../../tsconfig.json')
+const SRC_PATH = path.resolve(__dirname, 'src')
+const OUTPUT_PATH = path.resolve(__dirname, 'dist')
+const TS_CONFIG_PATH = path.resolve(__dirname, '../../tsconfig.json')
 
 module.exports = {
-  mode: NODE_ENV,
   devtool: 'eval-source-map',
   entry: {
-    index: PATH_SRC
+    index: SRC_PATH
   },
   output: {
     filename: '[name].js',
-    path: PATH_OUTPUT
+    path: OUTPUT_PATH
   },
   resolve: {
     extensions: ['.ts', '.js']
@@ -50,11 +47,11 @@ module.exports = {
       filename: '[file].map'
     }),
     new ForkTsCheckerPlugin({
-      typescript: { configFile: PATH_TS_CONFIG }
+      typescript: { configFile: TS_CONFIG_PATH }
     }),
     new HtmlPlugin({
       hash: false,
-      template: `${PATH_SRC}/index.html`,
+      template: `${SRC_PATH}/index.html`,
       filename: 'index.html'
     })
   ]
