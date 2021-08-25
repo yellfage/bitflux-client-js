@@ -128,10 +128,14 @@ export class DefaultWebSocketClient implements WebSocketClient {
     try {
       await this.webSocket.start(url)
     } catch (error) {
-      this.logger.logError(error)
-
       if (this.state.isTerminating) {
         return
+      }
+
+      this.logger.logError(error)
+
+      if (!this.reconnectionPolicy.confirm()) {
+        return this.terminate('Reconnection terminated')
       }
 
       await this.reconnect()
@@ -139,17 +143,15 @@ export class DefaultWebSocketClient implements WebSocketClient {
   }
 
   private async reconnect(): Promise<void> {
-    const attemptDelay = this.reconnectionPolicy.getNextDelay()
+    ++this.reconnectionAttempts
+
+    const attemptDelay = this.reconnectionPolicy.getNextDelay(
+      this.reconnectionAttempts
+    )
 
     if (!NumberUtils.isNumber(attemptDelay) || Number.isNaN(attemptDelay)) {
       throw new Error(`Invalid reconnection delay. Value: ${attemptDelay}`)
     }
-
-    if (attemptDelay < 0) {
-      return this.terminate('Reconnection terminated')
-    }
-
-    ++this.reconnectionAttempts
 
     this.state.setReconnecting()
 
@@ -163,7 +165,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
       return
     }
 
-    if (attemptDelay === 0) {
+    if (attemptDelay <= 0) {
       return this.connect()
     }
 
@@ -175,11 +177,11 @@ export class DefaultWebSocketClient implements WebSocketClient {
       await delay(attemptDelay, {
         signal: this.reconnectionAbortController.signal
       })
+    } catch {
+      return
+    }
 
-      // We do not need to await, because we only need to catch
-      // abortion of the delay function
-      return this.connect()
-    } catch {}
+    return this.connect()
   }
 
   private async terminate(reason: string): Promise<void> {
@@ -255,7 +257,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
       return
     }
 
-    if (!this.reconnectionPolicy.confirm(code)) {
+    if (!this.reconnectionPolicy.confirmCode(code)) {
       return this.terminate(`Disconnected. Code: ${code}. Reason: ${reason}`)
     }
 

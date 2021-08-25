@@ -37,18 +37,18 @@ export class DefaultReconnectionPolicy implements ReconnectionPolicy {
     this.attemptsAfterDelays = DEFAULT_ATTEMPTS_AFTER_DELAYS
   }
 
-  public confirm(code: DisconnectionCode): boolean {
-    return this.reconnectableCodes.includes(code)
+  public confirm(): boolean {
+    return (
+      !this.arePrimaryAttemptsExhausted() ||
+      !this.areSecondaryAttemptsExhausted()
+    )
+  }
+
+  public confirmCode(code: DisconnectionCode): boolean {
+    return this.confirm() && this.reconnectableCodes.includes(code)
   }
 
   public getNextDelay(): number {
-    if (
-      this.arePrimaryAttemptsExhausted() &&
-      this.areSecondaryAttemptsExhausted()
-    ) {
-      return -1
-    }
-
     if (this.arePrimaryAttemptsExhausted()) {
       ++this.attemptsAfterDelays
     } else {

@@ -1,7 +1,8 @@
 import { DisconnectionCode } from '../communication'
 
 export interface ReconnectionPolicy {
-  confirm(code: DisconnectionCode): boolean
-  getNextDelay(): number
+  confirm(): boolean
+  confirmCode(code: DisconnectionCode): boolean
+  getNextDelay(attempts: number): number
   reset(): void
 }
