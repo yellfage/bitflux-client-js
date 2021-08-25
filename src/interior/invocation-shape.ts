@@ -2,6 +2,6 @@ export interface InvocationShape<
   THandlerName extends string = string,
   TArgs extends any[] = any[]
 > {
-  handlerName: THandlerName
-  args: TArgs
+  readonly handlerName: THandlerName
+  readonly args: TArgs
 }
