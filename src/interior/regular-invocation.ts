@@ -92,19 +92,31 @@ export class RegularInvocation {
   }
 
   private runRejectionTimeout(): void {
+    const { rejectionDelay } = this.shape
+
+    if (rejectionDelay <= 0) {
+      return
+    }
+
     this.rejectionTimeout = setTimeout(() => {
       this.handleResult(
         new InvocationAbortedError('The invocation aborted: timeout')
       )
-    }, this.shape.rejectionDelay) as unknown as number
+    }, rejectionDelay) as unknown as number
   }
 
   private runAttemptRejectionTimeout(): void {
+    const { attemptRejectionDelay } = this.shape
+
+    if (attemptRejectionDelay <= 0) {
+      return
+    }
+
     this.attemptRejectionTimeout = setTimeout(() => {
       this.handleResult(
         new InvocationAbortedError('The invocation aborted: attempt timeout')
       )
-    }, this.shape.attemptRejectionDelay) as unknown as number
+    }, attemptRejectionDelay) as unknown as number
   }
 
   private clearRejectionTimeout(): void {
