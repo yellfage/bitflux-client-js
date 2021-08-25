@@ -18,6 +18,7 @@ import {
   PromisfiedWebSocket
 } from './interior'
 
+import { JsonProtocol } from './communication'
 import { Events } from './events'
 
 export class WstClientFactory {
@@ -41,6 +42,10 @@ export class WstClientFactory {
 
     if (configure) {
       configure(options)
+    }
+
+    if (!options.communication.protocols.length) {
+      options.communication.protocols.push(new JsonProtocol())
     }
 
     WstClientFactoryOptionsValidator.validate(options)

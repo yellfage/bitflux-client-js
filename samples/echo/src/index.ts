@@ -1,15 +1,9 @@
-import {
-  WstClientFactory,
-  DefaultReconnectionPolicy,
-  JsonProtocol
-} from '../../../src'
+import { WstClientFactory, DefaultReconnectionPolicy } from '../../../src'
 //
 ;(async () => {
   const client = new WstClientFactory().create(
     'wss://localhost:5001/ws',
     (options) => {
-      options.communication.protocols.push(new JsonProtocol())
-
       options.reconnection.policy = new DefaultReconnectionPolicy({
         delays: [],
         maxAttemptsAfterDelays: -1
