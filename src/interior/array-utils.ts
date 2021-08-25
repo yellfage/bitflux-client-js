@@ -15,13 +15,4 @@ export class ArrayUtils {
       return index > -1
     })
   }
-
-  /**
-   * Returns the last element of an array
-   * @param {array} The target array
-   * @returns {T} The last item
-   */
-  static getLast<T>(array: T[]): T | undefined {
-    return array[array.length - 1]
-  }
 }
