@@ -33,8 +33,8 @@ export class Client implements WstClient {
   }
 
   private readonly webSocket: WebSocketClient
-  private handlerMapper: HandlerMapper
-  private eventEmitter: EventEmitter<Events>
+  private readonly handlerMapper: HandlerMapper
+  private readonly eventEmitter: EventEmitter<Events>
   private readonly regularInvocationShapeFactory: RegularInvocationShapeFactory
   private readonly notifiableInvocationShapeFactory: NotifiableInvocationShapeFactory
   private readonly regularInvocationFactory: RegularInvocationFactory
