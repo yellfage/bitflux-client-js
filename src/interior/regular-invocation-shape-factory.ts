@@ -1,5 +1,3 @@
-import { nanoid } from 'nanoid'
-
 import { RegularInvocationSetup } from '../regular-invocation-setup'
 import { RegularInvocationShape } from './regular-invocation-shape'
 
@@ -25,7 +23,6 @@ export class RegularInvocationShapeFactory {
     return {
       handlerName,
       args,
-      id: nanoid(),
       rejectionDelay,
       attemptRejectionDelay,
       abortController

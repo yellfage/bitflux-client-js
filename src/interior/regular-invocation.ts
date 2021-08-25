@@ -1,3 +1,5 @@
+import { nanoid } from 'nanoid'
+
 import {
   WebSocketClient,
   WebSocketMessageEvent,
@@ -31,7 +33,7 @@ export class RegularInvocation {
     this.message = new OutgoingRegularInvocationMessage(
       shape.handlerName,
       shape.args,
-      shape.id
+      nanoid()
     )
 
     this.deferredPromise = new DeferredPromise()
@@ -204,6 +206,6 @@ export class RegularInvocation {
   private isInvocationIdMatching(
     message: IncomingRegularInvocationResultMessage
   ): boolean {
-    return this.shape.id === message.invocationId
+    return this.message.invocationId === message.invocationId
   }
 }
