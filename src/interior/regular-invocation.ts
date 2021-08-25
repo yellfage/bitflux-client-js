@@ -48,7 +48,7 @@ export class RegularInvocation {
   public perform(): Promise<any> {
     if (this.shape.abortController.signal.aborted) {
       throw new Error(
-        'Unable to perform regular invocation: The AbortController is already aborted'
+        'Unable to perform regular invocation: the provided AbortController is already aborted'
       )
     }
 
