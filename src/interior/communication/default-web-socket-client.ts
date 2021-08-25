@@ -78,7 +78,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
 
     if (!this.state.isConnected) {
       throw new Error(
-        'Failed to establish a connection or the client was terminated after connection'
+        'Failed to establish a connection or the client was terminated during connection'
       )
     }
   }
@@ -150,7 +150,9 @@ export class DefaultWebSocketClient implements WebSocketClient {
     )
 
     if (!NumberUtils.isNumber(attemptDelay) || Number.isNaN(attemptDelay)) {
-      throw new Error(`Invalid reconnection delay. Value: ${attemptDelay}`)
+      throw new Error(
+        `Unable to reconnect: invalid reconnection delay "${attemptDelay}"`
+      )
     }
 
     this.state.setReconnecting()
