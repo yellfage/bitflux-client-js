@@ -235,11 +235,13 @@ export class DefaultWebSocketClient implements WebSocketClient {
     await this.eventEmitter.emit('connected', { url: this.url })
 
     if (this.reconnectionAttempts > 0) {
-      this.reconnectionPolicy.reset()
-
       await this.eventEmitter.emit('reconnected', {
         attempts: this.reconnectionAttempts
       })
+
+      this.reconnectionPolicy.reset()
+
+      this.reconnectionAttempts = 0
     }
   }
 
