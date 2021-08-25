@@ -23,20 +23,13 @@ export class DefaultWebSocketClient implements WebSocketClient {
   }
 
   public readonly state: MutableState
-
   private logger: Logger
-
   private eventEmitter: EventEmitter<WebSocketEvents>
-
   private readonly protocols: Protocol[]
-
   private readonly reconnectionPolicy: ReconnectionPolicy
-
   private reconnectionAttempts: number
   private reconnectionAbortController: AbortController
-
   private cachedMessages: Set<any>
-
   private readonly webSocket: PromisfiedWebSocket
 
   public constructor(
@@ -48,20 +41,13 @@ export class DefaultWebSocketClient implements WebSocketClient {
     webSocket: PromisfiedWebSocket
   ) {
     this.state = state
-
     this.logger = logger
-
     this.eventEmitter = eventEmitter
-
     this.protocols = protocols
-
     this.reconnectionPolicy = reconnectionPolicy
-
     this.reconnectionAttempts = 0
     this.reconnectionAbortController = new AbortController()
-
     this.cachedMessages = new Set<any>()
-
     this.webSocket = webSocket
 
     this.webSocket.onopen = this.handleOpenEvent

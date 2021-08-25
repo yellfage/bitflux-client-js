@@ -9,7 +9,6 @@ import { NotifiableInvocationShape } from './notifiable-invocation-shape'
 
 export class NotifiableInvocation {
   private webSocket: WebSocketClient
-
   private message: OutgoingNotifiableInvocationMessage
 
   public constructor(

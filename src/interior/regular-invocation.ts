@@ -15,13 +15,9 @@ import { InvocationAbortedError } from '../invocation-aborted-error'
 
 export class RegularInvocation {
   private webSocket: WebSocketClient
-
   private shape: RegularInvocationShape
-
   private message: OutgoingRegularInvocationMessage
-
   private deferredPromise: DeferredPromise<any>
-
   private rejectionTimeoutId: number
   private attemptRejectionTimeoutId: number
 
@@ -30,7 +26,6 @@ export class RegularInvocation {
     shape: RegularInvocationShape
   ) {
     this.webSocket = webSocket
-
     this.shape = shape
 
     this.message = new OutgoingRegularInvocationMessage(
@@ -40,7 +35,6 @@ export class RegularInvocation {
     )
 
     this.deferredPromise = new DeferredPromise()
-
     this.rejectionTimeoutId = 0
     this.attemptRejectionTimeoutId = 0
   }
