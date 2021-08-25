@@ -1,6 +1,7 @@
 import { ReconnectionPolicy } from './reconnection-policy'
 import { DisconnectionCode } from '../communication'
 import { DefaultReconnectionPolicyOptions } from './default-reconnection-policy-options'
+import { DefaultReconnectionPolicyOptionsValidator } from '../interior/validation/default-reconnection-policy-options-validator'
 import { RECONNECTABLE_DISCONNECTION_CODES } from './reconnectable-disconnection-codes'
 
 const DEFAULT_DELAY_INDEX = -1
@@ -17,7 +18,7 @@ export class DefaultReconnectionPolicy implements ReconnectionPolicy {
   private attemptsAfterDelays: number
 
   public constructor(options: DefaultReconnectionPolicyOptions = {}) {
-    DefaultReconnectionPolicyOptions.validate(options)
+    DefaultReconnectionPolicyOptionsValidator.validate(options)
 
     const {
       delays = [1000, 2000, 5000, 10000, 15000],

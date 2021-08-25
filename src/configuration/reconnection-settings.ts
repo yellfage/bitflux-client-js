@@ -9,12 +9,4 @@ export class ReconnectionSettings {
   ) {
     this.policy = policy
   }
-
-  public static validate(settings: ReconnectionSettings): void {
-    if (settings.policy == null) {
-      throw TypeError(
-        'Invalid reconnection settings: the "policy" field cannot be a null or undefined'
-      )
-    }
-  }
 }

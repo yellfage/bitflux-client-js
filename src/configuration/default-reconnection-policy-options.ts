@@ -1,63 +1,9 @@
-import { NumberUtils } from '../interior/number-utils'
 import { DisconnectionCode } from '../communication'
 
-export class DefaultReconnectionPolicyOptions {
-  public readonly delays?: number[]
-  public readonly minDelayOffset?: number
-  public readonly maxDelayOffset?: number
-  public readonly maxAttemptsAfterDelays?: number
-  public readonly reconnectableCodes?: DisconnectionCode[]
-
-  public static validate(options: DefaultReconnectionPolicyOptions): void {
-    const {
-      delays,
-      minDelayOffset,
-      maxDelayOffset,
-      maxAttemptsAfterDelays,
-      reconnectableCodes
-    } = options
-
-    if (delays !== undefined && !Array.isArray(delays)) {
-      throw TypeError(
-        'Invalid default reconnection policy options: the "delays" field must be an array'
-      )
-    }
-
-    if (
-      minDelayOffset !== undefined &&
-      (!NumberUtils.isNumber(minDelayOffset) || Number.isNaN(minDelayOffset))
-    ) {
-      throw TypeError(
-        'Invalid default reconnection policy options: the "minDelayOffset" field must be an number'
-      )
-    }
-
-    if (
-      maxDelayOffset !== undefined &&
-      (!NumberUtils.isNumber(maxDelayOffset) || Number.isNaN(maxDelayOffset))
-    ) {
-      throw TypeError(
-        'Invalid default reconnection policy options: the "maxDelayOffset" field must be an number'
-      )
-    }
-
-    if (
-      maxAttemptsAfterDelays !== undefined &&
-      (!NumberUtils.isNumber(maxAttemptsAfterDelays) ||
-        Number.isNaN(maxAttemptsAfterDelays))
-    ) {
-      throw TypeError(
-        'Invalid default reconnection policy options: the "maxAttemptsAfterDelays" field must be an number'
-      )
-    }
-
-    if (
-      reconnectableCodes !== undefined &&
-      !Array.isArray(reconnectableCodes)
-    ) {
-      throw TypeError(
-        'Invalid default reconnection policy options: the "reconnectableCodes" field must be a function'
-      )
-    }
-  }
+export interface DefaultReconnectionPolicyOptions {
+  readonly delays?: number[]
+  readonly minDelayOffset?: number
+  readonly maxDelayOffset?: number
+  readonly maxAttemptsAfterDelays?: number
+  readonly reconnectableCodes?: DisconnectionCode[]
 }

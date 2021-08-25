@@ -11,6 +11,11 @@ import {
   WebSocketTerminatedEvent
 } from './communication'
 
+import {
+  RegularInvocationSetupValidator,
+  NotifiableInvocationSetupValidator
+} from './validation'
+
 import { HandlerMapper } from './handler-mapper'
 import { EventEmitter } from './event-emitter'
 import { InvocationHandler } from '../invocation-handler'
@@ -19,6 +24,7 @@ import { NotifiableInvocationShapeFactory } from './notifiable-invocation-shape-
 import { RegularInvocationFactory } from './regular-invocation-factory'
 import { NotifiableInvocationFactory } from './notifiable-invocation-factory'
 import { RegularInvocationSetup } from '../regular-invocation-setup'
+
 import { NotifiableInvocationSetup } from '../notifiable-invocation-setup'
 import { PlainObject } from '../plain-object'
 import { Events } from '../events'
@@ -100,21 +106,31 @@ export class Client implements WstClient {
 
   public invoke(...args: any[]): Promise<any> {
     if (ObjectUtils.isPlainObject<RegularInvocationSetup>(args[0])) {
-      RegularInvocationSetup.validate(args[0])
+      RegularInvocationSetupValidator.validate(args[0])
 
       return this.invokeCore(args[0])
     } else {
-      return this.invokeCore(new RegularInvocationSetup(args[0], args.slice(1)))
+      const setup: RegularInvocationSetup = {
+        handlerName: args[0],
+        args: args.slice(1)
+      }
+
+      return this.invoke(setup)
     }
   }
 
   public notify(...args: any[]): void {
     if (ObjectUtils.isPlainObject<NotifiableInvocationSetup>(args[0])) {
-      NotifiableInvocationSetup.validate(args[0])
+      NotifiableInvocationSetupValidator.validate(args[0])
 
       this.notifyCore(args[0])
     } else {
-      this.notifyCore(new RegularInvocationSetup(args[0], args.slice(1)))
+      const setup: NotifiableInvocationSetup = {
+        handlerName: args[0],
+        args: args.slice(1)
+      }
+
+      this.notify(setup)
     }
   }
 

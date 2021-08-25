@@ -4,6 +4,7 @@ import { WstClientFactoryOptions } from './wst-client-factory-options'
 import {
   StringUtils,
   FunctionUtils,
+  WstClientFactoryOptionsValidator,
   Client,
   DefaultWebSocketClient,
   MutableState,
@@ -16,6 +17,7 @@ import {
   NotifiableInvocationFactory,
   PromisfiedWebSocket
 } from './interior'
+
 import { Events } from './events'
 
 export class WstClientFactory {
@@ -41,7 +43,7 @@ export class WstClientFactory {
       configure(options)
     }
 
-    WstClientFactoryOptions.validate(options)
+    WstClientFactoryOptionsValidator.validate(options)
 
     return this.createCore(url, options)
   }

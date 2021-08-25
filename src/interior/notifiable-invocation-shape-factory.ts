@@ -6,6 +6,6 @@ export class NotifiableInvocationShapeFactory {
     handlerName,
     args = []
   }: NotifiableInvocationSetup): NotifiableInvocationShape {
-    return new NotifiableInvocationShape(handlerName, args)
+    return { handlerName, args }
   }
 }

@@ -22,11 +22,4 @@ export class WstClientFactoryOptions {
     this.regularInvocation = regularInvocation
     this.logging = logging
   }
-
-  public static validate(options: WstClientFactoryOptions): void {
-    CommunicationSettings.validate(options.communication)
-    ReconnectionSettings.validate(options.reconnection)
-    RegularInvocationSettings.validate(options.regularInvocation)
-    LoggingSettings.validate(options.logging)
-  }
 }

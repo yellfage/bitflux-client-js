@@ -14,10 +14,10 @@ import { IncomingMessage, IncomingMessageType } from '../communication'
 import { InvocationAbortedError } from '../invocation-aborted-error'
 
 export class RegularInvocation {
-  private webSocket: WebSocketClient
-  private shape: RegularInvocationShape
-  private message: OutgoingRegularInvocationMessage
-  private deferredPromise: DeferredPromise<any>
+  private readonly webSocket: WebSocketClient
+  private readonly shape: RegularInvocationShape
+  private readonly message: OutgoingRegularInvocationMessage
+  private readonly deferredPromise: DeferredPromise<any>
   private rejectionTimeoutId: number
   private attemptRejectionTimeoutId: number
 

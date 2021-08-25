@@ -8,8 +8,8 @@ import {
 import { NotifiableInvocationShape } from './notifiable-invocation-shape'
 
 export class NotifiableInvocation {
-  private webSocket: WebSocketClient
-  private message: OutgoingNotifiableInvocationMessage
+  private readonly webSocket: WebSocketClient
+  private readonly message: OutgoingNotifiableInvocationMessage
 
   public constructor(
     webSocket: WebSocketClient,

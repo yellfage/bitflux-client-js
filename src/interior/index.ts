@@ -1,4 +1,5 @@
 export * from './communication'
+export * from './validation'
 
 export * from './array-utils'
 export * from './callback'

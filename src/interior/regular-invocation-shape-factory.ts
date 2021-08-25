@@ -22,13 +22,13 @@ export class RegularInvocationShapeFactory {
     attemptRejectionDelay = this.defaultAttemptRejectionDelay,
     abortController = new AbortController()
   }: RegularInvocationSetup): RegularInvocationShape {
-    return new RegularInvocationShape(
+    return {
       handlerName,
       args,
-      nanoid(),
+      id: nanoid(),
       rejectionDelay,
       attemptRejectionDelay,
       abortController
-    )
+    }
   }
 }
