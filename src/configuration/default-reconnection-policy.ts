@@ -1,17 +1,7 @@
-import { DisconnectionCode } from '../communication'
 import { ReconnectionPolicy } from './reconnection-policy'
-import { ReconnectionConfirmationCallback } from './reconnection-confirmation-callback'
+import { DisconnectionCode } from '../communication'
 import { DefaultReconnectionPolicyOptions } from './default-reconnection-policy-options'
-
-const RECONNECTABLE_CODES: DisconnectionCode[] = [
-  DisconnectionCode.AbnormalClosure,
-  DisconnectionCode.MissingExtension,
-  DisconnectionCode.InternalServerError,
-  DisconnectionCode.ServiceRestart,
-  DisconnectionCode.TryAgainLater,
-  DisconnectionCode.BadGateway,
-  DisconnectionCode.TlsHandshake
-]
+import { RECONNECTABLE_DISCONNECTION_CODES } from './reconnectable-disconnection-codes'
 
 const DEFAULT_DELAY_INDEX = -1
 const DEFAULT_ATTEMPTS_AFTER_DELAYS = 0
@@ -21,7 +11,7 @@ export class DefaultReconnectionPolicy implements ReconnectionPolicy {
   private readonly minDelayOffset: number
   private readonly maxDelayOffset: number
   private readonly maxAttemptsAfterDelays: number
-  private readonly confirmationCallback: ReconnectionConfirmationCallback
+  private readonly reconnectableCodes: DisconnectionCode[]
 
   private delayIndex: number
   private attemptsAfterDelays: number
@@ -34,21 +24,21 @@ export class DefaultReconnectionPolicy implements ReconnectionPolicy {
       minDelayOffset = 0,
       maxDelayOffset = 0,
       maxAttemptsAfterDelays = 0,
-      confirm = (code) => RECONNECTABLE_CODES.includes(code)
+      reconnectableCodes = RECONNECTABLE_DISCONNECTION_CODES
     } = options
 
     this.delays = delays
     this.minDelayOffset = minDelayOffset
     this.maxDelayOffset = maxDelayOffset
     this.maxAttemptsAfterDelays = maxAttemptsAfterDelays
-    this.confirmationCallback = confirm
+    this.reconnectableCodes = reconnectableCodes
 
     this.delayIndex = DEFAULT_DELAY_INDEX
     this.attemptsAfterDelays = DEFAULT_ATTEMPTS_AFTER_DELAYS
   }
 
-  public confirm(code: DisconnectionCode, reason: string): boolean {
-    return this.confirmationCallback(code, reason)
+  public confirm(code: DisconnectionCode): boolean {
+    return this.reconnectableCodes.includes(code)
   }
 
   public getNextDelay(): number {

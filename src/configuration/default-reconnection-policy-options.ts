@@ -1,13 +1,12 @@
 import { NumberUtils } from '../interior/number-utils'
-import { FunctionUtils } from '../interior/function-utils'
-import { ReconnectionConfirmationCallback } from './reconnection-confirmation-callback'
+import { DisconnectionCode } from '../communication'
 
 export class DefaultReconnectionPolicyOptions {
   public readonly delays?: number[]
   public readonly minDelayOffset?: number
   public readonly maxDelayOffset?: number
   public readonly maxAttemptsAfterDelays?: number
-  public readonly confirm?: ReconnectionConfirmationCallback
+  public readonly reconnectableCodes?: DisconnectionCode[]
 
   public static validate(options: DefaultReconnectionPolicyOptions): void {
     const {
@@ -15,7 +14,7 @@ export class DefaultReconnectionPolicyOptions {
       minDelayOffset,
       maxDelayOffset,
       maxAttemptsAfterDelays,
-      confirm
+      reconnectableCodes
     } = options
 
     if (delays !== undefined && !Array.isArray(delays)) {
@@ -52,9 +51,12 @@ export class DefaultReconnectionPolicyOptions {
       )
     }
 
-    if (confirm !== undefined && !FunctionUtils.isFunction(confirm)) {
+    if (
+      reconnectableCodes !== undefined &&
+      !Array.isArray(reconnectableCodes)
+    ) {
       throw TypeError(
-        'Invalid default reconnection policy options: the "confirm" field must be a function'
+        'Invalid default reconnection policy options: the "reconnectableCodes" field must be a function'
       )
     }
   }

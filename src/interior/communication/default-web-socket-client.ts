@@ -255,7 +255,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
       return
     }
 
-    if (!this.reconnectionPolicy.confirm(code, reason)) {
+    if (!this.reconnectionPolicy.confirm(code)) {
       return this.terminate(`Disconnected. Code: ${code}. Reason: ${reason}`)
     }
 
