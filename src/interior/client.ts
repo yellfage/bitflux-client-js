@@ -1,15 +1,6 @@
 import { WstClient } from '../wst-client'
 
-import {
-  WebSocketClient,
-  WebSocketConnectingEvent,
-  WebSocketConnectedEvent,
-  WebSocketReconnectingEvent,
-  WebSocketReconnectedEvent,
-  WebSocketDisconnectedEvent,
-  WebSocketTerminatingEvent,
-  WebSocketTerminatedEvent
-} from './communication'
+import { WebSocketClient } from './communication'
 
 import {
   RegularInvocationSetupValidator,
@@ -62,14 +53,6 @@ export class Client implements WstClient {
     this.notifiableInvocationShapeFactory = notifiableInvocationShapeFactory
     this.regularInvocationFactory = regularInvocationFactory
     this.notifiableInvocationFactory = notifiableInvocationFactory
-
-    this.webSocket.on('connecting', this.handleConnectingWebSocketEvent)
-    this.webSocket.on('connected', this.handleConnectedWebSocketEvent)
-    this.webSocket.on('reconnecting', this.handleReconnectingWebSocketEvent)
-    this.webSocket.on('reconnected', this.handleReconnectedWebSocketEvent)
-    this.webSocket.on('disconnected', this.handleDisconnectedWebSocketEvent)
-    this.webSocket.on('terminating', this.handleTerminatingWebSocketEvent)
-    this.webSocket.on('terminated', this.handleTerminatedWebSocketEvent)
   }
 
   public start(url?: string): Promise<void> {
@@ -170,47 +153,5 @@ export class Client implements WstClient {
     const shape = this.notifiableInvocationShapeFactory.create(setup)
 
     this.notifiableInvocationFactory.create(shape).perform()
-  }
-
-  private handleConnectingWebSocketEvent = (
-    event: WebSocketConnectingEvent
-  ): Promise<void> => {
-    return this.eventEmitter.emit('connecting', event)
-  }
-
-  private handleConnectedWebSocketEvent = (
-    event: WebSocketConnectedEvent
-  ): Promise<void> => {
-    return this.eventEmitter.emit('connected', event)
-  }
-
-  private handleReconnectingWebSocketEvent = (
-    event: WebSocketReconnectingEvent
-  ): Promise<void> => {
-    return this.eventEmitter.emit('reconnecting', event)
-  }
-
-  private handleReconnectedWebSocketEvent = (
-    event: WebSocketReconnectedEvent
-  ): Promise<void> => {
-    return this.eventEmitter.emit('reconnected', event)
-  }
-
-  private handleDisconnectedWebSocketEvent = (
-    event: WebSocketDisconnectedEvent
-  ): Promise<void> => {
-    return this.eventEmitter.emit('disconnected', event)
-  }
-
-  private handleTerminatingWebSocketEvent = (
-    event: WebSocketTerminatingEvent
-  ): Promise<void> => {
-    return this.eventEmitter.emit('terminating', event)
-  }
-
-  private handleTerminatedWebSocketEvent = (
-    event: WebSocketTerminatedEvent
-  ): Promise<void> => {
-    return this.eventEmitter.emit('terminated', event)
   }
 }

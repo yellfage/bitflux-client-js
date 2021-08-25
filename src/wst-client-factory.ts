@@ -9,7 +9,6 @@ import {
   DefaultWebSocketClient,
   MutableState,
   EventEmitter,
-  WebSocketEvents,
   HandlerMapper,
   RegularInvocationShapeFactory,
   NotifiableInvocationShapeFactory,
@@ -60,10 +59,12 @@ export class WstClientFactory {
       (protocol) => protocol.name
     )
 
+    const eventEmitter = new EventEmitter<Events>()
+
     const webSocket = new DefaultWebSocketClient(
       new MutableState(),
       logger,
-      new EventEmitter<WebSocketEvents>(),
+      eventEmitter,
       options.communication.protocols,
       options.reconnection.policy,
       new PromisfiedWebSocket(url, subProtocolNames)
@@ -72,7 +73,7 @@ export class WstClientFactory {
     return new Client(
       webSocket,
       new HandlerMapper(webSocket, logger),
-      new EventEmitter<Events>(),
+      eventEmitter,
       new RegularInvocationShapeFactory(
         options.regularInvocation.rejectionDelay,
         options.regularInvocation.attemptRejectionDelay
