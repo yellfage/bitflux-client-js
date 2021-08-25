@@ -22,8 +22,8 @@ export class RegularInvocation {
 
   private deferredPromise: DeferredPromise<any>
 
-  private rejectionTimeout: number
-  private attemptRejectionTimeout: number
+  private rejectionTimeoutId: number
+  private attemptRejectionTimeoutId: number
 
   public constructor(
     webSocket: WebSocketClient,
@@ -41,8 +41,8 @@ export class RegularInvocation {
 
     this.deferredPromise = new DeferredPromise()
 
-    this.rejectionTimeout = 0
-    this.attemptRejectionTimeout = 0
+    this.rejectionTimeoutId = 0
+    this.attemptRejectionTimeoutId = 0
   }
 
   public perform(): Promise<any> {
@@ -98,7 +98,7 @@ export class RegularInvocation {
       return
     }
 
-    this.rejectionTimeout = setTimeout(() => {
+    this.rejectionTimeoutId = setTimeout(() => {
       this.handleResult(
         new InvocationAbortedError('The invocation aborted: timeout')
       )
@@ -112,7 +112,7 @@ export class RegularInvocation {
       return
     }
 
-    this.attemptRejectionTimeout = setTimeout(() => {
+    this.attemptRejectionTimeoutId = setTimeout(() => {
       this.handleResult(
         new InvocationAbortedError('The invocation aborted: attempt timeout')
       )
@@ -120,11 +120,11 @@ export class RegularInvocation {
   }
 
   private clearRejectionTimeout(): void {
-    clearTimeout(this.rejectionTimeout)
+    clearTimeout(this.rejectionTimeoutId)
   }
 
   private clearAttemptRejectionTimeout(): void {
-    clearTimeout(this.attemptRejectionTimeout)
+    clearTimeout(this.attemptRejectionTimeoutId)
   }
 
   private sendMessage(): void {
