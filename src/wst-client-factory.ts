@@ -23,7 +23,7 @@ import { Events } from './events'
 export class WstClientFactory {
   public create(
     url: string,
-    configure: (options: WstClientFactoryOptions) => void
+    configure?: (options: WstClientFactoryOptions) => void
   ): WstClient {
     if (!StringUtils.isString(url)) {
       throw new TypeError(
