@@ -280,10 +280,6 @@ export class DefaultWebSocketClient implements WebSocketClient {
     code: number,
     reason: string
   ): Promise<void> => {
-    if (this.state.isTerminating) {
-      return
-    }
-
     this.state.setDisconnected()
 
     await this.eventEmitter.emit('disconnected', { code, reason })
