@@ -98,7 +98,9 @@ export class DefaultWebSocketClient implements WebSocketClient {
 
   public async stop(reason = 'Stopping'): Promise<void> {
     if (this.state.isTerminating || this.state.isTerminated) {
-      return
+      throw new Error(
+        "Unable to stop the client: the client is already in the 'Terminating' or the 'Terminated' state"
+      )
     }
 
     await this.terminate(reason)
