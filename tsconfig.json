@@ -1,5 +1,5 @@
 {
-  "include": ["./src"],
+  "include": ["./src", "./samples"],
   "compilerOptions": {
     "lib": ["DOM", "ES2020"],
     "target": "ES2020",

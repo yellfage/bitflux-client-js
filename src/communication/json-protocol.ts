@@ -1,4 +1,4 @@
-import { Protocol } from './protocol'
+import type { Protocol } from './protocol'
 
 export class JsonProtocol implements Protocol {
   public readonly name: string
@@ -12,6 +12,6 @@ export class JsonProtocol implements Protocol {
   }
 
   public deserialize<TMessage>(data: string): TMessage {
-    return JSON.parse(data)
+    return JSON.parse(data) as TMessage
   }
 }

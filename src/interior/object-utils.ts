@@ -1,15 +1,11 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import type { PlainObject } from '../plain-object'
 
-import { PlainObject } from '../plain-object'
-
-export class ObjectUtils {
-  /**
-   * Determines whether a value is a plain object
-   * @param {value} The testable value
-   */
-  public static isPlainObject<TObject extends PlainObject = PlainObject>(
-    value: any
-  ): value is TObject {
-    return !!value && Object.getPrototypeOf(value) === Object.prototype
-  }
+/**
+ * Determines whether a value is a plain object
+ * @param {value} The testable value
+ */
+export function isPlainObject<TObject extends PlainObject = PlainObject>(
+  value: unknown
+): value is TObject {
+  return Boolean(value) && Object.getPrototypeOf(value) === Object.prototype
 }

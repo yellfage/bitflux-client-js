@@ -1,4 +1,4 @@
-import { IncomingMessage } from '../../communication'
+import type { IncomingMessage } from '../../communication'
 
 export interface IncomingRegularInvocationResultMessage
   extends IncomingMessage {

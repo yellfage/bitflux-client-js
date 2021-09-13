@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path')
 const { SourceMapDevToolPlugin } = require('webpack')
 const ForkTsCheckerPlugin = require('fork-ts-checker-webpack-plugin')

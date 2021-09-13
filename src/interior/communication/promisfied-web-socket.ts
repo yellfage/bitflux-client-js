@@ -1,4 +1,3 @@
-/* eslint-disable require-await */
 import WebSocket from 'isomorphic-ws'
 
 import { DeferredPromise } from '../deferred-promise'
@@ -22,15 +21,18 @@ export class PromisfiedWebSocket {
     return this.webSocket.protocol
   }
 
-  public onopen: (() => any) | null
-  public onclose: ((code: number, reason: string) => any) | null
-  public onmessage: ((data: any) => any) | null
+  public onopen: (() => unknown) | null
+
+  public onclose: ((code: number, reason: string) => unknown) | null
+
+  public onmessage: ((data: unknown) => unknown) | null
 
   private webSocket: WebSocket | null
 
-  private subProtocols: string[]
+  private readonly subProtocols: string[]
 
   private deferredOpeningPromise: DeferredPromise<void> | null
+
   private deferredClosingPromise: DeferredPromise<void> | null
 
   public constructor(url: string, subProtocols: string[]) {
@@ -56,13 +58,13 @@ export class PromisfiedWebSocket {
 
     this.webSocket = new WebSocket(url, this.subProtocols)
 
-    this.webSocket.addEventListener('open', () => this.handleOpenEvent())
+    this.webSocket.addEventListener('open', async () => this.handleOpenEvent())
 
-    this.webSocket.addEventListener('close', ({ code, reason }) =>
+    this.webSocket.addEventListener('close', async ({ code, reason }) =>
       this.handleCloseEvent(code, reason)
     )
 
-    this.webSocket.addEventListener('message', ({ data }) =>
+    this.webSocket.addEventListener('message', async ({ data }) =>
       this.handleMessageEvent(data)
     )
 
@@ -84,7 +86,7 @@ export class PromisfiedWebSocket {
   }
 
   public send(
-    message: string | ArrayBufferLike | Blob | ArrayBufferView
+    message: ArrayBufferLike | ArrayBufferView | Blob | string
   ): void {
     if (!this.webSocket || this.webSocket.readyState !== this.webSocket.OPEN) {
       throw new Error('The WebSocket is not connected')
@@ -93,7 +95,7 @@ export class PromisfiedWebSocket {
     this.webSocket.send(message)
   }
 
-  private handleOpenEvent = async (): Promise<void> => {
+  private readonly handleOpenEvent = async (): Promise<void> => {
     if (this.onopen) {
       await this.onopen()
     }
@@ -103,7 +105,7 @@ export class PromisfiedWebSocket {
     this.deferredOpeningPromise = null
   }
 
-  private handleCloseEvent = async (
+  private readonly handleCloseEvent = async (
     code: number,
     reason: string
   ): Promise<void> => {
@@ -126,9 +128,11 @@ export class PromisfiedWebSocket {
     this.deferredClosingPromise = null
   }
 
-  private handleMessageEvent = async (data: any): Promise<void> => {
+  private readonly handleMessageEvent = async (
+    data: unknown
+  ): Promise<void> => {
     if (this.onmessage) {
-      return this.onmessage(data)
+      await this.onmessage(data)
     }
   }
 }

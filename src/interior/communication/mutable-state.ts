@@ -1,12 +1,12 @@
-import { State } from './state'
+import type { State } from './state'
 
 enum Value {
-  Connecting,
-  Connected,
-  Reconnecting,
-  Disconnected,
-  Terminating,
-  Terminated
+  Connecting = 0,
+  Connected = 1,
+  Reconnecting = 2,
+  Disconnected = 3,
+  Terminating = 4,
+  Terminated = 5
 }
 
 export class MutableState implements State {

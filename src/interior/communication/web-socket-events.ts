@@ -1,6 +1,7 @@
-import { LifetimeEvents } from '../../lifetime-events'
-import { WebSocketMessageEvent } from './web-socket-message-event'
+import type { LifetimeEvents } from '../../lifetime-events'
+
+import type { WebSocketMessageEvent } from './web-socket-message-event'
 
 export type WebSocketEvents = LifetimeEvents & {
-  message: (event: WebSocketMessageEvent) => any
+  message: (event: WebSocketMessageEvent) => unknown
 }

@@ -1,4 +1,4 @@
 export enum OutgoingMessageType {
-  RegularInvocation,
-  NotifiableInvocation
+  RegularInvocation = 0,
+  NotifiableInvocation = 1
 }

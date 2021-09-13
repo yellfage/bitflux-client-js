@@ -1,4 +1,4 @@
-import { DisconnectionCode } from '../communication'
+import type { DisconnectionCode } from '../communication'
 
 export interface DefaultReconnectionPolicyOptions {
   readonly delays?: number[]

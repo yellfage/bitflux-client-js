@@ -1,28 +1,39 @@
-import { WstClient } from '../wst-client'
+import type { Events } from '../events'
 
-import { WebSocketClient } from './communication'
+import type { InvocationHandler } from '../invocation-handler'
+
+import type { NotifiableInvocationSetup } from '../notifiable-invocation-setup'
+
+import type { PlainObject } from '../plain-object'
+
+import type { RegularInvocationSetup } from '../regular-invocation-setup'
+
+import type { WstClient } from '../wst-client'
+
+import type { WebSocketClient } from './communication'
+
+import type { EventEmitter } from './event-emitter'
+
+import { isFunction } from './function-utils'
+
+import type { HandlerMapper } from './handler-mapper'
+
+import type { NotifiableInvocationFactory } from './notifiable-invocation-factory'
+
+import type { NotifiableInvocationShapeFactory } from './notifiable-invocation-shape-factory'
+
+import { isPlainObject } from './object-utils'
+
+import type { RegularInvocationFactory } from './regular-invocation-factory'
+
+import type { RegularInvocationShapeFactory } from './regular-invocation-shape-factory'
+
+import { isString } from './string-utils'
 
 import {
-  RegularInvocationSetupValidator,
-  NotifiableInvocationSetupValidator
+  validateRegularInvocationSetup,
+  validateNotifiableInvocationSetup
 } from './validation'
-
-import { HandlerMapper } from './handler-mapper'
-import { EventEmitter } from './event-emitter'
-import { InvocationHandler } from '../invocation-handler'
-import { RegularInvocationShapeFactory } from './regular-invocation-shape-factory'
-import { NotifiableInvocationShapeFactory } from './notifiable-invocation-shape-factory'
-import { RegularInvocationFactory } from './regular-invocation-factory'
-import { NotifiableInvocationFactory } from './notifiable-invocation-factory'
-import { RegularInvocationSetup } from '../regular-invocation-setup'
-
-import { NotifiableInvocationSetup } from '../notifiable-invocation-setup'
-import { PlainObject } from '../plain-object'
-import { Events } from '../events'
-
-import { FunctionUtils } from './function-utils'
-import { ObjectUtils } from './object-utils'
-import { StringUtils } from './string-utils'
 
 export class Client implements WstClient {
   public get url(): string {
@@ -30,11 +41,17 @@ export class Client implements WstClient {
   }
 
   private readonly webSocket: WebSocketClient
+
   private readonly handlerMapper: HandlerMapper
+
   private readonly eventEmitter: EventEmitter<Events>
+
   private readonly regularInvocationShapeFactory: RegularInvocationShapeFactory
+
   private readonly notifiableInvocationShapeFactory: NotifiableInvocationShapeFactory
+
   private readonly regularInvocationFactory: RegularInvocationFactory
+
   private readonly notifiableInvocationFactory: NotifiableInvocationFactory
 
   public constructor(
@@ -55,22 +72,22 @@ export class Client implements WstClient {
     this.notifiableInvocationFactory = notifiableInvocationFactory
   }
 
-  public start(url?: string): Promise<void> {
+  public async start(url?: string): Promise<void> {
     return this.webSocket.start(url)
   }
 
-  public stop(reason?: string): Promise<void> {
+  public async stop(reason?: string): Promise<void> {
     return this.webSocket.stop(reason)
   }
 
   public map(handlerName: string, handler: InvocationHandler): void {
-    if (!StringUtils.isString(handlerName)) {
+    if (!isString(handlerName)) {
       throw new TypeError(
         'Invalid type of the "handlerName" parameter. Expected type: string'
       )
     }
 
-    if (!FunctionUtils.isFunction(handler)) {
+    if (!isFunction(handler)) {
       throw new TypeError(
         'Invalid type of the "handler" parameter. Expected type: function'
       )
@@ -81,33 +98,71 @@ export class Client implements WstClient {
 
   public mapObject(obj: PlainObject): void {
     const handlerNames = Object.getOwnPropertyNames(obj).filter((name) =>
-      FunctionUtils.isFunction(obj[name])
+      isFunction(obj[name])
     )
 
-    handlerNames.forEach((name) => this.map(name, obj[name]))
+    handlerNames.forEach((name) =>
+      this.map(name, obj[name] as InvocationHandler)
+    )
   }
 
-  public invoke(...args: any[]): Promise<any> {
-    if (ObjectUtils.isPlainObject<RegularInvocationSetup>(args[0])) {
-      RegularInvocationSetupValidator.validate(args[0])
+  public invoke<
+    TResult = unknown,
+    THandlerName extends string = string,
+    TArgs extends unknown[] = unknown[]
+  >(setup: RegularInvocationSetup<THandlerName, TArgs>): Promise<TResult>
+
+  public invoke<
+    TResult = unknown,
+    THandlerName extends string = string,
+    TArgs extends unknown[] = unknown[]
+  >(handlerName: THandlerName, ...args: TArgs): Promise<TResult>
+
+  public async invoke(...args: unknown[]): Promise<unknown> {
+    if (isPlainObject<RegularInvocationSetup>(args[0])) {
+      validateRegularInvocationSetup(args[0])
 
       return this.invokeCore(args[0])
-    } else {
-      const setup: RegularInvocationSetup = {
-        handlerName: args[0],
-        args: args.slice(1)
-      }
-
-      return this.invoke(setup)
     }
+
+    if (!isString(args[0])) {
+      throw new Error(
+        'Invalid regular invocation arguments: the argument "handlerName" must be a string'
+      )
+    }
+
+    const setup: RegularInvocationSetup = {
+      handlerName: args[0],
+      args: args.slice(1)
+    }
+
+    return this.invoke(setup)
   }
 
-  public notify(...args: any[]): void {
-    if (ObjectUtils.isPlainObject<NotifiableInvocationSetup>(args[0])) {
-      NotifiableInvocationSetupValidator.validate(args[0])
+  public notify<
+    THandlerName extends string = string,
+    TArgs extends unknown[] = unknown[]
+  >(setup: NotifiableInvocationSetup<THandlerName, TArgs>): void
+
+  public notify<
+    THandlerName extends string = string,
+    TArgs extends unknown[] = unknown[]
+  >(handlerName: THandlerName, ...args: TArgs): void
+
+  public notify(...args: unknown[]): void
+
+  public notify(...args: unknown[]): void {
+    if (isPlainObject<NotifiableInvocationSetup>(args[0])) {
+      validateNotifiableInvocationSetup(args[0])
 
       this.notifyCore(args[0])
     } else {
+      if (!isString(args[0])) {
+        throw new Error(
+          'Invalid notifiable invocation arguments: the argument "handlerName" must be a string'
+        )
+      }
+
       const setup: NotifiableInvocationSetup = {
         handlerName: args[0],
         args: args.slice(1)
@@ -117,7 +172,17 @@ export class Client implements WstClient {
     }
   }
 
-  public notifyCarelessly(...args: any[]): void {
+  public notifyCarelessly<
+    THandlerName extends string = string,
+    TArgs extends unknown[] = unknown[]
+  >(setup: NotifiableInvocationSetup<THandlerName, TArgs>): void
+
+  public notifyCarelessly<
+    THandlerName extends string = string,
+    TArgs extends unknown[] = unknown[]
+  >(handlerName: THandlerName, ...args: TArgs): void
+
+  public notifyCarelessly(...args: unknown[]): void {
     if (!this.webSocket.state.isConnected) {
       return
     }
@@ -143,7 +208,7 @@ export class Client implements WstClient {
     this.handlerMapper.map(handlerName, handler)
   }
 
-  private invokeCore(setup: RegularInvocationSetup): Promise<any> {
+  private async invokeCore(setup: RegularInvocationSetup): Promise<unknown> {
     const shape = this.regularInvocationShapeFactory.create(setup)
 
     return this.regularInvocationFactory.create(shape).perform()

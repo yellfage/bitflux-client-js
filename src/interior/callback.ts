@@ -1,3 +1,3 @@
-export type Callback<TArgs extends any[] = any[], TResult extends any = any> = (
+export type Callback<TArgs extends unknown[] = unknown[], TResult = unknown> = (
   ...args: TArgs
 ) => TResult

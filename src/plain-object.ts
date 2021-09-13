@@ -1,1 +1,4 @@
-export type PlainObject<TValue = any> = Record<string | number | symbol, TValue>
+export type PlainObject<TValue = unknown> = Record<
+  number | string | symbol,
+  TValue
+>

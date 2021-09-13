@@ -1,10 +1,11 @@
-import { WstClient } from './wst-client'
-import { WstClientFactoryOptions } from './wst-client-factory-options'
+import { JsonProtocol } from './communication'
+
+import type { WebSocketEvents } from './interior'
 
 import {
-  StringUtils,
-  FunctionUtils,
-  WstClientFactoryOptionsValidator,
+  isString,
+  isFunction,
+  validateWstClientFactoryOptions,
   Client,
   DefaultWebSocketClient,
   MutableState,
@@ -17,21 +18,23 @@ import {
   PromisfiedWebSocket
 } from './interior'
 
-import { JsonProtocol } from './communication'
-import { Events } from './events'
+import type { WstClient } from './wst-client'
+
+import { WstClientFactoryOptions } from './wst-client-factory-options'
 
 export class WstClientFactory {
   public create(
     url: string,
     configure?: (options: WstClientFactoryOptions) => void
   ): WstClient {
-    if (!StringUtils.isString(url)) {
+    if (!isString(url)) {
       throw new TypeError(
         'Invalid type of the "url" parameter. Expected type: string'
       )
     }
 
-    if (configure !== undefined && !FunctionUtils.isFunction(configure)) {
+    // eslint-disable-next-line no-undefined
+    if (configure !== undefined && !isFunction(configure)) {
       throw new TypeError(
         'Invalid type of the "configure" parameter. Expected type: function'
       )
@@ -47,7 +50,7 @@ export class WstClientFactory {
       options.communication.protocols.push(new JsonProtocol())
     }
 
-    WstClientFactoryOptionsValidator.validate(options)
+    validateWstClientFactoryOptions(options)
 
     return this.createCore(url, options)
   }
@@ -59,7 +62,7 @@ export class WstClientFactory {
       (protocol) => protocol.name
     )
 
-    const eventEmitter = new EventEmitter<Events>()
+    const eventEmitter = new EventEmitter<WebSocketEvents>()
 
     const webSocket = new DefaultWebSocketClient(
       new MutableState(),

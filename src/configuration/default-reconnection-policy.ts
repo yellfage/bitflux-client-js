@@ -1,24 +1,33 @@
-import { ReconnectionPolicy } from './reconnection-policy'
-import { DisconnectionCode } from '../communication'
-import { DefaultReconnectionPolicyOptions } from './default-reconnection-policy-options'
-import { DefaultReconnectionPolicyOptionsValidator } from '../interior/validation/default-reconnection-policy-options-validator'
+import type { DisconnectionCode } from '../communication'
+
+import { validateDefaultReconnectionPolicyOptions } from '../interior/validation'
+
+import type { DefaultReconnectionPolicyOptions } from './default-reconnection-policy-options'
+
 import { RECONNECTABLE_DISCONNECTION_CODES } from './reconnectable-disconnection-codes'
+
+import type { ReconnectionPolicy } from './reconnection-policy'
 
 const DEFAULT_DELAY_INDEX = -1
 const DEFAULT_ATTEMPTS_AFTER_DELAYS = 0
 
 export class DefaultReconnectionPolicy implements ReconnectionPolicy {
   private readonly delays: number[]
+
   private readonly minDelayOffset: number
+
   private readonly maxDelayOffset: number
+
   private readonly maxAttemptsAfterDelays: number
+
   private readonly reconnectableCodes: DisconnectionCode[]
 
   private delayIndex: number
+
   private attemptsAfterDelays: number
 
   public constructor(options: DefaultReconnectionPolicyOptions = {}) {
-    DefaultReconnectionPolicyOptionsValidator.validate(options)
+    validateDefaultReconnectionPolicyOptions(options)
 
     const {
       delays = [1000, 2000, 5000, 10000, 15000],
@@ -51,9 +60,9 @@ export class DefaultReconnectionPolicy implements ReconnectionPolicy {
 
   public getNextDelay(): number {
     if (this.arePrimaryAttemptsExhausted()) {
-      ++this.attemptsAfterDelays
+      this.attemptsAfterDelays += 1
     } else {
-      ++this.delayIndex
+      this.delayIndex += 1
     }
 
     const delay = this.delays[this.delayIndex] || 0
@@ -75,7 +84,7 @@ export class DefaultReconnectionPolicy implements ReconnectionPolicy {
     return !this.delays.length || this.delayIndex === this.delays.length - 1
   }
 
-  private areSecondaryAttemptsExhausted() {
+  private areSecondaryAttemptsExhausted(): boolean {
     return this.attemptsAfterDelays === this.maxAttemptsAfterDelays
   }
 

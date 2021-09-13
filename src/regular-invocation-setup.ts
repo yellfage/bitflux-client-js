@@ -1,9 +1,9 @@
-import { InvocationSetup } from './invocation-setup'
+import type { InvocationSetup } from './invocation-setup'
 
-export interface RegularInvocationSetup<
+export type RegularInvocationSetup<
   THandlerName extends string = string,
-  TArgs extends any[] = any[]
-> extends InvocationSetup<THandlerName, TArgs> {
+  TArgs extends unknown[] = unknown[]
+> = InvocationSetup<THandlerName, TArgs> & {
   rejectionDelay?: number
   attemptRejectionDelay?: number
   abortController?: AbortController

@@ -1,3 +1,3 @@
-export type InvocationHandler<TArgs extends any[] = any[]> = (
+export type InvocationHandler<TArgs extends unknown[] = never[]> = (
   ...args: TArgs
-) => any
+) => unknown

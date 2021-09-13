@@ -7,8 +7,11 @@ import {
 
 export class WstClientFactoryOptions {
   public communication: CommunicationSettings
+
   public reconnection: ReconnectionSettings
+
   public regularInvocation: RegularInvocationSettings
+
   public logging: LoggingSettings
 
   public constructor(

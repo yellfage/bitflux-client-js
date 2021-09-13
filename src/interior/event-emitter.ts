@@ -1,10 +1,11 @@
-import { PlainObject } from '../plain-object'
+import type { PlainObject } from '../plain-object'
 
-import { ArrayUtils } from './array-utils'
-import { Callback } from './callback'
+import { removeFromArray } from './array-utils'
 
-export class EventEmitter<TEvents extends { [key: string]: Callback }> {
-  private handlers: PlainObject<Callback[]>
+import type { Callback } from './callback'
+
+export class EventEmitter<TEvents extends Record<string, Callback>> {
+  private readonly handlers: PlainObject<Callback[] | undefined>
 
   public constructor() {
     this.handlers = {}
@@ -14,11 +15,13 @@ export class EventEmitter<TEvents extends { [key: string]: Callback }> {
     eventName: TEventName,
     handler: TEvents[TEventName]
   ): TEvents[TEventName] {
-    if (!this.handlers[eventName]) {
-      this.handlers[eventName] = []
+    const handlers: Callback[] = this.handlers[eventName] ?? []
+
+    if (!handlers.length) {
+      this.handlers[eventName] = handlers
     }
 
-    this.handlers[eventName].push(handler)
+    handlers.push(handler)
 
     return handler
   }
@@ -27,14 +30,15 @@ export class EventEmitter<TEvents extends { [key: string]: Callback }> {
     eventName: TEventName,
     handler: TEvents[TEventName]
   ): void {
-    ArrayUtils.remove(this.handlers[eventName] || [], handler)
+    removeFromArray(this.handlers[eventName] ?? [], handler)
   }
 
   public async emit<TEventName extends keyof TEvents>(
     eventName: TEventName,
     ...args: Parameters<TEvents[TEventName]>
   ): Promise<void> {
-    for (const handler of this.handlers[eventName] || []) {
+    for (const handler of this.handlers[eventName] ?? []) {
+      // eslint-disable-next-line no-await-in-loop
       await handler(...args)
     }
   }

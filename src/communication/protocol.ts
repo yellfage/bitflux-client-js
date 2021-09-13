@@ -1,7 +1,9 @@
 export interface Protocol {
   readonly name: string
 
-  serialize(message: any): string | ArrayBufferLike | ArrayBufferView | Blob
+  serialize: (
+    message: unknown
+  ) => ArrayBufferLike | ArrayBufferView | Blob | string
 
-  deserialize<TMessage = any>(data: any): TMessage
+  deserialize: <TMessage = unknown>(data: unknown) => TMessage
 }

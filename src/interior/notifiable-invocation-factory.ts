@@ -1,6 +1,8 @@
 import { InvocationFactory } from './invocation-factory'
-import { NotifiableInvocationShape } from './notifiable-invocation-shape'
+
 import { NotifiableInvocation } from './notifiable-invocation'
+
+import type { NotifiableInvocationShape } from './notifiable-invocation-shape'
 
 export class NotifiableInvocationFactory extends InvocationFactory {
   public create(shape: NotifiableInvocationShape): NotifiableInvocation {

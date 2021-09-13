@@ -1,7 +1,7 @@
 export interface Logger {
-  logTrace(message: any): any
-  logDebug(message: any): any
-  logInformation(message: any): any
-  logWarning(message: any): any
-  logError(message: any): any
+  logTrace: (message: unknown) => void
+  logDebug: (message: unknown) => void
+  logInformation: (message: unknown) => void
+  logWarning: (message: unknown) => void
+  logError: (message: unknown) => void
 }

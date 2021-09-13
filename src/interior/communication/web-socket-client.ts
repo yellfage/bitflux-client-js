@@ -1,23 +1,23 @@
-import { State } from './state'
+import type { State } from './state'
 
-import { WebSocketEvents } from './web-socket-events'
+import type { WebSocketEvents } from './web-socket-events'
 
 export interface WebSocketClient {
   readonly url: string
   readonly state: State
 
-  start(url?: string): Promise<void>
-  stop(reason?: string): Promise<void>
+  start: (url?: string) => Promise<void>
+  stop: (reason?: string) => Promise<void>
 
-  send(message: any): void
+  send: (message: unknown) => void
 
-  on<TEventName extends keyof WebSocketEvents>(
+  on: <TEventName extends keyof WebSocketEvents>(
     eventName: TEventName,
     handler: WebSocketEvents[TEventName]
-  ): WebSocketEvents[TEventName]
+  ) => WebSocketEvents[TEventName]
 
-  off<TEventName extends keyof WebSocketEvents>(
+  off: <TEventName extends keyof WebSocketEvents>(
     eventName: TEventName,
     handler: WebSocketEvents[TEventName]
-  ): void
+  ) => void
 }

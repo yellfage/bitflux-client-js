@@ -1,4 +1,4 @@
-import { WebSocketClient } from './communication'
+import type { WebSocketClient } from './communication'
 
 export abstract class InvocationFactory {
   protected webSocket: WebSocketClient

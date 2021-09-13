@@ -1,13 +1,16 @@
-import { OutgoingMessage, OutgoingMessageType } from '../../communication'
+import type { OutgoingMessageType } from '../../communication'
+
+import { OutgoingMessage } from '../../communication'
 
 export class OutgoingInvocationMessage extends OutgoingMessage {
   public readonly handlerName: string
-  public readonly arguments: any[]
+
+  public readonly arguments: unknown[]
 
   public constructor(
     type: OutgoingMessageType,
     handlerName: string,
-    args: any[]
+    args: unknown[]
   ) {
     super(type)
 

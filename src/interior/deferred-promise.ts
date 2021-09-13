@@ -1,8 +1,9 @@
-export class DeferredPromise<TResult = any> {
+export class DeferredPromise<TResult = unknown> {
   public promise: Promise<TResult>
 
-  public resolve: (value: TResult | PromiseLike<TResult>) => void
-  public reject: (reason?: any) => void
+  public resolve: (value: PromiseLike<TResult> | TResult) => void
+
+  public reject: (reason?: unknown) => void
 
   public constructor() {
     this.promise = new Promise((resolve, reject) => {

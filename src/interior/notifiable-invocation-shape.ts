@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-empty-interface */
-
-import { InvocationShape } from './invocation-shape'
+import type { InvocationShape } from './invocation-shape'
 
 export interface NotifiableInvocationShape<
   THandlerName extends string = string,
-  TArgs extends any[] = any[]
+  TArgs extends unknown[] = unknown[]
 > extends InvocationShape<THandlerName, TArgs> {}

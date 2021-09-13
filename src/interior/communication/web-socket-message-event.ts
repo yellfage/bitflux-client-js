@@ -1,3 +1,3 @@
-export interface WebSocketMessageEvent<TData = any> {
+export interface WebSocketMessageEvent<TData = unknown> {
   data: TData
 }

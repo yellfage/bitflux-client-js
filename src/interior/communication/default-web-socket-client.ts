@@ -1,21 +1,24 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-
 import delay from 'delay'
 
-import { WebSocketClient } from './web-socket-client'
-import { MutableState } from './mutable-state'
-import { EventEmitter } from '../event-emitter'
-import { PromisfiedWebSocket } from './promisfied-web-socket'
+import type { Protocol } from '../../communication'
 
-import { Protocol } from '../../communication'
-import { ReconnectionPolicy } from '../../configuration'
+import type { ReconnectionPolicy } from '../../configuration'
 
-import { Logger } from '../../logging'
-import { Callback } from '../callback'
+import type { Logger } from '../../logging'
 
-import { WebSocketEvents } from './web-socket-events'
+import type { Callback } from '../callback'
 
-import { NumberUtils } from '../number-utils'
+import type { EventEmitter } from '../event-emitter'
+
+import { isNumber } from '../number-utils'
+
+import type { MutableState } from './mutable-state'
+
+import type { PromisfiedWebSocket } from './promisfied-web-socket'
+
+import type { WebSocketClient } from './web-socket-client'
+
+import type { WebSocketEvents } from './web-socket-events'
 
 export class DefaultWebSocketClient implements WebSocketClient {
   public get url(): string {
@@ -23,14 +26,22 @@ export class DefaultWebSocketClient implements WebSocketClient {
   }
 
   public readonly state: MutableState
+
   private readonly logger: Logger
+
   private readonly eventEmitter: EventEmitter<WebSocketEvents>
+
   private readonly protocols: Protocol[]
+
   private readonly reconnectionPolicy: ReconnectionPolicy
+
   private readonly webSocket: PromisfiedWebSocket
+
   private reconnectionAttempts: number
+
   private reconnectionAbortController: AbortController
-  private cachedMessages: Set<any>
+
+  private cachedMessages: Set<unknown>
 
   public constructor(
     state: MutableState,
@@ -48,7 +59,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
     this.webSocket = webSocket
     this.reconnectionAttempts = 0
     this.reconnectionAbortController = new AbortController()
-    this.cachedMessages = new Set<any>()
+    this.cachedMessages = new Set<unknown>()
 
     this.webSocket.onopen = this.handleOpenEvent
     this.webSocket.onclose = this.handleCloseEvent
@@ -77,7 +88,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
     await this.terminate(reason)
   }
 
-  public send(message: any): void {
+  public send(message: unknown): void {
     if (!this.state.isConnected) {
       this.cachedMessages.add(message)
 
@@ -95,7 +106,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
     this.eventEmitter.off(eventName, handler)
   }
 
-  private sendCore(message: any): void {
+  private sendCore(message: unknown): void {
     const serializedMessage = this.resolveProtocol().serialize(message)
 
     this.webSocket.send(serializedMessage)
@@ -113,7 +124,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
 
     try {
       await this.webSocket.start(url)
-    } catch (error) {
+    } catch (error: unknown) {
       if (this.state.isTerminating) {
         return
       }
@@ -121,7 +132,9 @@ export class DefaultWebSocketClient implements WebSocketClient {
       this.logger.logError(error)
 
       if (!this.reconnectionPolicy.confirm()) {
-        return this.terminate('Reconnection terminated')
+        await this.terminate('Reconnection terminated')
+
+        return
       }
 
       await this.reconnect()
@@ -129,13 +142,13 @@ export class DefaultWebSocketClient implements WebSocketClient {
   }
 
   private async reconnect(): Promise<void> {
-    ++this.reconnectionAttempts
+    this.reconnectionAttempts += 1
 
     const attemptDelay = this.reconnectionPolicy.getNextDelay(
       this.reconnectionAttempts
     )
 
-    if (!NumberUtils.isNumber(attemptDelay) || Number.isNaN(attemptDelay)) {
+    if (!isNumber(attemptDelay) || Number.isNaN(attemptDelay)) {
       throw new Error(
         `Unable to reconnect: invalid reconnection delay "${attemptDelay}"`
       )
@@ -154,7 +167,9 @@ export class DefaultWebSocketClient implements WebSocketClient {
     }
 
     if (attemptDelay <= 0) {
-      return this.connect()
+      await this.connect()
+
+      return
     }
 
     if (this.reconnectionAbortController.signal.aborted) {
@@ -169,7 +184,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
       return
     }
 
-    return this.connect()
+    await this.connect()
   }
 
   private async terminate(reason: string): Promise<void> {
@@ -204,16 +219,22 @@ export class DefaultWebSocketClient implements WebSocketClient {
   }
 
   private clearCachedMessages(): void {
-    this.cachedMessages = new Set<any>()
+    this.cachedMessages = new Set<unknown>()
   }
 
   private resolveProtocol(): Protocol {
-    return this.protocols.find(
-      (protocol) => protocol.name === this.webSocket.subProtocol
-    )!
+    const protocol = this.protocols.find(
+      ({ name }) => name === this.webSocket.subProtocol
+    )
+
+    if (!protocol) {
+      throw new Error('Unable to resolve negotiated sub protocol')
+    }
+
+    return protocol
   }
 
-  private handleOpenEvent = async () => {
+  private readonly handleOpenEvent = async (): Promise<void> => {
     this.state.setConnected()
 
     // We need to process the cached messages only after the "connected" state is set
@@ -233,7 +254,10 @@ export class DefaultWebSocketClient implements WebSocketClient {
     }
   }
 
-  private handleCloseEvent = async (code: number, reason: string) => {
+  private readonly handleCloseEvent = async (
+    code: number,
+    reason: string
+  ): Promise<void> => {
     if (this.state.isTerminating) {
       return
     }
@@ -248,13 +272,17 @@ export class DefaultWebSocketClient implements WebSocketClient {
     }
 
     if (!this.reconnectionPolicy.confirmCode(code)) {
-      return this.terminate(`Disconnected. Code: ${code}. Reason: ${reason}`)
+      await this.terminate(`Disconnected. Code: ${code}. Reason: ${reason}`)
+
+      return
     }
 
     await this.reconnect()
   }
 
-  private handleMessageEvent = async (data: any) => {
+  private readonly handleMessageEvent = async (
+    data: unknown
+  ): Promise<void> => {
     await this.eventEmitter.emit('message', {
       data: this.resolveProtocol().deserialize(data)
     })

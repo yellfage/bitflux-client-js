@@ -1,4 +1,4 @@
-import { Protocol } from '../communication'
+import type { Protocol } from '../communication'
 
 export class CommunicationSettings {
   public protocols: Protocol[]

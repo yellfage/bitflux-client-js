@@ -1,8 +1,8 @@
-import { InvocationShape } from './invocation-shape'
+import type { InvocationShape } from './invocation-shape'
 
 export interface RegularInvocationShape<
   THandlerName extends string = string,
-  TArgs extends any[] = any[]
+  TArgs extends unknown[] = unknown[]
 > extends InvocationShape<THandlerName, TArgs> {
   readonly rejectionDelay: number
   readonly attemptRejectionDelay: number

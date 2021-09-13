@@ -1,6 +1,8 @@
 import { InvocationFactory } from './invocation-factory'
-import { RegularInvocationShape } from './regular-invocation-shape'
+
 import { RegularInvocation } from './regular-invocation'
+
+import type { RegularInvocationShape } from './regular-invocation-shape'
 
 export class RegularInvocationFactory extends InvocationFactory {
   public create(shape: RegularInvocationShape): RegularInvocation {

@@ -1,14 +1,12 @@
-/* eslint-disable require-await */
+import type { WebSocketClient } from './communication'
 
-import {
-  WebSocketClient,
-  OutgoingNotifiableInvocationMessage
-} from './communication'
+import { OutgoingNotifiableInvocationMessage } from './communication'
 
-import { NotifiableInvocationShape } from './notifiable-invocation-shape'
+import type { NotifiableInvocationShape } from './notifiable-invocation-shape'
 
 export class NotifiableInvocation {
   private readonly webSocket: WebSocketClient
+
   private readonly message: OutgoingNotifiableInvocationMessage
 
   public constructor(

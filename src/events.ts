@@ -1,3 +1,3 @@
-import { LifetimeEvents } from './lifetime-events'
+import type { LifetimeEvents } from './lifetime-events'
 
 export type Events = LifetimeEvents

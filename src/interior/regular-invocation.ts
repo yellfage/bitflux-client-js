@@ -1,26 +1,36 @@
 import { nanoid } from 'nanoid'
 
-import {
+import type { IncomingMessage } from '../communication'
+
+import { IncomingMessageType } from '../communication'
+
+import { InvocationAbortedError } from '../invocation-aborted-error'
+
+import type {
   WebSocketClient,
   WebSocketMessageEvent,
-  OutgoingRegularInvocationMessage,
   IncomingSuccessfulRegularInvocationResultMessage,
   IncomingFailedRegularInvocationResultMessage,
   IncomingRegularInvocationResultMessage
 } from './communication'
 
-import { RegularInvocationShape } from './regular-invocation-shape'
+import { OutgoingRegularInvocationMessage } from './communication'
+
 import { DeferredPromise } from './deferred-promise'
 
-import { IncomingMessage, IncomingMessageType } from '../communication'
-import { InvocationAbortedError } from '../invocation-aborted-error'
+import type { RegularInvocationShape } from './regular-invocation-shape'
 
 export class RegularInvocation {
   private readonly webSocket: WebSocketClient
+
   private readonly shape: RegularInvocationShape
+
   private readonly message: OutgoingRegularInvocationMessage
-  private readonly deferredPromise: DeferredPromise<any>
+
+  private readonly deferredPromise: DeferredPromise
+
   private rejectionTimeoutId: number
+
   private attemptRejectionTimeoutId: number
 
   public constructor(
@@ -41,7 +51,7 @@ export class RegularInvocation {
     this.attemptRejectionTimeoutId = 0
   }
 
-  public perform(): Promise<any> {
+  public async perform(): Promise<unknown> {
     if (this.shape.abortController.signal.aborted) {
       throw new Error(
         'Unable to perform regular invocation: the provided AbortController is already aborted'
@@ -129,7 +139,7 @@ export class RegularInvocation {
     this.runAttemptRejectionTimeout()
   }
 
-  private handleResult = (result: any): void => {
+  private readonly handleResult = (result: unknown): void => {
     this.clearRejectionTimeout()
     this.clearAttemptRejectionTimeout()
 
@@ -143,27 +153,27 @@ export class RegularInvocation {
     }
   }
 
-  private handleAbortion = (): void => {
+  private readonly handleAbortion = (): void => {
     this.handleResult(
       new InvocationAbortedError('The invocation aborted: manual abortion')
     )
   }
 
-  private handleTerminating = (): void => {
+  private readonly handleTerminating = (): void => {
     this.handleResult(
       new InvocationAbortedError('The invocation aborted: termination')
     )
   }
 
-  private handleDisconnect = (): void => {
+  private readonly handleDisconnect = (): void => {
     this.clearAttemptRejectionTimeout()
   }
 
-  private handleConnect = (): void => {
+  private readonly handleConnect = (): void => {
     this.sendMessage()
   }
 
-  private handleMessage = ({
+  private readonly handleMessage = ({
     data: message
   }: WebSocketMessageEvent<IncomingMessage>): void => {
     if (

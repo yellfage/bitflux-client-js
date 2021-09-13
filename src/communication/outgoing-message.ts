@@ -1,4 +1,4 @@
-import { OutgoingMessageType } from './outgoing-message-type'
+import type { OutgoingMessageType } from './outgoing-message-type'
 
 export abstract class OutgoingMessage {
   public readonly type: OutgoingMessageType

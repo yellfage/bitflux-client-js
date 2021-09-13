@@ -1,16 +1,21 @@
-import { Logger } from '../logging'
-import { InvocationHandler } from '../invocation-handler'
-import { IncomingMessage, IncomingMessageType } from '../communication'
+import type { IncomingMessage } from '../communication'
 
-import {
+import { IncomingMessageType } from '../communication'
+
+import type { InvocationHandler } from '../invocation-handler'
+
+import type { Logger } from '../logging'
+
+import type {
   WebSocketClient,
   WebSocketMessageEvent,
   IncomingNotifiableInvocationMessage
 } from './communication'
 
 export class HandlerMapper {
-  private webSocket: WebSocketClient
-  private logger: Logger
+  private readonly webSocket: WebSocketClient
+
+  private readonly logger: Logger
 
   public constructor(webSocket: WebSocketClient, logger: Logger) {
     this.webSocket = webSocket

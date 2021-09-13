@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-empty-interface */
+import type { InvocationSetup } from './invocation-setup'
 
-import { InvocationSetup } from './invocation-setup'
-
-export interface NotifiableInvocationSetup<
+export type NotifiableInvocationSetup<
   THandlerName extends string = string,
-  TArgs extends any[] = any[]
-> extends InvocationSetup<THandlerName, TArgs> {}
+  TArgs extends unknown[] = unknown[]
+> = InvocationSetup<THandlerName, TArgs>

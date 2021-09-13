@@ -1,9 +1,11 @@
-import { RegularInvocationSetup } from '../regular-invocation-setup'
-import { RegularInvocationShape } from './regular-invocation-shape'
+import type { RegularInvocationSetup } from '../regular-invocation-setup'
+
+import type { RegularInvocationShape } from './regular-invocation-shape'
 
 export class RegularInvocationShapeFactory {
-  private defaultRejectionDelay: number
-  private defaultAttemptRejectionDelay: number
+  private readonly defaultRejectionDelay: number
+
+  private readonly defaultAttemptRejectionDelay: number
 
   public constructor(
     defaultRejectionDelay: number,

@@ -1,7 +1,7 @@
-export interface InvocationSetup<
+export type InvocationSetup<
   THandlerName extends string = string,
-  TArgs extends any[] = any[]
-> {
+  TArgs extends unknown[] = unknown[]
+> = {
   handlerName: THandlerName
   args?: TArgs
 }
