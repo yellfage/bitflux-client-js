@@ -7,6 +7,7 @@ export interface WebSocketClient {
   readonly state: State
 
   start: (url?: string) => Promise<void>
+  restart: (url?: string) => Promise<void>
   stop: (reason?: string) => Promise<void>
 
   send: (message: unknown) => void

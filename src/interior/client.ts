@@ -76,6 +76,10 @@ export class Client implements WstClient {
     return this.webSocket.start(url)
   }
 
+  public async restart(url?: string): Promise<void> {
+    return this.webSocket.restart(url)
+  }
+
   public async stop(reason?: string): Promise<void> {
     return this.webSocket.stop(reason)
   }

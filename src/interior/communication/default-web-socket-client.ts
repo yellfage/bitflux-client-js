@@ -80,6 +80,20 @@ export class DefaultWebSocketClient implements WebSocketClient {
     }
   }
 
+  public async restart(url?: string): Promise<void> {
+    this.cancelReconnection()
+
+    await this.disconnect()
+
+    await this.connect(url)
+
+    if (!this.state.isConnected) {
+      throw new Error(
+        'Failed to establish a connection or the client was terminated during connection'
+      )
+    }
+  }
+
   public async stop(reason = 'Stopping'): Promise<void> {
     if (this.state.isTerminating || this.state.isTerminated) {
       return
@@ -141,6 +155,10 @@ export class DefaultWebSocketClient implements WebSocketClient {
     }
   }
 
+  private async disconnect(): Promise<void> {
+    return this.webSocket.stop()
+  }
+
   private async reconnect(): Promise<void> {
     this.reconnectionAttempts += 1
 
@@ -197,7 +215,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
     this.clearCachedMessages()
     this.cancelReconnection()
 
-    await this.webSocket.stop()
+    await this.disconnect()
 
     this.state.setTerminated()
 
@@ -272,8 +290,6 @@ export class DefaultWebSocketClient implements WebSocketClient {
     }
 
     if (!this.reconnectionPolicy.confirmCode(code)) {
-      await this.terminate(`Disconnected. Code: ${code}. Reason: ${reason}`)
-
       return
     }
 

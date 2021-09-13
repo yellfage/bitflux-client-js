@@ -12,6 +12,7 @@ export interface WstClient {
   readonly url: string
 
   start: (url?: string) => Promise<void>
+  restart: (url?: string) => Promise<void>
   stop: (reason?: string) => Promise<void>
 
   map: (handlerName: string, handler: InvocationHandler) => void
