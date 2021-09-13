@@ -15,9 +15,9 @@
     "clear:dist": "rimraf -rf ./dist/*",
     "commit": "commit",
     "eslint": "eslint --report-unused-disable-directives --ext .js,.jsx,.ts,.tsx",
-    "eslint:root": "npm run eslint ./",
-    "eslint:root:fix": "npm run eslint ./ -- --fix",
-    "prepublishOnly": "npm-run-all eslint:root:fix build"
+    "eslint:src": "npm run eslint ./src",
+    "eslint:src:fix": "npm run eslint:src -- -- --fix",
+    "prepublishOnly": "npm-run-all eslint:src:fix build"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
