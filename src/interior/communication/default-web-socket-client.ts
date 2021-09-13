@@ -68,7 +68,9 @@ export class DefaultWebSocketClient implements WebSocketClient {
 
   public async start(url?: string): Promise<void> {
     if (!this.state.isTerminated) {
-      return
+      throw new Error(
+        "Unable to start the client: the client is not in the 'Terminated' state"
+      )
     }
 
     await this.connect(url)
