@@ -37,7 +37,7 @@ export class MutableState implements State {
   private value
 
   public constructor() {
-    this.value = Value.Terminated
+    this.value = Value.Disconnected
   }
 
   public setConnecting(): void {

@@ -49,9 +49,9 @@ export class PromisfiedWebSocket {
     this.deferredClosingPromise = null
   }
 
-  public async start(url = this.url): Promise<void> {
+  public async connect(url = this.url): Promise<void> {
     if (this.webSocket) {
-      return
+      throw new Error('The WebSocket is already connected')
     }
 
     this.url = url
@@ -73,9 +73,9 @@ export class PromisfiedWebSocket {
     return this.deferredOpeningPromise.promise
   }
 
-  public async stop(code?: number, reason?: string): Promise<void> {
+  public async disconnect(code?: number, reason?: string): Promise<void> {
     if (!this.webSocket) {
-      return
+      throw new Error('The WebSocket is not connected')
     }
 
     this.webSocket.close(code, reason)

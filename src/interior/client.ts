@@ -72,16 +72,32 @@ export class Client implements WstClient {
     this.notifiableInvocationFactory = notifiableInvocationFactory
   }
 
-  public async start(url?: string): Promise<void> {
-    return this.webSocket.start(url)
+  public async connect(url?: string): Promise<void> {
+    return this.webSocket.connect(url)
   }
 
-  public async restart(url?: string): Promise<void> {
-    return this.webSocket.restart(url)
+  public async reconnect(url?: string): Promise<void> {
+    return this.webSocket.reconnect(url)
   }
 
-  public async stop(reason?: string): Promise<void> {
-    return this.webSocket.stop(reason)
+  public async reconnectCoercively(url?: string): Promise<void> {
+    return this.webSocket.reconnectCoercively(url)
+  }
+
+  public hasteReconnection(): void {
+    this.webSocket.hasteReconnection()
+  }
+
+  public resetReconnection(): void {
+    this.webSocket.resetReconnection()
+  }
+
+  public async disconnect(reason?: string): Promise<void> {
+    return this.webSocket.disconnect(reason)
+  }
+
+  public async terminate(reason?: string): Promise<void> {
+    return this.webSocket.terminate(reason)
   }
 
   public map(handlerName: string, handler: InvocationHandler): void {

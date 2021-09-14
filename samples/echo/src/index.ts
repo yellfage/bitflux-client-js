@@ -33,7 +33,7 @@ client.map('Notify', (message: string) => {
     message: 'The cached notifiable invocation message'
   })
 
-  await client.start()
+  await client.connect()
 
   await client.invoke('Authenticate')
 

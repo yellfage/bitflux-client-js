@@ -11,9 +11,13 @@ import type { RegularInvocationSetup } from './regular-invocation-setup'
 export interface WstClient {
   readonly url: string
 
-  start: (url?: string) => Promise<void>
-  restart: (url?: string) => Promise<void>
-  stop: (reason?: string) => Promise<void>
+  connect: (url?: string) => Promise<void>
+  reconnect: (url?: string) => Promise<void>
+  reconnectCoercively: (url?: string) => Promise<void>
+  hasteReconnection: () => void
+  resetReconnection: () => void
+  disconnect: (reason?: string) => Promise<void>
+  terminate: (reason?: string) => Promise<void>
 
   map: (handlerName: string, handler: InvocationHandler) => void
   mapObject: (obj: PlainObject) => void

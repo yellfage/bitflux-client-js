@@ -66,47 +66,71 @@ export class DefaultWebSocketClient implements WebSocketClient {
     this.webSocket.onmessage = this.handleMessageEvent
   }
 
-  public async start(url?: string): Promise<void> {
-    if (!this.state.isTerminated) {
+  public async connect(url?: string): Promise<void> {
+    if (!this.state.isDisconnected) {
       throw new Error(
-        "Unable to start the client: the client is not in the 'Terminated' state"
+        'Unable to perform connection: the client is not disconnected'
       )
     }
 
-    await this.connect(url)
-
-    if (!this.state.isConnected) {
-      throw new Error(
-        'Failed to establish a connection or the client was terminated during connection'
-      )
-    }
+    await this.performConnection(url)
   }
 
-  public async restart(url?: string): Promise<void> {
-    this.cancelReconnection()
+  public async reconnect(url?: string): Promise<void> {
+    this.checkTermination()
 
-    await this.disconnect()
-
-    await this.connect(url)
-
-    if (!this.state.isConnected) {
-      throw new Error(
-        'Failed to establish a connection or the client was terminated during connection'
-      )
+    if (this.state.isConnected) {
+      await this.performDisconnection()
     }
+
+    await this.performConnection(url)
   }
 
-  public async stop(reason = 'Stopping'): Promise<void> {
-    if (this.state.isTerminating || this.state.isTerminated) {
+  public async reconnectCoercively(url = this.url): Promise<void> {
+    if (!this.state.isConnecting) {
       throw new Error(
-        "Unable to stop the client: the client is already in the 'Terminating' or the 'Terminated' state"
+        'Unable to perform coercive reconnection: the client is not connecting'
       )
     }
 
-    await this.terminate(reason)
+    this.webSocket.url = url
+
+    await this.performReconnection()
+  }
+
+  public hasteReconnection(): void {
+    if (!this.state.isReconnecting) {
+      return
+    }
+
+    this.reconnectionAbortController.abort()
+  }
+
+  public resetReconnection(): void {
+    this.reconnectionAttempts = 0
+
+    this.reconnectionPolicy.reset()
+  }
+
+  public async disconnect(reason = 'Manual disconnection'): Promise<void> {
+    if (!this.state.isConnected) {
+      throw new Error(
+        'Unable to perform disconnection: the client is not connected'
+      )
+    }
+
+    await this.performDisconnection(reason)
+  }
+
+  public async terminate(reason = 'Manual termination'): Promise<void> {
+    this.checkTermination()
+
+    await this.performTermination(reason)
   }
 
   public send(message: unknown): void {
+    this.checkTermination()
+
     if (!this.state.isConnected) {
       this.cachedMessages.add(message)
 
@@ -117,10 +141,14 @@ export class DefaultWebSocketClient implements WebSocketClient {
   }
 
   public on(eventName: keyof WebSocketEvents, handler: Callback): Callback {
+    this.checkTermination()
+
     return this.eventEmitter.on(eventName, handler)
   }
 
   public off(eventName: keyof WebSocketEvents, handler: Callback): void {
+    this.checkTermination()
+
     this.eventEmitter.off(eventName, handler)
   }
 
@@ -130,40 +158,46 @@ export class DefaultWebSocketClient implements WebSocketClient {
     this.webSocket.send(serializedMessage)
   }
 
-  private async connect(url = this.url): Promise<void> {
+  private async performConnection(url = this.url): Promise<void> {
     this.state.setConnecting()
 
     await this.eventEmitter.emit('connecting', { url })
 
-    // Check if a "connecting" event handler has called stop()
-    if (!this.state.isConnecting) {
+    if (this.state.isConnected) {
       return
     }
 
+    // Check if a "connecting" event handler has called terminate()
+    if (!this.state.isConnecting) {
+      throw new Error('Failed to establish a connection: termination')
+    }
+
     try {
-      await this.webSocket.start(url)
+      await this.webSocket.connect(url)
     } catch (error: unknown) {
       if (this.state.isTerminating) {
-        return
+        throw new Error(
+          'Failed to establish a connection: termination during connection'
+        )
       }
 
       this.logger.logError(error)
 
       if (!this.reconnectionPolicy.confirm()) {
-        await this.terminate('Reconnection terminated')
+        this.state.setDisconnected()
 
-        return
+        throw new Error(`Failed to establish a connection: unknown error`)
       }
 
-      await this.reconnect()
+      await this.performReconnection()
     }
   }
 
-  private async disconnect(): Promise<void> {
-    return this.webSocket.stop()
+  private async performDisconnection(reason?: string): Promise<void> {
+    await this.webSocket.disconnect(1000, reason)
   }
 
-  private async reconnect(): Promise<void> {
+  private async performReconnection(): Promise<void> {
     this.reconnectionAttempts += 1
 
     const attemptDelay = this.reconnectionPolicy.getNextDelay(
@@ -172,7 +206,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
 
     if (!isNumber(attemptDelay) || Number.isNaN(attemptDelay)) {
       throw new Error(
-        `Unable to reconnect: invalid reconnection delay "${attemptDelay}"`
+        `Unable to perform reconnection: the reconnection delay "${attemptDelay}" is invalid`
       )
     }
 
@@ -183,15 +217,13 @@ export class DefaultWebSocketClient implements WebSocketClient {
       delay: attemptDelay
     })
 
-    // Check if a "reconnecting" event handler has called stop()
+    // Check if a "reconnecting" event handler has called terminate()
     if (!this.state.isReconnecting) {
-      return
+      throw new Error('Unable to perform reconnection: termination')
     }
 
     if (attemptDelay <= 0) {
-      await this.connect()
-
-      return
+      return this.performConnection()
     }
 
     if (this.reconnectionAbortController.signal.aborted) {
@@ -203,35 +235,54 @@ export class DefaultWebSocketClient implements WebSocketClient {
         signal: this.reconnectionAbortController.signal
       })
     } catch {
-      return
+      if (this.state.isTerminating) {
+        throw new Error('Unable to perform reconnection: termination')
+      }
     }
 
-    await this.connect()
+    await this.performConnection()
   }
 
-  private async terminate(reason: string): Promise<void> {
+  private async performTermination(reason: string): Promise<void> {
     this.state.setTerminating()
 
     await this.eventEmitter.emit('terminating', { reason })
 
-    // We need to perform all cleanup operations only after
-    // emitting "terminating" event to clear everything for sure
-    this.clearCachedMessages()
-    this.cancelReconnection()
+    if (this.state.isReconnecting) {
+      this.cancelReconnection()
+    }
 
-    await this.disconnect()
+    if (this.state.isConnected) {
+      await this.performDisconnection('Termination')
+    }
 
     this.state.setTerminated()
 
     await this.eventEmitter.emit('terminated', { reason })
+
+    // We need to perform all cleanup operations only after
+    // emitting the event "terminated" to clear everything for sure
+    this.clearCachedMessages()
   }
 
   private cancelReconnection(): void {
-    this.reconnectionAbortController.abort()
+    if (!this.state.isReconnecting) {
+      throw new Error(
+        'Unable to cancel reconnection: a reconnection is not performing'
+      )
+    }
 
     this.reconnectionPolicy.reset()
 
-    this.reconnectionAttempts = 0
+    this.reconnectionAbortController.abort()
+  }
+
+  private checkTermination(): void {
+    if (this.state.isTerminating || this.state.isTerminated) {
+      throw new Error(
+        'Unable to perform the operation: the client is terminating or has already terminated'
+      )
+    }
   }
 
   private processCachedMessages(): void {
@@ -270,9 +321,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
         attempts: this.reconnectionAttempts
       })
 
-      this.reconnectionPolicy.reset()
-
-      this.reconnectionAttempts = 0
+      this.resetReconnection()
     }
   }
 
@@ -284,7 +333,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
 
     await this.eventEmitter.emit('disconnected', { code, reason })
 
-    // Check if a "disconnected" event handler has called stop()
+    // Check if a "disconnected" event handler has called terminate()
     if (!this.state.isDisconnected) {
       return
     }
@@ -293,7 +342,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
       return
     }
 
-    await this.reconnect()
+    await this.performReconnection()
   }
 
   private readonly handleMessageEvent = async (
