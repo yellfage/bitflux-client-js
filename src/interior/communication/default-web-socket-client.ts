@@ -21,9 +21,7 @@ import type { WebSocketClient } from './web-socket-client'
 import type { WebSocketEvents } from './web-socket-events'
 
 export class DefaultWebSocketClient implements WebSocketClient {
-  public get url(): string {
-    return this.webSocket.url
-  }
+  public url: URL
 
   public readonly state: MutableState
 
@@ -44,6 +42,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
   private cachedMessages: Set<unknown>
 
   public constructor(
+    url: string,
     state: MutableState,
     logger: Logger,
     eventEmitter: EventEmitter<WebSocketEvents>,
@@ -51,6 +50,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
     reconnectionPolicy: ReconnectionPolicy,
     webSocket: PromisfiedWebSocket
   ) {
+    this.url = new URL(url)
     this.state = state
     this.logger = logger
     this.eventEmitter = eventEmitter
@@ -86,14 +86,12 @@ export class DefaultWebSocketClient implements WebSocketClient {
     await this.performConnection(url)
   }
 
-  public async reconnectCoercively(url = this.url): Promise<void> {
+  public async reconnectCoercively(): Promise<void> {
     if (!this.state.isConnecting) {
       throw new Error(
         'Unable to perform coercive reconnection: the client is not connecting'
       )
     }
-
-    this.webSocket.url = url
 
     await this.performReconnection()
   }
@@ -158,10 +156,14 @@ export class DefaultWebSocketClient implements WebSocketClient {
     this.webSocket.send(serializedMessage)
   }
 
-  private async performConnection(url = this.url): Promise<void> {
+  private async performConnection(url = this.url.toString()): Promise<void> {
+    if (url !== this.url.toString()) {
+      this.url = new URL(url)
+    }
+
     this.state.setConnecting()
 
-    await this.eventEmitter.emit('connecting', { url })
+    await this.eventEmitter.emit('connecting', { url: this.url })
 
     if (this.state.isConnected) {
       return

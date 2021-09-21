@@ -1,3 +1,5 @@
+import 'core-js/web/url'
+
 import 'abort-controller/polyfill'
 
 export * from './communication'

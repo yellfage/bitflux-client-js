@@ -3,7 +3,7 @@ import type { State } from './state'
 import type { WebSocketEvents } from './web-socket-events'
 
 export interface WebSocketClient {
-  readonly url: string
+  readonly url: URL
   readonly state: State
 
   connect: (url?: string) => Promise<void>

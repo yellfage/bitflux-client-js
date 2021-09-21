@@ -18,7 +18,7 @@ module.exports = {
     path: OUTPUT_PATH,
     libraryTarget: 'commonjs2'
   },
-  externals: ['abort-controller/polyfill', 'isomorphic-ws'],
+  externals: ['core-js/web/url', 'abort-controller/polyfill', 'isomorphic-ws'],
   resolve: {
     extensions: ['.ts', '.js']
   },

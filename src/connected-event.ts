@@ -1,3 +1,3 @@
 export interface ConnectedEvent {
-  readonly url: string
+  readonly url: URL
 }

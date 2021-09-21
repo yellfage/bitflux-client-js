@@ -1,3 +1,3 @@
 export interface ConnectingEvent {
-  readonly url: string
+  readonly url: URL
 }

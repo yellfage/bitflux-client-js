@@ -3,8 +3,6 @@ import WebSocket from 'isomorphic-ws'
 import { DeferredPromise } from '../deferred-promise'
 
 export class PromisfiedWebSocket {
-  public url: string
-
   public get state(): number {
     if (!this.webSocket) {
       throw new Error('The WebSocket is not connected')
@@ -35,8 +33,7 @@ export class PromisfiedWebSocket {
 
   private deferredClosingPromise: DeferredPromise<void> | null
 
-  public constructor(url: string, subProtocols: string[]) {
-    this.url = url
+  public constructor(subProtocols: string[]) {
     this.subProtocols = subProtocols
 
     this.onopen = null
@@ -49,12 +46,10 @@ export class PromisfiedWebSocket {
     this.deferredClosingPromise = null
   }
 
-  public async connect(url = this.url): Promise<void> {
+  public async connect(url: string): Promise<void> {
     if (this.webSocket) {
       throw new Error('The WebSocket is already connected')
     }
-
-    this.url = url
 
     this.webSocket = new WebSocket(url, this.subProtocols)
 

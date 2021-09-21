@@ -9,11 +9,11 @@ import type { PlainObject } from './plain-object'
 import type { RegularInvocationSetup } from './regular-invocation-setup'
 
 export interface WstClient {
-  readonly url: string
+  readonly url: URL
 
   connect: (url?: string) => Promise<void>
   reconnect: (url?: string) => Promise<void>
-  reconnectCoercively: (url?: string) => Promise<void>
+  reconnectCoercively: () => Promise<void>
   hasteReconnection: () => void
   resetReconnection: () => void
   disconnect: (reason?: string) => Promise<void>

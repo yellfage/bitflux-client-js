@@ -36,7 +36,7 @@ import {
 } from './validation'
 
 export class Client implements WstClient {
-  public get url(): string {
+  public get url(): URL {
     return this.webSocket.url
   }
 
@@ -80,8 +80,8 @@ export class Client implements WstClient {
     return this.webSocket.reconnect(url)
   }
 
-  public async reconnectCoercively(url?: string): Promise<void> {
-    return this.webSocket.reconnectCoercively(url)
+  public async reconnectCoercively(): Promise<void> {
+    return this.webSocket.reconnectCoercively()
   }
 
   public hasteReconnection(): void {

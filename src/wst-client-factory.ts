@@ -65,12 +65,13 @@ export class WstClientFactory {
     const eventEmitter = new EventEmitter<WebSocketEvents>()
 
     const webSocket = new DefaultWebSocketClient(
+      url,
       new MutableState(),
       logger,
       eventEmitter,
       options.communication.protocols,
       options.reconnection.policy,
-      new PromisfiedWebSocket(url, subProtocolNames)
+      new PromisfiedWebSocket(subProtocolNames)
     )
 
     return new Client(
