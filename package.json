@@ -20,16 +20,12 @@
     "prepublishOnly": "npm-run-all eslint:src:fix build"
   },
   "devDependencies": {
-    "@babel/core": "^7.15.0",
-    "@babel/preset-env": "^7.15.0",
     "@commitlint/cli": "^13.1.0",
     "@commitlint/prompt-cli": "^13.1.0",
     "@types/ws": "^7.4.7",
     "@yellfage/eslint-config": "^1.0.0",
     "@yellfage/eslint-config-typescript": "^1.0.0",
-    "babel-loader": "^8.2.2",
     "commitlint": "^13.1.0",
-    "core-js": "^3.16.1",
     "cross-env": "^7.0.3",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
