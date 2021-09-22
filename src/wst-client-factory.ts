@@ -25,7 +25,7 @@ import { WstClientFactoryOptions } from './wst-client-factory-options'
 export class WstClientFactory {
   public create(
     url: string,
-    configure?: (options: WstClientFactoryOptions) => void
+    configure: (options: WstClientFactoryOptions) => void = () => {}
   ): WstClient {
     if (!isString(url)) {
       throw new TypeError(
@@ -33,8 +33,7 @@ export class WstClientFactory {
       )
     }
 
-    // eslint-disable-next-line no-undefined
-    if (configure !== undefined && !isFunction(configure)) {
+    if (!isFunction(configure)) {
       throw new TypeError(
         'Invalid type of the "configure" parameter. Expected type: function'
       )
@@ -42,9 +41,7 @@ export class WstClientFactory {
 
     const options = new WstClientFactoryOptions()
 
-    if (configure) {
-      configure(options)
-    }
+    configure(options)
 
     if (!options.communication.protocols.length) {
       options.communication.protocols.push(new JsonProtocol())
