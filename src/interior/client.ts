@@ -147,7 +147,7 @@ export class Client implements WstClient {
 
     if (!isString(args[0])) {
       throw new Error(
-        'Invalid regular invocation arguments: the argument "handlerName" must be a string'
+        'Invalid regular invocation arguments: the "handlerName" argument must be a string'
       )
     }
 
@@ -179,7 +179,7 @@ export class Client implements WstClient {
     } else {
       if (!isString(args[0])) {
         throw new Error(
-          'Invalid notifiable invocation arguments: the argument "handlerName" must be a string'
+          'Invalid notifiable invocation arguments: the "handlerName" argument must be a string'
         )
       }
 

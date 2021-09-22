@@ -33,7 +33,7 @@ export class HandlerMapper {
         if (message.handlerName !== handlerName) {
           this.logger.logWarning(
             'Unable process incoming notifiable invocation: ' +
-              `the '${message.handlerName}' handler not found`
+              `the "${message.handlerName}" handler not found`
           )
 
           return

@@ -1,8 +1,8 @@
 import type { PlainObject } from '../plain-object'
 
 /**
- * Determines whether a value is a plain object
- * @param {value} The testable value
+ * Finds out whether or not a value is a plain object
+ * @param value The testable value
  */
 export function isPlainObject<TObject extends PlainObject = PlainObject>(
   value: unknown

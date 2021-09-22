@@ -208,7 +208,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
 
     if (!isNumber(attemptDelay) || Number.isNaN(attemptDelay)) {
       throw new Error(
-        `Unable to perform reconnection: the reconnection delay "${attemptDelay}" is invalid`
+        `Unable to perform reconnection: the "${attemptDelay}" reconnection delay is invalid`
       )
     }
 
@@ -263,7 +263,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
     await this.eventEmitter.emit('terminated', { reason })
 
     // We need to perform all cleanup operations only after
-    // emitting the event "terminated" to clear everything for sure
+    // emitting the "terminated" event to clear everything for sure
     this.clearCachedMessages()
   }
 
@@ -312,7 +312,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
   private readonly handleOpenEvent = async (): Promise<void> => {
     this.state.setConnected()
 
-    // We need to process the cached messages only after the "connected" state is set
+    // We need to process cached messages only after the "connected" state is setted
     // Otherwise, the cached messages will be cached again
     this.processCachedMessages()
 

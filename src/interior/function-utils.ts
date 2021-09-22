@@ -1,8 +1,8 @@
 import type { Callback } from './callback'
 
 /**
- * Determines whether a value is a function
- * @param {value} The testable value
+ * Finds out whether or not a value is a function
+ * @param value The testable value
  */
 export function isFunction<TFunction extends Callback = Callback>(
   value: unknown
