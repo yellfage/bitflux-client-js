@@ -14,7 +14,7 @@
     "create:declarations": "tsc --project ./tsconfig.json --outDir './dist' --emitDeclarationOnly",
     "clear:dist": "rimraf -rf ./dist/*",
     "commit": "commit",
-    "eslint": "eslint --report-unused-disable-directives --ext .js,.jsx,.ts,.tsx",
+    "eslint": "eslint --report-unused-disable-directives --ext .js,.ts",
     "eslint:src": "npm run eslint ./src",
     "eslint:src:fix": "npm run eslint:src -- -- --fix",
     "prepublishOnly": "npm-run-all eslint:src:fix build"
