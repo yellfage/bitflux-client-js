@@ -9,6 +9,8 @@ enum Value {
   Terminated = 5
 }
 
+const DEFAULT_VALUE = Value.Disconnected
+
 export class MutableState implements State {
   public get isConnecting(): boolean {
     return this.value === Value.Connecting
@@ -34,10 +36,10 @@ export class MutableState implements State {
     return this.value === Value.Terminated
   }
 
-  private value
+  private value: Value
 
   public constructor() {
-    this.value = Value.Disconnected
+    this.value = DEFAULT_VALUE
   }
 
   public setConnecting(): void {
@@ -62,5 +64,9 @@ export class MutableState implements State {
 
   public setTerminated(): void {
     this.value = Value.Terminated
+  }
+
+  public reset(): void {
+    this.value = DEFAULT_VALUE
   }
 }

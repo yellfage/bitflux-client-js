@@ -39,6 +39,8 @@ export class DefaultWebSocketClient implements WebSocketClient {
 
   private reconnectionAttempts: number
 
+  private connectionAbortController: AbortController
+
   private reconnectionAbortController: AbortController
 
   private cachedMessages: Set<unknown>
@@ -60,6 +62,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
     this.reconnectionPolicy = reconnectionPolicy
     this.webSocket = webSocket
     this.reconnectionAttempts = 0
+    this.connectionAbortController = new AbortController()
     this.reconnectionAbortController = new AbortController()
     this.cachedMessages = new Set<unknown>()
 
@@ -165,15 +168,21 @@ export class DefaultWebSocketClient implements WebSocketClient {
 
     this.state.setConnecting()
 
-    await this.eventEmitter.emit('connecting', { url: this.url })
+    await this.eventEmitter.emit('connecting', {
+      url: this.url,
+      abort: () => this.cancelConnection()
+    })
+
+    if (this.connectionAbortController.signal.aborted) {
+      this.state.reset()
+
+      this.connectionAbortController = new AbortController()
+
+      throw new AbortError('The connection has been aborted: manual abortion')
+    }
 
     if (this.state.isConnected) {
       return
-    }
-
-    // Check if a "connecting" event handler has called terminate()
-    if (!this.state.isConnecting) {
-      throw new AbortError('The connection has been aborted: termination')
     }
 
     try {
@@ -252,6 +261,10 @@ export class DefaultWebSocketClient implements WebSocketClient {
 
     await this.eventEmitter.emit('terminating', { reason })
 
+    if (this.state.isConnecting) {
+      this.cancelConnection()
+    }
+
     if (this.state.isReconnecting) {
       this.cancelReconnection()
     }
@@ -267,6 +280,16 @@ export class DefaultWebSocketClient implements WebSocketClient {
     // We need to perform all cleanup operations only after
     // emitting the "terminated" event to clear everything for sure
     this.clearCachedMessages()
+  }
+
+  private cancelConnection(): void {
+    if (!this.state.isConnecting) {
+      throw new Error(
+        'Unable to cancel connection: a connection is not performing'
+      )
+    }
+
+    this.connectionAbortController.abort()
   }
 
   private cancelReconnection(): void {
@@ -346,7 +369,15 @@ export class DefaultWebSocketClient implements WebSocketClient {
       return
     }
 
-    await this.performReconnection()
+    try {
+      await this.performReconnection()
+    } catch (error: unknown) {
+      if (error instanceof AbortError) {
+        return
+      }
+
+      throw error
+    }
   }
 
   private readonly handleMessageEvent = async (
