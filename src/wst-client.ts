@@ -1,4 +1,4 @@
-import type { Events } from './events'
+import type { EventHandlerMap } from './event-handler-map'
 
 import type { InvocationHandler } from './invocation-handler'
 
@@ -68,13 +68,13 @@ export interface WstClient {
     ...args: TArgs
   ): void
 
-  on<TEventName extends keyof Events>(
+  on<TEventName extends keyof EventHandlerMap>(
     eventName: TEventName,
-    handler: Events[TEventName]
-  ): Events[TEventName]
+    handler: EventHandlerMap[TEventName]
+  ): EventHandlerMap[TEventName]
 
-  off<TEventName extends keyof Events>(
+  off<TEventName extends keyof EventHandlerMap>(
     eventName: TEventName,
-    handler: Events[TEventName]
+    handler: EventHandlerMap[TEventName]
   ): void
 }

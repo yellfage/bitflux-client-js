@@ -1,6 +1,6 @@
 import type { State } from './state'
 
-import type { WebSocketEvents } from './web-socket-events'
+import type { WebSocketEventHandlerMap } from './web-socket-event-handler-map'
 
 export interface WebSocketClient {
   readonly url: URL
@@ -15,13 +15,13 @@ export interface WebSocketClient {
 
   send(message: unknown): void
 
-  on<TEventName extends keyof WebSocketEvents>(
+  on<TEventName extends keyof WebSocketEventHandlerMap>(
     eventName: TEventName,
-    handler: WebSocketEvents[TEventName]
-  ): WebSocketEvents[TEventName]
+    handler: WebSocketEventHandlerMap[TEventName]
+  ): WebSocketEventHandlerMap[TEventName]
 
-  off<TEventName extends keyof WebSocketEvents>(
+  off<TEventName extends keyof WebSocketEventHandlerMap>(
     eventName: TEventName,
-    handler: WebSocketEvents[TEventName]
+    handler: WebSocketEventHandlerMap[TEventName]
   ): void
 }

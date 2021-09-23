@@ -20,7 +20,7 @@ import type { PromisfiedWebSocket } from './promisfied-web-socket'
 
 import type { WebSocketClient } from './web-socket-client'
 
-import type { WebSocketEvents } from './web-socket-events'
+import type { WebSocketEventHandlerMap } from './web-socket-event-handler-map'
 
 export class DefaultWebSocketClient implements WebSocketClient {
   public url: URL
@@ -29,7 +29,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
 
   private readonly logger: Logger
 
-  private readonly eventEmitter: EventEmitter<WebSocketEvents>
+  private readonly eventEmitter: EventEmitter<WebSocketEventHandlerMap>
 
   private readonly protocols: Protocol[]
 
@@ -49,7 +49,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
     url: string,
     state: MutableState,
     logger: Logger,
-    eventEmitter: EventEmitter<WebSocketEvents>,
+    eventEmitter: EventEmitter<WebSocketEventHandlerMap>,
     protocols: Protocol[],
     reconnectionPolicy: ReconnectionPolicy,
     webSocket: PromisfiedWebSocket
@@ -133,13 +133,19 @@ export class DefaultWebSocketClient implements WebSocketClient {
     this.sendCore(message)
   }
 
-  public on(eventName: keyof WebSocketEvents, handler: Callback): Callback {
+  public on(
+    eventName: keyof WebSocketEventHandlerMap,
+    handler: Callback
+  ): Callback {
     this.checkTermination()
 
     return this.eventEmitter.on(eventName, handler)
   }
 
-  public off(eventName: keyof WebSocketEvents, handler: Callback): void {
+  public off(
+    eventName: keyof WebSocketEventHandlerMap,
+    handler: Callback
+  ): void {
     this.checkTermination()
 
     this.eventEmitter.off(eventName, handler)

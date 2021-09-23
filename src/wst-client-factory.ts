@@ -1,6 +1,6 @@
 import { JsonProtocol } from './communication'
 
-import type { WebSocketEvents } from './interior'
+import type { WebSocketEventHandlerMap } from './interior'
 
 import {
   isString,
@@ -59,7 +59,7 @@ export class WstClientFactory {
       (protocol) => protocol.name
     )
 
-    const eventEmitter = new EventEmitter<WebSocketEvents>()
+    const eventEmitter = new EventEmitter<WebSocketEventHandlerMap>()
 
     const webSocket = new DefaultWebSocketClient(
       url,

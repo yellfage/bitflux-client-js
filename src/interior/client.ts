@@ -1,4 +1,4 @@
-import type { Events } from '../events'
+import type { EventHandlerMap } from '../event-handler-map'
 
 import type { InvocationHandler } from '../invocation-handler'
 
@@ -44,7 +44,7 @@ export class Client implements WstClient {
 
   private readonly handlerMapper: HandlerMapper
 
-  private readonly eventEmitter: EventEmitter<Events>
+  private readonly eventEmitter: EventEmitter<EventHandlerMap>
 
   private readonly regularInvocationShapeFactory: RegularInvocationShapeFactory
 
@@ -57,7 +57,7 @@ export class Client implements WstClient {
   public constructor(
     webSocket: WebSocketClient,
     handlerMapper: HandlerMapper,
-    eventEmitter: EventEmitter<Events>,
+    eventEmitter: EventEmitter<EventHandlerMap>,
     regularInvocationShapeFactory: RegularInvocationShapeFactory,
     notifiableInvocationShapeFactory: NotifiableInvocationShapeFactory,
     regularInvocationFactory: RegularInvocationFactory,
@@ -206,16 +206,16 @@ export class Client implements WstClient {
     this.notify(...args)
   }
 
-  public on<TEventName extends keyof Events>(
+  public on<TEventName extends keyof EventHandlerMap>(
     eventName: TEventName,
-    handler: Events[TEventName]
-  ): Events[TEventName] {
+    handler: EventHandlerMap[TEventName]
+  ): EventHandlerMap[TEventName] {
     return this.eventEmitter.on(eventName, handler)
   }
 
-  public off<TEventName extends keyof Events>(
+  public off<TEventName extends keyof EventHandlerMap>(
     eventName: TEventName,
-    handler: Events[TEventName]
+    handler: EventHandlerMap[TEventName]
   ): void {
     this.eventEmitter.off(eventName, handler)
   }
