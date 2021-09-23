@@ -195,7 +195,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
       this.logger.logError(error)
 
       if (!this.reconnectionPolicy.confirm()) {
-        this.state.setDisconnected()
+        this.state.reset()
 
         throw new AbortError(`The connection has been aborted: unknown error`)
       }
