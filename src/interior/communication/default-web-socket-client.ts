@@ -223,10 +223,6 @@ export class DefaultWebSocketClient implements WebSocketClient {
       return this.performConnection()
     }
 
-    if (this.reconnectionAbortController.signal.aborted) {
-      this.reconnectionAbortController = new AbortController()
-    }
-
     try {
       await delay(attemptDelay, {
         signal: this.reconnectionAbortController.signal
@@ -237,6 +233,8 @@ export class DefaultWebSocketClient implements WebSocketClient {
           'The reconnection has been aborted: termination during delay'
         )
       }
+
+      this.reconnectionAbortController = new AbortController()
     }
 
     await this.performConnection()
