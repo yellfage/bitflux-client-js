@@ -1,4 +1,4 @@
-import type { DefaultReconnectionPolicyOptions } from '../../configuration/default-reconnection-policy-options'
+import type { DefaultReconnectionPolicyOptions } from '../../reconnection'
 
 import { isNumber } from '../number-utils'
 

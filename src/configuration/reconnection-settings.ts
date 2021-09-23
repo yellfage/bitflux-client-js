@@ -1,6 +1,6 @@
-import { DefaultReconnectionPolicy } from './default-reconnection-policy'
+import type { ReconnectionPolicy } from '../reconnection'
 
-import type { ReconnectionPolicy } from './reconnection-policy'
+import { DefaultReconnectionPolicy } from '../reconnection'
 
 export class ReconnectionSettings {
   public policy: ReconnectionPolicy

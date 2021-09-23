@@ -4,9 +4,9 @@ import { AbortError } from '../../abort-error'
 
 import type { Protocol } from '../../communication'
 
-import type { ReconnectionPolicy } from '../../configuration'
-
 import type { Logger } from '../../logging'
+
+import type { ReconnectionPolicy } from '../../reconnection'
 
 import type { Callback } from '../callback'
 

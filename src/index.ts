@@ -5,6 +5,7 @@ import 'abort-controller/polyfill'
 export * from './communication'
 export * from './configuration'
 export * from './logging'
+export * from './reconnection'
 
 export * from './abort-error'
 export * from './connected-event'
