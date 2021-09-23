@@ -11,67 +11,70 @@ import type { RegularInvocationSetup } from './regular-invocation-setup'
 export interface WstClient {
   readonly url: URL
 
-  connect: (url?: string) => Promise<void>
-  reconnect: (url?: string) => Promise<void>
-  hasteReconnection: () => void
-  resetReconnection: () => void
-  disconnect: (reason?: string) => Promise<void>
-  terminate: (reason?: string) => Promise<void>
+  connect(url?: string): Promise<void>
+  reconnect(url?: string): Promise<void>
+  hasteReconnection(): void
+  resetReconnection(): void
+  disconnect(reason?: string): Promise<void>
+  terminate(reason?: string): Promise<void>
 
-  map: (handlerName: string, handler: InvocationHandler) => void
-  mapObject: (obj: PlainObject) => void
+  map(handlerName: string, handler: InvocationHandler): void
+  mapObject(obj: PlainObject): void
 
-  invoke: (<
+  invoke<
     TResult = unknown,
     THandlerName extends string = string,
     TArgs extends unknown[] = unknown[]
   >(
     setup: RegularInvocationSetup<THandlerName, TArgs>
-  ) => Promise<TResult>) &
-    (<
-      TResult = unknown,
-      THandlerName extends string = string,
-      TArgs extends unknown[] = unknown[]
-    >(
-      handlerName: THandlerName,
-      ...args: TArgs
-    ) => Promise<TResult>)
+  ): Promise<TResult>
 
-  notify: (<
+  invoke<
+    TResult = unknown,
+    THandlerName extends string = string,
+    TArgs extends unknown[] = unknown[]
+  >(
+    handlerName: THandlerName,
+    ...args: TArgs
+  ): Promise<TResult>
+
+  notify<
     THandlerName extends string = string,
     TArgs extends unknown[] = unknown[]
   >(
     setup: NotifiableInvocationSetup<THandlerName, TArgs>
-  ) => void) &
-    (<
-      THandlerName extends string = string,
-      TArgs extends unknown[] = unknown[]
-    >(
-      handlerName: THandlerName,
-      ...args: TArgs
-    ) => void)
+  ): void
 
-  notifyCarelessly: (<
+  notify<
+    THandlerName extends string = string,
+    TArgs extends unknown[] = unknown[]
+  >(
+    handlerName: THandlerName,
+    ...args: TArgs
+  ): void
+
+  notifyCarelessly<
     THandlerName extends string = string,
     TArgs extends unknown[] = unknown[]
   >(
     setup: NotifiableInvocationSetup<THandlerName, TArgs>
-  ) => void) &
-    (<
-      THandlerName extends string = string,
-      TArgs extends unknown[] = unknown[]
-    >(
-      handlerName: THandlerName,
-      ...args: TArgs
-    ) => void)
+  ): void
 
-  on: <TEventName extends keyof Events>(
+  notifyCarelessly<
+    THandlerName extends string = string,
+    TArgs extends unknown[] = unknown[]
+  >(
+    handlerName: THandlerName,
+    ...args: TArgs
+  ): void
+
+  on<TEventName extends keyof Events>(
     eventName: TEventName,
     handler: Events[TEventName]
-  ) => Events[TEventName]
+  ): Events[TEventName]
 
-  off: <TEventName extends keyof Events>(
+  off<TEventName extends keyof Events>(
     eventName: TEventName,
     handler: Events[TEventName]
-  ) => void
+  ): void
 }
