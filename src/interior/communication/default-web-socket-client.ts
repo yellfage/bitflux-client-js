@@ -220,7 +220,9 @@ export class DefaultWebSocketClient implements WebSocketClient {
     }
 
     if (attemptDelay <= 0) {
-      return this.performConnection()
+      await this.performConnection()
+
+      return
     }
 
     try {
