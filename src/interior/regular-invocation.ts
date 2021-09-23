@@ -1,10 +1,10 @@
 import { nanoid } from 'nanoid'
 
+import { AbortError } from '../abort-error'
+
 import type { IncomingMessage } from '../communication'
 
 import { IncomingMessageType } from '../communication'
-
-import { InvocationAbortedError } from '../invocation-aborted-error'
 
 import type {
   WebSocketClient,
@@ -105,9 +105,7 @@ export class RegularInvocation {
     }
 
     this.rejectionTimeoutId = setTimeout(() => {
-      this.handleResult(
-        new InvocationAbortedError('The invocation aborted: timeout')
-      )
+      this.handleResult(new AbortError('The invocation aborted: timeout'))
     }, rejectionDelay) as unknown as number
   }
 
@@ -120,7 +118,7 @@ export class RegularInvocation {
 
     this.attemptRejectionTimeoutId = setTimeout(() => {
       this.handleResult(
-        new InvocationAbortedError('The invocation aborted: attempt timeout')
+        new AbortError('The invocation aborted: attempt timeout')
       )
     }, attemptRejectionDelay) as unknown as number
   }
@@ -154,15 +152,11 @@ export class RegularInvocation {
   }
 
   private readonly handleAbortion = (): void => {
-    this.handleResult(
-      new InvocationAbortedError('The invocation aborted: manual abortion')
-    )
+    this.handleResult(new AbortError('The invocation aborted: manual abortion'))
   }
 
   private readonly handleTerminating = (): void => {
-    this.handleResult(
-      new InvocationAbortedError('The invocation aborted: termination')
-    )
+    this.handleResult(new AbortError('The invocation aborted: termination'))
   }
 
   private readonly handleDisconnect = (): void => {
