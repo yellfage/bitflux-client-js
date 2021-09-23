@@ -1,5 +1,7 @@
 import delay from 'delay'
 
+import { AbortError } from '../../abort-error'
+
 import type { Protocol } from '../../communication'
 
 import type { ReconnectionPolicy } from '../../configuration'
@@ -171,16 +173,14 @@ export class DefaultWebSocketClient implements WebSocketClient {
 
     // Check if a "connecting" event handler has called terminate()
     if (!this.state.isConnecting) {
-      throw new Error('Failed to establish a connection: termination')
+      throw new AbortError('The connection has been aborted: termination')
     }
 
     try {
       await this.webSocket.connect(url)
     } catch (error: unknown) {
       if (this.state.isTerminating) {
-        throw new Error(
-          'Failed to establish a connection: termination during connection'
-        )
+        throw new AbortError('The connection has been aborted: termination')
       }
 
       this.logger.logError(error)
@@ -188,7 +188,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
       if (!this.reconnectionPolicy.confirm()) {
         this.state.setDisconnected()
 
-        throw new Error(`Failed to establish a connection: unknown error`)
+        throw new AbortError(`The connection has been aborted: unknown error`)
       }
 
       await this.performReconnection()
@@ -221,7 +221,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
 
     // Check if a "reconnecting" event handler has called terminate()
     if (!this.state.isReconnecting) {
-      throw new Error('Unable to perform reconnection: termination')
+      throw new AbortError('The reconnection has been aborted: termination')
     }
 
     if (attemptDelay <= 0) {
@@ -238,7 +238,9 @@ export class DefaultWebSocketClient implements WebSocketClient {
       })
     } catch {
       if (this.state.isTerminating) {
-        throw new Error('Unable to perform reconnection: termination')
+        throw new AbortError(
+          'The reconnection has been aborted: termination during delay'
+        )
       }
     }
 
