@@ -80,10 +80,6 @@ export class Client implements WstClient {
     return this.webSocket.reconnect(url)
   }
 
-  public async reconnectCoercively(): Promise<void> {
-    return this.webSocket.reconnectCoercively()
-  }
-
   public hasteReconnection(): void {
     this.webSocket.hasteReconnection()
   }

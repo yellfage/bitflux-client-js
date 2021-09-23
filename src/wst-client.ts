@@ -13,7 +13,6 @@ export interface WstClient {
 
   connect: (url?: string) => Promise<void>
   reconnect: (url?: string) => Promise<void>
-  reconnectCoercively: () => Promise<void>
   hasteReconnection: () => void
   resetReconnection: () => void
   disconnect: (reason?: string) => Promise<void>

@@ -91,16 +91,6 @@ export class DefaultWebSocketClient implements WebSocketClient {
     await this.performConnection(url)
   }
 
-  public async reconnectCoercively(): Promise<void> {
-    if (!this.state.isConnecting) {
-      throw new Error(
-        'Unable to perform coercive reconnection: the client is not connecting'
-      )
-    }
-
-    await this.performReconnection()
-  }
-
   public hasteReconnection(): void {
     if (!this.state.isReconnecting) {
       return
@@ -179,10 +169,6 @@ export class DefaultWebSocketClient implements WebSocketClient {
       this.connectionAbortController = new AbortController()
 
       throw new AbortError('The connection has been aborted: manual abortion')
-    }
-
-    if (this.state.isConnected) {
-      return
     }
 
     try {
