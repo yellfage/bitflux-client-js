@@ -23,7 +23,6 @@
     "@commitlint/cli": "^13.1.0",
     "@commitlint/prompt-cli": "^13.1.0",
     "@types/ws": "^7.4.7",
-    "@yellfage/eslint-config": "^1.0.0",
     "@yellfage/eslint-config-typescript": "^1.0.0",
     "commitlint": "^13.1.0",
     "cross-env": "^7.0.3",
