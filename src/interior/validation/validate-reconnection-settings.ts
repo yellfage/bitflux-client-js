@@ -1,12 +1,12 @@
 import type { ReconnectionSettings } from '../../configuration'
 
 export function validateReconnectionSettings({
-  policy
+  scheme
 }: ReconnectionSettings): void {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  if (policy == null) {
+  if (scheme == null) {
     throw new TypeError(
-      'Invalid reconnection settings: the "policy" field cannot be a null or undefined'
+      'Invalid reconnection settings: the "scheme" field cannot be a null or undefined'
     )
   }
 }

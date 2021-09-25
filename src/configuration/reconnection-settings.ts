@@ -1,13 +1,13 @@
-import type { ReconnectionPolicy } from '../reconnection'
+import type { ReconnectionScheme } from '../reconnection'
 
-import { DefaultReconnectionPolicy } from '../reconnection'
+import { DefaultReconnectionScheme } from '../reconnection'
 
 export class ReconnectionSettings {
-  public policy: ReconnectionPolicy
+  public scheme: ReconnectionScheme
 
   public constructor(
-    policy: ReconnectionPolicy = new DefaultReconnectionPolicy()
+    scheme: ReconnectionScheme = new DefaultReconnectionScheme()
   ) {
-    this.policy = policy
+    this.scheme = scheme
   }
 }

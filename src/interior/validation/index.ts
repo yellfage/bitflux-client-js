@@ -1,5 +1,5 @@
 export * from './validate-communication-settings'
-export * from './validate-default-reconnection-policy-options'
+export * from './validate-default-reconnection-scheme-options'
 export * from './validate-invocation-setup'
 export * from './validate-logging-settings'
 export * from './validate-notifiable-invocation-setup'

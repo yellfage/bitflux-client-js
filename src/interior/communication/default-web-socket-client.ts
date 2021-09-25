@@ -6,7 +6,7 @@ import type { Protocol } from '../../communication'
 
 import type { Logger } from '../../logging'
 
-import type { ReconnectionPolicy } from '../../reconnection'
+import type { ReconnectionScheme } from '../../reconnection'
 
 import type { Callback } from '../callback'
 
@@ -33,7 +33,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
 
   private readonly protocols: Protocol[]
 
-  private readonly reconnectionPolicy: ReconnectionPolicy
+  private readonly reconnectionScheme: ReconnectionScheme
 
   private readonly webSocket: PromisfiedWebSocket
 
@@ -51,7 +51,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
     logger: Logger,
     eventEmitter: EventEmitter<WebSocketEventHandlerMap>,
     protocols: Protocol[],
-    reconnectionPolicy: ReconnectionPolicy,
+    reconnectionScheme: ReconnectionScheme,
     webSocket: PromisfiedWebSocket
   ) {
     this.url = new URL(url)
@@ -59,7 +59,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
     this.logger = logger
     this.eventEmitter = eventEmitter
     this.protocols = protocols
-    this.reconnectionPolicy = reconnectionPolicy
+    this.reconnectionScheme = reconnectionScheme
     this.webSocket = webSocket
     this.reconnectionAttempts = 0
     this.connectionAbortController = new AbortController()
@@ -102,7 +102,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
   public resetReconnection(): void {
     this.reconnectionAttempts = 0
 
-    this.reconnectionPolicy.reset()
+    this.reconnectionScheme.reset()
   }
 
   public async disconnect(reason = 'Manual disconnection'): Promise<void> {
@@ -186,7 +186,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
 
       this.logger.logError(error)
 
-      if (!this.reconnectionPolicy.confirm()) {
+      if (!this.reconnectionScheme.confirm()) {
         this.state.reset()
 
         throw new AbortError(`The connection has been aborted: unknown error`)
@@ -203,7 +203,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
   private async performReconnection(): Promise<void> {
     this.reconnectionAttempts += 1
 
-    const attemptDelay = this.reconnectionPolicy.getNextDelay(
+    const attemptDelay = this.reconnectionScheme.getNextDelay(
       this.reconnectionAttempts
     )
 
@@ -291,7 +291,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
       )
     }
 
-    this.reconnectionPolicy.reset()
+    this.reconnectionScheme.reset()
 
     this.reconnectionAbortController.abort()
   }
@@ -357,7 +357,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
       return
     }
 
-    if (!this.reconnectionPolicy.confirmCode(code)) {
+    if (!this.reconnectionScheme.confirmCode(code)) {
       return
     }
 

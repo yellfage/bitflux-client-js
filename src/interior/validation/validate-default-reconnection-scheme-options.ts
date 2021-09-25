@@ -1,17 +1,17 @@
-import type { DefaultReconnectionPolicyOptions } from '../../reconnection'
+import type { DefaultReconnectionSchemeOptions } from '../../reconnection'
 
 import { isNumber } from '../number-utils'
 
-export function validateDefaultReconnectionPolicyOptions({
+export function validateDefaultReconnectionSchemeOptions({
   delays,
   minDelayOffset,
   maxDelayOffset,
   maxAttemptsAfterDelays,
   reconnectableCodes
-}: DefaultReconnectionPolicyOptions): void {
+}: DefaultReconnectionSchemeOptions): void {
   if (delays != null && !Array.isArray(delays)) {
     throw new TypeError(
-      'Invalid default reconnection policy options: the "delays" field must be an array'
+      'Invalid default reconnection scheme options: the "delays" field must be an array'
     )
   }
 
@@ -20,7 +20,7 @@ export function validateDefaultReconnectionPolicyOptions({
     (!isNumber(minDelayOffset) || Number.isNaN(minDelayOffset))
   ) {
     throw new TypeError(
-      'Invalid default reconnection policy options: the "minDelayOffset" field must be a number'
+      'Invalid default reconnection scheme options: the "minDelayOffset" field must be a number'
     )
   }
 
@@ -29,7 +29,7 @@ export function validateDefaultReconnectionPolicyOptions({
     (!isNumber(maxDelayOffset) || Number.isNaN(maxDelayOffset))
   ) {
     throw new TypeError(
-      'Invalid default reconnection policy options: the "maxDelayOffset" field must be a number'
+      'Invalid default reconnection scheme options: the "maxDelayOffset" field must be a number'
     )
   }
 
@@ -38,13 +38,13 @@ export function validateDefaultReconnectionPolicyOptions({
     (!isNumber(maxAttemptsAfterDelays) || Number.isNaN(maxAttemptsAfterDelays))
   ) {
     throw new TypeError(
-      'Invalid default reconnection policy options: the "maxAttemptsAfterDelays" field must be a number'
+      'Invalid default reconnection scheme options: the "maxAttemptsAfterDelays" field must be a number'
     )
   }
 
   if (reconnectableCodes != null && !Array.isArray(reconnectableCodes)) {
     throw new TypeError(
-      'Invalid default reconnection policy options: the "reconnectableCodes" field must be an array'
+      'Invalid default reconnection scheme options: the "reconnectableCodes" field must be an array'
     )
   }
 }

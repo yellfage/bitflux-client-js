@@ -1,17 +1,17 @@
 import type { DisconnectionCode } from '../communication'
 
-import { validateDefaultReconnectionPolicyOptions } from '../interior/validation'
+import { validateDefaultReconnectionSchemeOptions } from '../interior'
 
-import type { DefaultReconnectionPolicyOptions } from './default-reconnection-policy-options'
+import type { DefaultReconnectionSchemeOptions } from './default-reconnection-scheme-options'
 
 import { RECONNECTABLE_DISCONNECTION_CODES } from './reconnectable-disconnection-codes'
 
-import type { ReconnectionPolicy } from './reconnection-policy'
+import type { ReconnectionScheme } from './reconnection-scheme'
 
 const DEFAULT_DELAY_INDEX = -1
 const DEFAULT_ATTEMPTS_AFTER_DELAYS = 0
 
-export class DefaultReconnectionPolicy implements ReconnectionPolicy {
+export class DefaultReconnectionScheme implements ReconnectionScheme {
   private readonly delays: number[]
 
   private readonly minDelayOffset: number
@@ -26,8 +26,8 @@ export class DefaultReconnectionPolicy implements ReconnectionPolicy {
 
   private attemptsAfterDelays: number
 
-  public constructor(options: DefaultReconnectionPolicyOptions = {}) {
-    validateDefaultReconnectionPolicyOptions(options)
+  public constructor(options: DefaultReconnectionSchemeOptions = {}) {
+    validateDefaultReconnectionSchemeOptions(options)
 
     const {
       delays = [1000, 2000, 5000, 10000, 15000],

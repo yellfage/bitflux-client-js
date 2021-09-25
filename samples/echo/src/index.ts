@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
-import { WstClientFactory, DefaultReconnectionPolicy } from '../../../src'
+import { WstClientFactory, DefaultReconnectionScheme } from '../../../src'
 
 const client = new WstClientFactory().create(
   'wss://localhost:5001/ws',
   (options) => {
-    options.reconnection.policy = new DefaultReconnectionPolicy({
+    options.reconnection.scheme = new DefaultReconnectionScheme({
       delays: [],
       maxAttemptsAfterDelays: -1
     })

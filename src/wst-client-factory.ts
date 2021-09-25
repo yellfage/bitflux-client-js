@@ -67,7 +67,7 @@ export class WstClientFactory {
       logger,
       eventEmitter,
       options.communication.protocols,
-      options.reconnection.policy,
+      options.reconnection.scheme,
       new PromisfiedWebSocket(subProtocolNames)
     )
 
