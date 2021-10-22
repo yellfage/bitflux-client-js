@@ -1,11 +1,9 @@
 import type { Logger } from '../logging'
 
-import { DefaultLogger, LogLevel } from '../logging'
-
 export class LoggingSettings {
-  public logger: Logger
+  public readonly logger: Logger
 
-  public constructor(logger: Logger = new DefaultLogger(LogLevel.Trace)) {
+  public constructor(logger: Logger) {
     this.logger = logger
   }
 }

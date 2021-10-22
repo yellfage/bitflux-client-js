@@ -1,15 +1,16 @@
 /* eslint-disable no-console */
-import { WstClientFactory, DefaultReconnectionScheme } from '../../../src'
+import { WstClientBuilder, DefaultReconnectionScheme } from '../../../src'
 
-const client = new WstClientFactory().create(
-  'wss://localhost:5001/ws',
-  (options) => {
-    options.reconnection.scheme = new DefaultReconnectionScheme({
-      delays: [],
-      maxAttemptsAfterDelays: -1
-    })
-  }
-)
+const client = new WstClientBuilder('wss://localhost:5001/ws')
+  .configureReconnection((builder) =>
+    builder.setScheme(
+      new DefaultReconnectionScheme({
+        delays: [1000],
+        maxAttemptsAfterDelays: -1
+      })
+    )
+  )
+  .build()
 
 client.on('connecting', (event) => console.log('Connecting', event))
 client.on('connected', (event) => console.log('Connected', event))

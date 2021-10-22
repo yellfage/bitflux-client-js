@@ -1,13 +1,9 @@
 import type { ReconnectionScheme } from '../reconnection'
 
-import { DefaultReconnectionScheme } from '../reconnection'
-
 export class ReconnectionSettings {
-  public scheme: ReconnectionScheme
+  public readonly scheme: ReconnectionScheme
 
-  public constructor(
-    scheme: ReconnectionScheme = new DefaultReconnectionScheme()
-  ) {
+  public constructor(scheme: ReconnectionScheme) {
     this.scheme = scheme
   }
 }

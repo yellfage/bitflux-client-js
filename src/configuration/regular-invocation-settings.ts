@@ -1,9 +1,9 @@
 export class RegularInvocationSettings {
-  public rejectionDelay: number
+  public readonly rejectionDelay: number
 
-  public attemptRejectionDelay: number
+  public readonly attemptRejectionDelay: number
 
-  public constructor(rejectionDelay = 30000, attemptRejectionDelay = 8000) {
+  public constructor(rejectionDelay: number, attemptRejectionDelay: number) {
     this.rejectionDelay = rejectionDelay
     this.attemptRejectionDelay = attemptRejectionDelay
   }
