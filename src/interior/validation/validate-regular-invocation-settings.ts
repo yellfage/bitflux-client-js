@@ -1,6 +1,6 @@
 import type { RegularInvocationSettings } from '../../configuration'
 
-import { isNumber } from '../number-utils'
+import { isNumber } from '../is-number'
 
 export function validateRegularInvocationSettings({
   rejectionDelay,

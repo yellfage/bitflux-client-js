@@ -18,21 +18,21 @@ import type { WebSocketClient } from './communication'
 
 import type { EventEmitter } from './event-emitter'
 
-import { isFunction } from './function-utils'
-
 import type { HandlerMapper } from './handler-mapper'
+
+import { isFunction } from './is-function'
+
+import { isPlainObject } from './is-plain-object'
+
+import { isString } from './is-string'
 
 import type { NotifiableInvocationFactory } from './notifiable-invocation-factory'
 
 import type { NotifiableInvocationShapeFactory } from './notifiable-invocation-shape-factory'
 
-import { isPlainObject } from './object-utils'
-
 import type { RegularInvocationFactory } from './regular-invocation-factory'
 
 import type { RegularInvocationShapeFactory } from './regular-invocation-shape-factory'
-
-import { isString } from './string-utils'
 
 import {
   validateRegularInvocationSetup,

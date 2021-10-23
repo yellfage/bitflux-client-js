@@ -1,8 +1,8 @@
 import type { PlainObject } from '../plain-object'
 
-import { removeFromArray } from './array-utils'
-
 import type { Callback } from './callback'
+
+import { removeFromArray } from './remove-from-array'
 
 export class EventEmitter<TEventHandlerMap extends Record<string, Callback>> {
   private readonly handlers: PlainObject<Callback[] | undefined>

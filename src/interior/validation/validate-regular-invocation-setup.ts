@@ -1,6 +1,6 @@
 import type { RegularInvocationSetup } from '../../regular-invocation-setup'
 
-import { isNumber } from '../number-utils'
+import { isNumber } from '../is-number'
 
 import { validateInvocationSetup } from './validate-invocation-setup'
 

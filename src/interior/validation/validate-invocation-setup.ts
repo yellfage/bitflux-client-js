@@ -1,6 +1,6 @@
 import type { InvocationSetup } from '../../invocation-setup'
 
-import { isString } from '../string-utils'
+import { isString } from '../is-string'
 
 export function validateInvocationSetup({
   handlerName,

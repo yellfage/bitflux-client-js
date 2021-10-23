@@ -1,6 +1,6 @@
 import type { DefaultReconnectionSchemeOptions } from '../../reconnection'
 
-import { isNumber } from '../number-utils'
+import { isNumber } from '../is-number'
 
 export function validateDefaultReconnectionSchemeOptions({
   delays,
