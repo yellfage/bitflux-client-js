@@ -6,6 +6,8 @@ import type { NotifiableInvocationSetup } from './notifiable-invocation-setup'
 
 import type { PlainObject } from './plain-object'
 
+import type { Plugin } from './plugin'
+
 import type { RegularInvocationSetup } from './regular-invocation-setup'
 
 import type { State } from './state'
@@ -20,6 +22,8 @@ export interface WstClient {
   resetReconnection(): void
   disconnect(reason?: string): Promise<void>
   terminate(reason?: string): Promise<void>
+
+  use(plugin: Plugin)
 
   map(handlerName: string, handler: InvocationHandler): void
   mapObject(obj: PlainObject): void

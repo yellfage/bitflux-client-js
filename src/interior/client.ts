@@ -6,6 +6,8 @@ import type { NotifiableInvocationSetup } from '../notifiable-invocation-setup'
 
 import type { PlainObject } from '../plain-object'
 
+import type { Plugin } from '../plugin'
+
 import type { RegularInvocationSetup } from '../regular-invocation-setup'
 
 import type { State } from '../state'
@@ -100,6 +102,10 @@ export class Client implements WstClient {
 
   public async terminate(reason?: string): Promise<void> {
     return this.webSocket.terminate(reason)
+  }
+
+  public use(plugin: Plugin): void {
+    plugin.initialize(this)
   }
 
   public map(handlerName: string, handler: InvocationHandler): void {
