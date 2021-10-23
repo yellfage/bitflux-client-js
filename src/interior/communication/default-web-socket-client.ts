@@ -12,9 +12,9 @@ import type { Callback } from '../callback'
 
 import type { EventEmitter } from '../event-emitter'
 
-import { isNumber } from '../number-utils'
+import type { MutableState } from '../mutable-state'
 
-import type { MutableState } from './mutable-state'
+import { isNumber } from '../number-utils'
 
 import type { PromisfiedWebSocket } from './promisfied-web-socket'
 
@@ -178,7 +178,7 @@ export class DefaultWebSocketClient implements WebSocketClient {
     }
 
     try {
-      await this.webSocket.connect(url)
+      await this.webSocket.connect(this.url.toString())
     } catch (error: unknown) {
       if (this.state.isTerminating) {
         throw new AbortError('The connection has been aborted: termination')

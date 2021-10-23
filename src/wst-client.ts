@@ -8,8 +8,11 @@ import type { PlainObject } from './plain-object'
 
 import type { RegularInvocationSetup } from './regular-invocation-setup'
 
+import type { State } from './state'
+
 export interface WstClient {
   readonly url: URL
+  readonly state: State
 
   connect(url?: string): Promise<void>
   reconnect(url?: string): Promise<void>

@@ -8,6 +8,8 @@ import type { PlainObject } from '../plain-object'
 
 import type { RegularInvocationSetup } from '../regular-invocation-setup'
 
+import type { State } from '../state'
+
 import type { WstClient } from '../wst-client'
 
 import type { WebSocketClient } from './communication'
@@ -38,6 +40,10 @@ import {
 export class Client implements WstClient {
   public get url(): URL {
     return this.webSocket.url
+  }
+
+  public get state(): State {
+    return this.webSocket.state
   }
 
   private readonly webSocket: WebSocketClient

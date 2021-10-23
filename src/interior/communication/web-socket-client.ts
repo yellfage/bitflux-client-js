@@ -1,4 +1,4 @@
-import type { State } from './state'
+import type { State } from '../../state'
 
 import type { WebSocketEventHandlerMap } from './web-socket-event-handler-map'
 

@@ -1,4 +1,4 @@
-import type { State } from './state'
+import type { State } from '../state'
 
 enum Value {
   Connecting = 0,
