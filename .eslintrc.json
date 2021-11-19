@@ -1,0 +1,9 @@
+{
+  "extends": [
+    "@yellfage/eslint-config-typescript",
+    "plugin:prettier/recommended"
+  ],
+  "parserOptions": {
+    "project": ["./tsconfig.json", "./package/**/tsconfig.json"]
+  }
+}

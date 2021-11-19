@@ -1,0 +1,40 @@
+{
+  "name": "@yellfage/wst-client-json-protocol",
+  "version": "1.0.0",
+  "author": "Yellfage",
+  "description": "WST client json protocol",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "npm-run-all clear:dist compile:prod create:declarations",
+    "compile:prod": "cross-env NODE_ENV=production webpack --config ./webpack.config.js",
+    "create:declarations": "tsc --project ./tsconfig.json --outDir './dist' --emitDeclarationOnly",
+    "clear:dist": "rimraf -rf ./dist/*",
+    "eslint": "eslint ./ --ext .js,.ts --ignore-path=../../.eslintignore --report-unused-disable-directives",
+    "eslint:fix": "npm run eslint -- --fix",
+    "prepublishOnly": "npm-run-all eslint:fix build"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yellfage/wst-client-js.git",
+    "directory": "package/wst-client-json-protocol"
+  },
+  "peerDependencies": {
+    "@yellfage/wst-client": "^1.0.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "eslint": "^7.32.0",
+    "fork-ts-checker-webpack-plugin": "^6.4.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.4.1",
+    "rimraf": "^3.0.2",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.4.4",
+    "webpack": "^5.59.1",
+    "webpack-cli": "^4.9.1"
+  }
+}
