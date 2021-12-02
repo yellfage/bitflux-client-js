@@ -9,7 +9,7 @@ import type {
   BridgeMessageEvent,
   IncomingFailedRegularInvocationResultMessage,
   IncomingRegularInvocationResultMessage,
-  IncomingSuccessfulRegularInvocationResultMessage
+  IncomingSuccessfulRegularInvocationResultMessage,
 } from '../communication'
 
 import { OutgoingRegularInvocationMessage } from '../communication'
@@ -42,14 +42,14 @@ export class BasicRegularInvocation<TResult>
     this.message = new OutgoingRegularInvocationMessage(
       shape.id,
       shape.handlerName,
-      shape.args
+      shape.args,
     )
   }
 
   public async perform(): Promise<TResult> {
     if (this.shape.abortController.signal.aborted) {
       throw new Error(
-        'Unable to perform regular invocation: the provided AbortController is already aborted'
+        'Unable to perform regular invocation: the provided AbortController is already aborted',
       )
     }
 
@@ -81,14 +81,14 @@ export class BasicRegularInvocation<TResult>
   private registerAbortionHandler(): void {
     this.shape.abortController.signal.addEventListener(
       'abort',
-      this.handleAbortion
+      this.handleAbortion,
     )
   }
 
   private unregisterAbortionHandler(): void {
     this.shape.abortController.signal.removeEventListener(
       'abort',
-      this.handleAbortion
+      this.handleAbortion,
     )
   }
 
@@ -100,7 +100,7 @@ export class BasicRegularInvocation<TResult>
     }
 
     this.rejectionTimeoutId = setTimeout(() => {
-      this.handleResult(new AbortError('The invocation aborted: timeout'))
+      this.shape.abortController.abort()
     }, rejectionDelay) as unknown as number
   }
 
@@ -112,9 +112,7 @@ export class BasicRegularInvocation<TResult>
     }
 
     this.attemptRejectionTimeoutId = setTimeout(() => {
-      this.handleResult(
-        new AbortError('The invocation aborted: attempt timeout')
-      )
+      this.shape.abortController.abort()
     }, attemptRejectionDelay) as unknown as number
   }
 
@@ -147,11 +145,11 @@ export class BasicRegularInvocation<TResult>
   }
 
   private readonly handleAbortion = (): void => {
-    this.handleResult(new AbortError('The invocation aborted: manual abortion'))
+    this.handleResult(new AbortError('The invocation aborted'))
   }
 
   private readonly handleTerminatingEvent = (): void => {
-    this.handleResult(new AbortError('The invocation aborted: termination'))
+    this.shape.abortController.abort()
   }
 
   private readonly handleDisconnectedEvent = (): void => {
@@ -163,7 +161,7 @@ export class BasicRegularInvocation<TResult>
   }
 
   private readonly handleMessageEvent = ({
-    message
+    message,
   }: BridgeMessageEvent): void => {
     if (
       !this.isRegularInvocationResultMessage(message) ||
@@ -180,7 +178,7 @@ export class BasicRegularInvocation<TResult>
   }
 
   private isRegularInvocationResultMessage(
-    message: IncomingMessage
+    message: IncomingMessage,
   ): message is IncomingRegularInvocationResultMessage {
     return (
       this.isSuccessfulRegularInvocationResultMessage(message) ||
@@ -189,7 +187,7 @@ export class BasicRegularInvocation<TResult>
   }
 
   private isSuccessfulRegularInvocationResultMessage(
-    message: IncomingMessage
+    message: IncomingMessage,
   ): message is IncomingSuccessfulRegularInvocationResultMessage {
     return (
       message.type === IncomingMessageType.SuccessfulRegularInvocationResult
@@ -197,13 +195,13 @@ export class BasicRegularInvocation<TResult>
   }
 
   private isFailedRegularInvocationResultMessage(
-    message: IncomingMessage
+    message: IncomingMessage,
   ): message is IncomingFailedRegularInvocationResultMessage {
     return message.type === IncomingMessageType.FailedRegularInvocationResult
   }
 
   private isInvocationIdMatching(
-    message: IncomingRegularInvocationResultMessage
+    message: IncomingRegularInvocationResultMessage,
   ): boolean {
     return this.shape.id === message.id
   }
