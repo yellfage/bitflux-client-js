@@ -9,7 +9,7 @@ import { DisconnectionCode } from '../../communication'
 import type {
   OutgoingMessage,
   TransportDisconnectedEvent,
-  TransportMessageEvent
+  TransportMessageEvent,
 } from '../../communication'
 
 import type { Logger } from '../../logging'
@@ -60,7 +60,7 @@ export class BasicBridge implements Bridge {
     negotiator: Negotiator,
     eventEmitter: EventEmitter<BridgeEventHandlerMap>,
     logger: Logger,
-    reconnectionScheme: ReconnectionScheme
+    reconnectionScheme: ReconnectionScheme,
   ) {
     this.url = url
     this.state = state
@@ -163,14 +163,14 @@ export class BasicBridge implements Bridge {
 
   public on<TEventName extends keyof BridgeEventHandlerMap>(
     eventName: TEventName,
-    handler: BridgeEventHandlerMap[TEventName]
+    handler: BridgeEventHandlerMap[TEventName],
   ): BridgeEventHandlerMap[TEventName] {
     return this.eventEmitter.on(eventName, handler)
   }
 
   public off<TEventName extends keyof BridgeEventHandlerMap>(
     eventName: TEventName,
-    handler: BridgeEventHandlerMap[TEventName]
+    handler: BridgeEventHandlerMap[TEventName],
   ): void {
     this.eventEmitter.off(eventName, handler)
   }
@@ -182,7 +182,7 @@ export class BasicBridge implements Bridge {
     this.reconnectionAttempts += 1
 
     const attemptDelay = this.reconnectionScheme.getNextDelay(
-      this.reconnectionAttempts
+      this.reconnectionAttempts,
     )
 
     this.state.setReconnecting()
@@ -190,7 +190,7 @@ export class BasicBridge implements Bridge {
     await this.eventEmitter.emit('reconnecting', {
       target: this,
       attempts: this.reconnectionAttempts,
-      delay: attemptDelay
+      delay: attemptDelay,
     })
 
     // Check if a "reconnecting" event handler has called terminate()
@@ -206,12 +206,12 @@ export class BasicBridge implements Bridge {
 
     try {
       await delay(attemptDelay, {
-        signal: this.reconnectionAbortController.signal
+        signal: this.reconnectionAbortController.signal,
       })
     } catch (error: unknown) {
       if (this.state.isTerminating) {
         throw new AbortError(
-          'The reconnection has been aborted: termination during delay'
+          'The reconnection has been aborted: termination during delay',
         )
       }
 
@@ -228,7 +228,7 @@ export class BasicBridge implements Bridge {
 
     await this.eventEmitter.emit('reconnected', {
       target: this,
-      attempts: this.reconnectionAttempts
+      attempts: this.reconnectionAttempts,
     })
 
     this.resetReconnection()
@@ -243,7 +243,7 @@ export class BasicBridge implements Bridge {
   private abortReconnection(): void {
     if (!this.state.isReconnecting) {
       throw new Error(
-        'Unable to abort reconnection: a reconnection is not performing'
+        'Unable to abort reconnection: a reconnection is not performing',
       )
     }
 
@@ -288,7 +288,7 @@ export class BasicBridge implements Bridge {
 
   private readonly handleTransportDisconnectedEvent = async ({
     code,
-    reason
+    reason,
   }: TransportDisconnectedEvent): Promise<void> => {
     this.unregisterTransportEvents()
 
@@ -324,14 +324,14 @@ export class BasicBridge implements Bridge {
   }
 
   private readonly handleTransportMessageEvent = async ({
-    message
+    message,
   }: TransportMessageEvent): Promise<void> => {
     const finalMessage =
       message instanceof Blob ? await message.text() : message
 
     await this.eventEmitter.emit('message', {
       target: this,
-      message: this.agreement.protocol.deserialize(finalMessage)
+      message: this.agreement.protocol.deserialize(finalMessage),
     })
   }
 }

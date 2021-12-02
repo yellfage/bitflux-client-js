@@ -25,7 +25,7 @@ export class BasicRegularInvocationBuilder<TResult>
     bridge: Bridge,
     handlerName: string,
     defaultRejectionDelay: number,
-    defaultAttempRejectionDelay: number
+    defaultAttempRejectionDelay: number,
   ) {
     this.bridge = bridge
     this.handlerName = handlerName
@@ -64,7 +64,7 @@ export class BasicRegularInvocationBuilder<TResult>
       id: nanoid(),
       rejectionDelay: this.rejectionDelay,
       attemptRejectionDelay: this.attemptRejectionDelay,
-      abortController: this.abortController
+      abortController: this.abortController,
     }).perform()
   }
 }

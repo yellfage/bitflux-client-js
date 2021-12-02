@@ -18,7 +18,7 @@ export class BasicRegularInvocationBuilderFactory
   public constructor(
     bridge: Bridge,
     rejectionDelay: number,
-    attempRejectionDelay: number
+    attempRejectionDelay: number,
   ) {
     this.bridge = bridge
     this.rejectionDelay = rejectionDelay
@@ -26,13 +26,13 @@ export class BasicRegularInvocationBuilderFactory
   }
 
   public create<TResult>(
-    handlerName: string
+    handlerName: string,
   ): RegularInvocationBuilder<TResult> {
     return new BasicRegularInvocationBuilder(
       this.bridge,
       handlerName,
       this.rejectionDelay,
-      this.attemptRejectionDelay
+      this.attemptRejectionDelay,
     )
   }
 }

@@ -22,7 +22,7 @@ export class WebSocketTransport implements Transport {
   public constructor(
     eventEmitter: EventEmitter<TransportEventHandlerMap>,
     webSocket: PromisfiedWebSocket,
-    urlScheme: WebSocketUrlScheme
+    urlScheme: WebSocketUrlScheme,
   ) {
     this.eventEmitter = eventEmitter
     this.webSocket = webSocket
@@ -40,7 +40,7 @@ export class WebSocketTransport implements Transport {
     const { host, pathname, search } = url
 
     await this.webSocket.connect(
-      `${this.urlScheme}://${host}${pathname}${search}`
+      `${this.urlScheme}://${host}${pathname}${search}`,
     )
   }
 
@@ -58,21 +58,21 @@ export class WebSocketTransport implements Transport {
 
   public on<TEventName extends keyof TransportEventHandlerMap>(
     eventName: TEventName,
-    handler: TransportEventHandlerMap[TEventName]
+    handler: TransportEventHandlerMap[TEventName],
   ): TransportEventHandlerMap[TEventName] {
     return this.eventEmitter.on(eventName, handler)
   }
 
   public off<TEventName extends keyof TransportEventHandlerMap>(
     eventName: TEventName,
-    handler: TransportEventHandlerMap[TEventName]
+    handler: TransportEventHandlerMap[TEventName],
   ): void {
     this.eventEmitter.off(eventName, handler)
   }
 
   private readonly handleWebSocketCloseEvent = async ({
     code,
-    reason
+    reason,
   }: CloseEvent): Promise<void> => {
     let finalCode = DisconnectionCode.Abnormal
 
@@ -83,16 +83,16 @@ export class WebSocketTransport implements Transport {
     await this.eventEmitter.emit('disconnected', {
       target: this,
       code: finalCode,
-      reason
+      reason,
     })
   }
 
   private readonly handleWebSocketMessageEvent = async ({
-    data
+    data,
   }: MessageEvent<string | Blob>): Promise<void> => {
     await this.eventEmitter.emit('message', {
       target: this,
-      message: data
+      message: data,
     })
   }
 }

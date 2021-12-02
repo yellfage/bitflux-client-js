@@ -3,7 +3,7 @@ import type { EventHandlerMap } from './event-handler-map'
 import type {
   InvocationHandler,
   NotifiableInvocationBuilder,
-  RegularInvocationBuilder
+  RegularInvocationBuilder,
 } from './invocation'
 
 import type { PluginBuilder } from './plugin-builder'
@@ -31,11 +31,11 @@ export interface WstClient {
 
   on<TEventName extends keyof EventHandlerMap>(
     eventName: TEventName,
-    handler: EventHandlerMap[TEventName]
+    handler: EventHandlerMap[TEventName],
   ): EventHandlerMap[TEventName]
 
   off<TEventName extends keyof EventHandlerMap>(
     eventName: TEventName,
-    handler: EventHandlerMap[TEventName]
+    handler: EventHandlerMap[TEventName],
   ): void
 }

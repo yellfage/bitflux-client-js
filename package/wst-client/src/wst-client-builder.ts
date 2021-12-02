@@ -5,7 +5,7 @@ import type { CommunicationSettings } from './configuration'
 import {
   CommunicationSettingsBuilder,
   LoggingSettingsBuilder,
-  RegularInvocationSettingsBuilder
+  RegularInvocationSettingsBuilder,
 } from './configuration'
 
 import { ReconnectionSettingsBuilder } from './configuration/reconnection-settings-builder'
@@ -17,7 +17,7 @@ import {
   BasicRegularInvocationBuilderFactory,
   BasicWstClient,
   MutableState,
-  Negotiator
+  Negotiator,
 } from './interior'
 
 import type { WstClient } from './wst-client'
@@ -41,7 +41,7 @@ export class WstClientBuilder {
   }
 
   public configureCommunication(
-    configure: (builder: CommunicationSettingsBuilder) => void
+    configure: (builder: CommunicationSettingsBuilder) => void,
   ): this {
     configure(this.communicationSettingsBuilder)
 
@@ -49,7 +49,7 @@ export class WstClientBuilder {
   }
 
   public configureReconnection(
-    configure: (builder: ReconnectionSettingsBuilder) => void
+    configure: (builder: ReconnectionSettingsBuilder) => void,
   ): this {
     configure(this.reconnectionSettingsBuilder)
 
@@ -57,7 +57,7 @@ export class WstClientBuilder {
   }
 
   public configureRegularInvocation(
-    configure: (builder: RegularInvocationSettingsBuilder) => void
+    configure: (builder: RegularInvocationSettingsBuilder) => void,
   ): this {
     configure(this.regularInvocationSettingsBuilder)
 
@@ -65,7 +65,7 @@ export class WstClientBuilder {
   }
 
   public configureLogging(
-    configure: (builder: LoggingSettingsBuilder) => void
+    configure: (builder: LoggingSettingsBuilder) => void,
   ): this {
     configure(this.loggingSettingsBuilder)
 
@@ -93,11 +93,11 @@ export class WstClientBuilder {
       new Negotiator(
         url,
         communicationSettings.transports,
-        communicationSettings.protocols
+        communicationSettings.protocols,
       ),
       new EventEmitter(),
       loggingSettings.logger,
-      reconnectionSettings.scheme
+      reconnectionSettings.scheme,
     )
 
     return new BasicWstClient(
@@ -107,9 +107,9 @@ export class WstClientBuilder {
       new BasicRegularInvocationBuilderFactory(
         bridge,
         regularInvocationSettings.rejectionDelay,
-        regularInvocationSettings.attemptRejectionDelay
+        regularInvocationSettings.attemptRejectionDelay,
       ),
-      new BasicNotifiableInvocationBuilderFactory(bridge)
+      new BasicNotifiableInvocationBuilderFactory(bridge),
     )
   }
 

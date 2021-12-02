@@ -44,7 +44,7 @@ export class BasicReconnectionSchemeBuilder
       this.delays,
       this.minDelayOffset,
       this.maxDelayOffset,
-      this.maxAttemptsAfterDelays
+      this.maxAttemptsAfterDelays,
     )
   }
 }

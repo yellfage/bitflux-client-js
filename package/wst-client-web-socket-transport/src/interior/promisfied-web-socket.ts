@@ -64,15 +64,15 @@ export class PromisfiedWebSocket {
   }
 
   private readonly handleCloseEvent = async (
-    event: CloseEvent
+    event: CloseEvent,
   ): Promise<void> => {
     this.webSocket = null
 
     if (this.deferredOpeningPromise) {
       this.deferredOpeningPromise.reject(
         new Error(
-          `Unable to establish a connection. Code: ${event.code}. Reason: ${event.reason}`
-        )
+          `Unable to establish a connection. Code: ${event.code}. Reason: ${event.reason}`,
+        ),
       )
 
       this.deferredOpeningPromise = null
@@ -86,7 +86,7 @@ export class PromisfiedWebSocket {
   }
 
   private readonly handleMessageEvent = async (
-    event: MessageEvent<string | Blob>
+    event: MessageEvent<string | Blob>,
   ): Promise<void> => {
     await this.onmessage(event)
   }

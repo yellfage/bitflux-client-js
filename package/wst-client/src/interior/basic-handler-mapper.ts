@@ -9,7 +9,7 @@ import type { Logger } from '../logging'
 import type {
   Bridge,
   BridgeMessageEvent,
-  IncomingNotifiableInvocationMessage
+  IncomingNotifiableInvocationMessage,
 } from './communication'
 
 import type { HandlerMapper } from './handler-mapper'
@@ -33,7 +33,7 @@ export class BasicHandlerMapper implements HandlerMapper {
       if (message.handlerName !== handlerName) {
         this.logger.logWarning(
           'Unable process incoming notifiable invocation: ' +
-            `the "${message.handlerName}" handler not found`
+            `the "${message.handlerName}" handler not found`,
         )
 
         return
@@ -44,7 +44,7 @@ export class BasicHandlerMapper implements HandlerMapper {
   }
 
   private isNotifiableInvocationMessage(
-    message: IncomingMessage
+    message: IncomingMessage,
   ): message is IncomingNotifiableInvocationMessage {
     return message.type === IncomingMessageType.NotifiableInvocation
   }

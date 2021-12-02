@@ -35,7 +35,7 @@ export class Negotiator {
     if (response.status !== 200) {
       throw new Error(
         'Unable to negotiate communication: the server has responded ' +
-          `with the "${response.status}(${response.statusText})" status`
+          `with the "${response.status}(${response.statusText})" status`,
       )
     }
 
@@ -50,13 +50,13 @@ export class Negotiator {
         'Unable to negotiate communication: the server version ' +
           'is incompatable with the client version. ' +
           `Client version: ${this.version.major}.${this.version.minor}. ` +
-          `Server version: ${version.major}.${version.minor}`
+          `Server version: ${version.major}.${version.minor}`,
       )
     }
 
     return {
       transport: this.selectTransport(transportNames),
-      protocol: this.selectProtocol(protocolNames)
+      protocol: this.selectProtocol(protocolNames),
     }
   }
 
@@ -70,7 +70,7 @@ export class Negotiator {
     if (!transports.length) {
       throw new Error(
         'Unable to select a transport: the provided transports ' +
-          'are not supported in the current environment'
+          'are not supported in the current environment',
       )
     }
 
@@ -78,7 +78,7 @@ export class Negotiator {
 
     if (!transport) {
       throw new Error(
-        `Unable to select a transport: the provided transports are not supported on the server side`
+        `Unable to select a transport: the provided transports are not supported on the server side`,
       )
     }
 
@@ -90,7 +90,7 @@ export class Negotiator {
 
     if (!protocol) {
       throw new Error(
-        `Unable to select a protocol: the provided protocols are not supported on the server side`
+        `Unable to select a protocol: the provided protocols are not supported on the server side`,
       )
     }
 

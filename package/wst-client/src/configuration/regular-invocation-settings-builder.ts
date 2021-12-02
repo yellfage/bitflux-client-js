@@ -20,7 +20,7 @@ export class RegularInvocationSettingsBuilder {
   public build(): RegularInvocationSettings {
     return new RegularInvocationSettings(
       this.rejectionDelay,
-      this.attemptRejectionDelay
+      this.attemptRejectionDelay,
     )
   }
 }

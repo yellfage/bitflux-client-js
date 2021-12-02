@@ -20,7 +20,7 @@ export class BasicReconnectionScheme implements ReconnectionScheme {
     delays: number[],
     minDelayOffset: number,
     maxDelayOffset: number,
-    maxAttemptsAfterDelays: number
+    maxAttemptsAfterDelays: number,
   ) {
     this.delays = delays
     this.minDelayOffset = minDelayOffset
@@ -49,7 +49,7 @@ export class BasicReconnectionScheme implements ReconnectionScheme {
 
     const delayAddition = this.generateRandomInt(
       this.minDelayOffset,
-      this.maxDelayOffset
+      this.maxDelayOffset,
     )
 
     return delay + delayAddition

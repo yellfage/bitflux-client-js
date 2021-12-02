@@ -2,7 +2,7 @@ import type {
   Protocol,
   ProtocolBuilder,
   Transport,
-  TransportBuilder
+  TransportBuilder,
 } from '../communication'
 
 import { CommunicationSettings } from './communication-settings'

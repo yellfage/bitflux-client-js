@@ -27,7 +27,7 @@ export class BasicNotifiableInvocationBuilder
   public perform(): void {
     new BasicNotifiableInvocation(this.bridge, {
       handlerName: this.handlerName,
-      args: this.args
+      args: this.args,
     }).perform()
   }
 }

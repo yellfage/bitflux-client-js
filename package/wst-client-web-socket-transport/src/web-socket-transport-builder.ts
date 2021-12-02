@@ -19,7 +19,7 @@ export class WebSocketTransportBuilder implements TransportBuilder {
     return new WebSocketTransport(
       new EventEmitter(),
       new PromisfiedWebSocket(),
-      this.urlScheme
+      this.urlScheme,
     )
   }
 }

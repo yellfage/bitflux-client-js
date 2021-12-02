@@ -13,7 +13,7 @@ export class OutgoingInvocationMessage extends OutgoingMessage {
     type: OutgoingMessageType,
     id: string,
     handlerName: string,
-    args: unknown[]
+    args: unknown[],
   ) {
     super(type)
 

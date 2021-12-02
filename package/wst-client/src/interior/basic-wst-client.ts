@@ -5,7 +5,7 @@ import type { EventHandlerMap } from '../event-handler-map'
 import type {
   InvocationHandler,
   NotifiableInvocationBuilder,
-  RegularInvocationBuilder
+  RegularInvocationBuilder,
 } from '../invocation'
 
 import type { PluginBuilder } from '../plugin-builder'
@@ -20,14 +20,14 @@ import type {
   BridgeReconnectedEvent,
   BridgeReconnectingEvent,
   BridgeTerminatedEvent,
-  BridgeTerminatingEvent
+  BridgeTerminatingEvent,
 } from './communication'
 
 import type { HandlerMapper } from './handler-mapper'
 
 import type {
   NotifiableInvocationBuilderFactory,
-  RegularInvocationBuilderFactory
+  RegularInvocationBuilderFactory,
 } from './invocation'
 
 export class BasicWstClient implements WstClient {
@@ -54,7 +54,7 @@ export class BasicWstClient implements WstClient {
     eventEmitter: EventEmitter<EventHandlerMap>,
     handlerMapper: HandlerMapper,
     regularInvocationBuilderFactory: RegularInvocationBuilderFactory,
-    notifiableInvocationBuilderFactory: NotifiableInvocationBuilderFactory
+    notifiableInvocationBuilderFactory: NotifiableInvocationBuilderFactory,
   ) {
     this.bridge = bridge
     this.eventEmitter = eventEmitter
@@ -86,7 +86,7 @@ export class BasicWstClient implements WstClient {
   }
 
   public invoke<TResult>(
-    handlerName: string
+    handlerName: string,
   ): RegularInvocationBuilder<TResult> {
     return this.regularInvocationBuilderFactory.create(handlerName)
   }
@@ -97,14 +97,14 @@ export class BasicWstClient implements WstClient {
 
   public on<TEventName extends keyof EventHandlerMap>(
     eventName: TEventName,
-    handler: EventHandlerMap[TEventName]
+    handler: EventHandlerMap[TEventName],
   ): EventHandlerMap[TEventName] {
     return this.eventEmitter.on(eventName, handler)
   }
 
   public off<TEventName extends keyof EventHandlerMap>(
     eventName: TEventName,
-    handler: EventHandlerMap[TEventName]
+    handler: EventHandlerMap[TEventName],
   ): void {
     this.eventEmitter.off(eventName, handler)
   }
@@ -128,7 +128,7 @@ export class BasicWstClient implements WstClient {
 
   private readonly handleBridgeDisconnectedEvent = async ({
     code,
-    reason
+    reason,
   }: BridgeDisconnectedEvent): Promise<void> => {
     await this.eventEmitter.emit('disconnected', { target: this, code, reason })
   }
@@ -139,38 +139,38 @@ export class BasicWstClient implements WstClient {
 
   private readonly handleBridgeConnectedEvent = async (): Promise<void> => {
     await this.eventEmitter.emit('connected', {
-      target: this
+      target: this,
     })
   }
 
   private readonly handleBridgeReconnectingEvent = async ({
     attempts,
-    delay
+    delay,
   }: BridgeReconnectingEvent): Promise<void> => {
     await this.eventEmitter.emit('reconnecting', {
       target: this,
       attempts,
-      delay
+      delay,
     })
   }
 
   private readonly handleBridgeReconnectedEvent = async ({
-    attempts
+    attempts,
   }: BridgeReconnectedEvent): Promise<void> => {
     await this.eventEmitter.emit('reconnected', {
       target: this,
-      attempts
+      attempts,
     })
   }
 
   private readonly handleBridgeTerminatingEvent = async ({
-    reason
+    reason,
   }: BridgeTerminatingEvent): Promise<void> => {
     await this.eventEmitter.emit('terminating', { target: this, reason })
   }
 
   private readonly handleBridgeTerminatedEvent = async ({
-    reason
+    reason,
   }: BridgeTerminatedEvent): Promise<void> => {
     await this.eventEmitter.emit('terminated', { target: this, reason })
   }

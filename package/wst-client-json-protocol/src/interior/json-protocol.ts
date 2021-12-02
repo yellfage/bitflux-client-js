@@ -1,7 +1,7 @@
 import type {
   IncomingMessage,
   OutgoingMessage,
-  Protocol
+  Protocol,
 } from '@yellfage/wst-client'
 
 export class JsonProtocol implements Protocol {

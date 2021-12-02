@@ -12,11 +12,11 @@ export interface Transport {
 
   on<TEventName extends keyof TransportEventHandlerMap>(
     eventName: TEventName,
-    handler: TransportEventHandlerMap[TEventName]
+    handler: TransportEventHandlerMap[TEventName],
   ): TransportEventHandlerMap[TEventName]
 
   off<TEventName extends keyof TransportEventHandlerMap>(
     eventName: TEventName,
-    handler: TransportEventHandlerMap[TEventName]
+    handler: TransportEventHandlerMap[TEventName],
   ): void
 }

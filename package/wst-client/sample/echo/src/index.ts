@@ -9,14 +9,14 @@ const client = new WstClientBuilder('https://localhost:5001/ws')
   .configureCommunication((builder) =>
     builder
       .addProtocolBuilder(new JsonProtocolBuilder())
-      .addTransportBuilder(new WebSocketTransportBuilder().setUrlScheme('wss'))
+      .addTransportBuilder(new WebSocketTransportBuilder().setUrlScheme('wss')),
   )
   .configureReconnection((builder) =>
     builder.setSchemeBuilder(
       new BasicReconnectionSchemeBuilder()
         .setDelays([1000])
-        .setMaxAttemptsAfterDelays(-1)
-    )
+        .setMaxAttemptsAfterDelays(-1),
+    ),
   )
   .build()
 
@@ -37,7 +37,7 @@ client.map('Notify', (message: string) => {
   client
     .notify('Notify')
     .setArgs({
-      message: 'The cached notifiable invocation message'
+      message: 'The cached notifiable invocation message',
     })
     .perform()
 
@@ -48,7 +48,7 @@ client.map('Notify', (message: string) => {
   const result = await client
     .invoke<string>('Echo')
     .setArgs({
-      message: 'The regular invocation message'
+      message: 'The regular invocation message',
     })
     .perform()
 
@@ -57,21 +57,21 @@ client.map('Notify', (message: string) => {
   client
     .notify('Notify')
     .setArgs({
-      message: 'The notifiable invocation message #1'
+      message: 'The notifiable invocation message #1',
     })
     .perform()
 
   client
     .notify('Notify')
     .setArgs({
-      message: 'The notifiable invocation message #2'
+      message: 'The notifiable invocation message #2',
     })
     .perform()
 
   client
     .notify('Notify')
     .setArgs({
-      message: 'The notifiable invocation message #3'
+      message: 'The notifiable invocation message #3',
     })
     .perform()
 })()

@@ -6,7 +6,7 @@ enum Value {
   Connected = 2,
   Reconnecting = 3,
   Terminating = 4,
-  Terminated = 5
+  Terminated = 5,
 }
 
 export class MutableState implements State {

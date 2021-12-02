@@ -20,8 +20,8 @@ export class BasicNotifiableInvocation implements NotifiableInvocation {
     this.bridge.send(
       new OutgoingNotifiableInvocationMessage(
         this.shape.handlerName,
-        this.shape.args
-      )
+        this.shape.args,
+      ),
     )
   }
 }

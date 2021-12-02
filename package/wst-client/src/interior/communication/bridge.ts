@@ -19,11 +19,11 @@ export interface Bridge {
 
   on<TEventName extends keyof BridgeEventHandlerMap>(
     eventName: TEventName,
-    handler: BridgeEventHandlerMap[TEventName]
+    handler: BridgeEventHandlerMap[TEventName],
   ): BridgeEventHandlerMap[TEventName]
 
   off<TEventName extends keyof BridgeEventHandlerMap>(
     eventName: TEventName,
-    handler: BridgeEventHandlerMap[TEventName]
+    handler: BridgeEventHandlerMap[TEventName],
   ): void
 }
