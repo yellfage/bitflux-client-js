@@ -10,9 +10,9 @@
     "compile:prod": "cross-env NODE_ENV=production webpack --config ./webpack.config.js",
     "create:declarations": "tsc --project ./tsconfig.json --outDir './dist' --emitDeclarationOnly",
     "clear:dist": "rimraf -rf ./dist/*",
-    "eslint": "eslint ./ --ext .js,.ts --ignore-path=../../.eslintignore --report-unused-disable-directives",
-    "eslint:fix": "npm run eslint -- --fix",
-    "prepublishOnly": "npm-run-all eslint:fix build"
+    "eslint:src": "eslint ./src --ext .js,.ts --ignore-path=../../.eslintignore --report-unused-disable-directives",
+    "eslint:src:fix": "npm run eslint:src -- --fix",
+    "prepublishOnly": "npm-run-all eslint:src:fix build"
   },
   "files": [
     "dist"

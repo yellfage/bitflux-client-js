@@ -1,9 +1,12 @@
 /* eslint-disable no-console */
+import {
+  WstClientBuilder,
+  BasicReconnectionSchemeBuilder,
+} from '@yellfage/wst-client'
+
 import { JsonProtocolBuilder } from '@yellfage/wst-client-json-protocol'
 
 import { WebSocketTransportBuilder } from '@yellfage/wst-client-web-socket-transport'
-
-import { WstClientBuilder, BasicReconnectionSchemeBuilder } from '../../../src'
 
 const client = new WstClientBuilder('https://localhost:5001/ws')
   .configureCommunication((builder) =>

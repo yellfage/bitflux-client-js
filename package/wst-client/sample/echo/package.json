@@ -12,6 +12,7 @@
     "webpack-dev-server": "^4.4.0"
   },
   "dependencies": {
+    "@yellfage/wst-client": "^1.0.0",
     "@yellfage/wst-client-json-protocol": "^1.0.0",
     "@yellfage/wst-client-web-socket-transport": "^1.0.0"
   }
