@@ -2,7 +2,7 @@ import type {
   IncomingMessage,
   OutgoingMessage,
   Protocol,
-} from '@yellfage/wst-client'
+} from '@yellfage/bitflux-client'
 
 export class JsonProtocol implements Protocol {
   public readonly name = 'json'

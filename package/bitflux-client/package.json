@@ -1,8 +1,8 @@
 {
-  "name": "@yellfage/wst-client",
+  "name": "@yellfage/bitflux-client",
   "version": "1.0.0",
   "author": "Yellfage",
-  "description": "WST JavaScript Client",
+  "description": "Bitflux JavaScript Client",
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
@@ -19,8 +19,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/yellfage/wst-client-js.git",
-    "directory": "package/wst-client"
+    "url": "https://github.com/yellfage/bitflux-client-js.git",
+    "directory": "package/bitflux-client"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",

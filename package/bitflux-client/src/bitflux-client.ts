@@ -10,7 +10,7 @@ import type { PluginBuilder } from './plugin-builder'
 
 import type { State } from './state'
 
-export interface WstClient {
+export interface BitfluxClient {
   readonly url: URL
   readonly state: State
 

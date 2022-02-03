@@ -1,14 +1,15 @@
 /* eslint-disable no-console */
+
 import {
-  WstClientBuilder,
   BasicReconnectionSchemeBuilder,
-} from '@yellfage/wst-client'
+  BitfluxClientBuilder,
+} from '@yellfage/bitflux-client'
 
-import { JsonProtocolBuilder } from '@yellfage/wst-client-json-protocol'
+import { JsonProtocolBuilder } from '@yellfage/bitflux-client-json-protocol'
 
-import { WebSocketTransportBuilder } from '@yellfage/wst-client-web-socket-transport'
+import { WebSocketTransportBuilder } from '@yellfage/bitflux-client-web-socket-transport'
 
-const client = new WstClientBuilder('https://localhost:5001/ws')
+const client = new BitfluxClientBuilder('https://localhost:5001/ws')
   .configureCommunication((builder) =>
     builder
       .addProtocolBuilder(new JsonProtocolBuilder())

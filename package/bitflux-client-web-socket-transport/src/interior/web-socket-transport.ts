@@ -1,8 +1,11 @@
+import { DisconnectionCode } from '@yellfage/bitflux-client'
+
+import type {
+  TransportEventHandlerMap,
+  Transport,
+} from '@yellfage/bitflux-client'
+
 import type { EventEmitter } from '@yellfage/event-emitter'
-
-import { DisconnectionCode } from '@yellfage/wst-client'
-
-import type { TransportEventHandlerMap, Transport } from '@yellfage/wst-client'
 
 import type { WebSocketUrlScheme } from '../web-socket-url-scheme'
 

@@ -1,6 +1,6 @@
-import { EventEmitter } from '@yellfage/event-emitter'
+import type { Transport, TransportBuilder } from '@yellfage/bitflux-client'
 
-import type { Transport, TransportBuilder } from '@yellfage/wst-client'
+import { EventEmitter } from '@yellfage/event-emitter'
 
 import { PromisfiedWebSocket, WebSocketTransport } from './interior'
 

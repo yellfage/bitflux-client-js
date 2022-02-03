@@ -1,5 +1,7 @@
 import { EventEmitter } from '@yellfage/event-emitter'
 
+import type { BitfluxClient } from './bitflux-client'
+
 import type { CommunicationSettings } from './configuration'
 
 import {
@@ -11,18 +13,16 @@ import {
 import { ReconnectionSettingsBuilder } from './configuration/reconnection-settings-builder'
 
 import {
+  BasicBitfluxClient,
   BasicBridge,
   BasicHandlerMapper,
   BasicNotifiableInvocationBuilderFactory,
   BasicRegularInvocationBuilderFactory,
-  BasicWstClient,
   MutableState,
   Negotiator,
 } from './interior'
 
-import type { WstClient } from './wst-client'
-
-export class WstClientBuilder {
+export class BitfluxClientBuilder {
   private readonly communicationSettingsBuilder =
     new CommunicationSettingsBuilder()
 
@@ -72,7 +72,7 @@ export class WstClientBuilder {
     return this
   }
 
-  public build(): WstClient {
+  public build(): BitfluxClient {
     const communicationSettings = this.communicationSettingsBuilder.build()
 
     const reconnectionSettings = this.reconnectionSettingsBuilder.build()
@@ -100,7 +100,7 @@ export class WstClientBuilder {
       reconnectionSettings.scheme,
     )
 
-    return new BasicWstClient(
+    return new BasicBitfluxClient(
       bridge,
       new EventEmitter(),
       new BasicHandlerMapper(bridge, loggingSettings.logger),

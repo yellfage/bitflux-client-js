@@ -1,8 +1,8 @@
 {
-  "name": "@yellfage/wst-client-json-protocol",
+  "name": "@yellfage/bitflux-client-json-protocol",
   "version": "1.0.0",
   "author": "Yellfage",
-  "description": "WST client json protocol",
+  "description": "Bitflux client json protocol",
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
@@ -19,11 +19,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/yellfage/wst-client-js.git",
-    "directory": "package/wst-client-json-protocol"
+    "url": "https://github.com/yellfage/bitflux-client-js.git",
+    "directory": "package/bitflux-client-json-protocol"
   },
   "peerDependencies": {
-    "@yellfage/wst-client": "^1.0.0"
+    "@yellfage/bitflux-client": "^1.0.0"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",

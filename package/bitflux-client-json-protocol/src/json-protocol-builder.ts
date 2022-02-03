@@ -1,4 +1,4 @@
-import type { Protocol, ProtocolBuilder } from '@yellfage/wst-client'
+import type { Protocol, ProtocolBuilder } from '@yellfage/bitflux-client'
 
 import { JsonProtocol } from './interior'
 

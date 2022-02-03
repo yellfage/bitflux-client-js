@@ -1,5 +1,7 @@
 import type { EventEmitter } from '@yellfage/event-emitter'
 
+import type { BitfluxClient } from '../bitflux-client'
+
 import type { EventHandlerMap } from '../event-handler-map'
 
 import type {
@@ -11,8 +13,6 @@ import type {
 import type { PluginBuilder } from '../plugin-builder'
 
 import type { State } from '../state'
-
-import type { WstClient } from '../wst-client'
 
 import type {
   Bridge,
@@ -30,7 +30,7 @@ import type {
   RegularInvocationBuilderFactory,
 } from './invocation'
 
-export class BasicWstClient implements WstClient {
+export class BasicBitfluxClient implements BitfluxClient {
   public get url(): URL {
     return this.bridge.url
   }

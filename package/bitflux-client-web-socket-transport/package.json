@@ -1,8 +1,8 @@
 {
-  "name": "@yellfage/wst-client-web-socket-transport",
+  "name": "@yellfage/bitflux-client-web-socket-transport",
   "version": "1.0.0",
   "author": "Yellfage",
-  "description": "WST client web socket transport",
+  "description": "Bitflux client web socket transport",
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
@@ -19,12 +19,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/yellfage/wst-client-js.git",
-    "directory": "package/wst-client-web-socket-transport"
+    "url": "https://github.com/yellfage/bitflux-client-js.git",
+    "directory": "package/bitflux-client-web-socket-transport"
   },
   "peerDependencies": {
-    "@yellfage/event-emitter": "^1.0.0",
-    "@yellfage/wst-client": "^1.0.0"
+    "@yellfage/bitflux-client": "^1.0.0",
+    "@yellfage/event-emitter": "^1.0.0"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
