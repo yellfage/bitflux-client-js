@@ -6,8 +6,8 @@ type Version = { major: number; minor: number }
 
 type AgreementResponse = {
   version: Version
-  transportNames: string[]
-  protocolNames: string[]
+  transports: string[]
+  protocols: string[]
 }
 
 export class Negotiator {
@@ -39,7 +39,7 @@ export class Negotiator {
       )
     }
 
-    const { version, transportNames, protocolNames } =
+    const { version, transports, protocols } =
       (await response.json()) as AgreementResponse
 
     if (
@@ -55,8 +55,8 @@ export class Negotiator {
     }
 
     return {
-      transport: this.selectTransport(transportNames),
-      protocol: this.selectProtocol(protocolNames),
+      transport: this.selectTransport(transports),
+      protocol: this.selectProtocol(protocols),
     }
   }
 
