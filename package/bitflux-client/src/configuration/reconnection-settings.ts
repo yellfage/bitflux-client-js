@@ -1,9 +1,18 @@
-import type { ReconnectionScheme } from '../reconnection'
+import type {
+  ReconnectionControl,
+  ReconnectionDelayScheme,
+} from '../reconnection'
 
 export class ReconnectionSettings {
-  public readonly scheme: ReconnectionScheme
+  public readonly control: ReconnectionControl
 
-  public constructor(scheme: ReconnectionScheme) {
-    this.scheme = scheme
+  public readonly delayScheme: ReconnectionDelayScheme
+
+  public constructor(
+    control: ReconnectionControl,
+    delayScheme: ReconnectionDelayScheme,
+  ) {
+    this.control = control
+    this.delayScheme = delayScheme
   }
 }

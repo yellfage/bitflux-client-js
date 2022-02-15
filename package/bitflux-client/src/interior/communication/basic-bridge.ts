@@ -14,7 +14,10 @@ import type {
 
 import type { Logger } from '../../logging'
 
-import type { ReconnectionScheme } from '../../reconnection'
+import type {
+  ReconnectionControl,
+  ReconnectionDelayScheme,
+} from '../../reconnection'
 
 import type { MutableState } from '../mutable-state'
 
@@ -44,7 +47,9 @@ export class BasicBridge implements Bridge {
 
   private readonly logger: Logger
 
-  private readonly reconnectionScheme: ReconnectionScheme
+  private readonly reconnectionControl: ReconnectionControl
+
+  private readonly reconnectionDelayScheme: ReconnectionDelayScheme
 
   private readonly cachedMessages = new Set<OutgoingMessage>()
 
@@ -60,14 +65,16 @@ export class BasicBridge implements Bridge {
     negotiator: Negotiator,
     eventEmitter: EventEmitter<BridgeEventHandlerMap>,
     logger: Logger,
-    reconnectionScheme: ReconnectionScheme,
+    reconnectionControl: ReconnectionControl,
+    reconnectionDelayScheme: ReconnectionDelayScheme,
   ) {
     this.url = url
     this.state = state
     this.negotiator = negotiator
     this.eventEmitter = eventEmitter
     this.logger = logger
-    this.reconnectionScheme = reconnectionScheme
+    this.reconnectionControl = reconnectionControl
+    this.reconnectionDelayScheme = reconnectionDelayScheme
   }
 
   /**
@@ -99,7 +106,12 @@ export class BasicBridge implements Bridge {
 
       this.logger.logError(error)
 
-      if (!this.reconnectionScheme.confirm()) {
+      if (
+        !this.reconnectionControl.confirmError({
+          attempts: this.reconnectionAttempts,
+          error,
+        })
+      ) {
         this.state.setDisconnected()
 
         throw new AbortError(`The connection has been aborted: unknown error`)
@@ -181,9 +193,7 @@ export class BasicBridge implements Bridge {
   private async reconnect(): Promise<void> {
     this.reconnectionAttempts += 1
 
-    const attemptDelay = this.reconnectionScheme.getNextDelay(
-      this.reconnectionAttempts,
-    )
+    const attemptDelay = this.reconnectionDelayScheme.moveNext()
 
     this.state.setReconnecting()
 
@@ -253,7 +263,7 @@ export class BasicBridge implements Bridge {
   private resetReconnection(): void {
     this.reconnectionAttempts = 0
 
-    this.reconnectionScheme.reset()
+    this.reconnectionDelayScheme.reset()
   }
 
   private resetAgreement(): void {
@@ -307,7 +317,7 @@ export class BasicBridge implements Bridge {
 
     if (
       code === DisconnectionCode.Normal ||
-      !this.reconnectionScheme.confirm()
+      !this.reconnectionControl.confirm({ attempts: this.reconnectionAttempts })
     ) {
       return
     }

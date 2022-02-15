@@ -97,7 +97,8 @@ export class BitfluxClientBuilder {
       ),
       new EventEmitter(),
       loggingSettings.logger,
-      reconnectionSettings.scheme,
+      reconnectionSettings.control,
+      reconnectionSettings.delayScheme,
     )
 
     return new BasicBitfluxClient(
