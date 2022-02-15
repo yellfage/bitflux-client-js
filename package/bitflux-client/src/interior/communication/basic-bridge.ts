@@ -104,8 +104,6 @@ export class BasicBridge implements Bridge {
         throw new AbortError('The connection has been aborted: termination')
       }
 
-      this.logger.logError(error)
-
       if (
         !this.reconnectionControl.confirmError({
           attempts: this.reconnectionAttempts,
@@ -114,8 +112,10 @@ export class BasicBridge implements Bridge {
       ) {
         this.state.setDisconnected()
 
-        throw new AbortError(`The connection has been aborted: unknown error`)
+        throw error
       }
+
+      this.logger.logError(error)
 
       await this.reconnect()
 
