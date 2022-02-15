@@ -110,8 +110,6 @@ export class BasicBridge implements Bridge {
           error,
         })
       ) {
-        this.state.setDisconnected()
-
         throw error
       }
 
