@@ -10,6 +10,7 @@
     "@commitlint/prompt-cli": "^16.2.1",
     "@yellfage/eslint-config-typescript": "^1.0.0",
     "commitlint": "^16.2.1",
+    "eslint": "^8.9.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "husky": "^7.0.4",
