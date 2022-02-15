@@ -10,16 +10,16 @@ const TS_CONFIG_PATH = path.resolve(__dirname, 'tsconfig.json')
 module.exports = {
   mode: NODE_ENV,
   entry: {
-    index: SRC_PATH
+    index: SRC_PATH,
   },
   output: {
     filename: '[name].js',
     path: OUTPUT_PATH,
-    libraryTarget: 'commonjs2'
+    libraryTarget: 'commonjs2',
   },
   externals: ['core-js/web/url', 'abort-controller/polyfill'],
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js'],
   },
   stats: { modules: false, children: false },
   performance: { hints: false },
@@ -32,16 +32,16 @@ module.exports = {
           {
             loader: 'ts-loader',
             options: {
-              transpileOnly: true
-            }
-          }
-        ]
-      }
-    ]
+              transpileOnly: true,
+            },
+          },
+        ],
+      },
+    ],
   },
   plugins: [
     new ForkTsCheckerPlugin({
-      typescript: { configFile: TS_CONFIG_PATH }
-    })
-  ]
+      typescript: { configFile: TS_CONFIG_PATH },
+    }),
+  ],
 }
