@@ -1,6 +1,6 @@
 {
   "name": "@yellfage/bitflux-client-json-protocol",
-  "version": "1.0.0",
+  "version": "1.0.0-beta.1",
   "author": "Yellfage",
   "description": "Bitflux client json protocol",
   "main": "dist/index.js",
@@ -23,7 +23,7 @@
     "directory": "package/bitflux-client-json-protocol"
   },
   "peerDependencies": {
-    "@yellfage/bitflux-client": "^1.0.0"
+    "@yellfage/bitflux-client": "^1.0.0-beta.1"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",

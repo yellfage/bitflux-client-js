@@ -1,7 +1,8 @@
 /* eslint-disable no-console */
 
 import {
-  BasicReconnectionSchemeBuilder,
+  BasicReconnectionControlBuilder,
+  BasicReconnectionDelaySchemeBuilder,
   BitfluxClientBuilder,
 } from '@yellfage/bitflux-client'
 
@@ -16,11 +17,13 @@ const client = new BitfluxClientBuilder('https://localhost:5001/ws')
       .addTransportBuilder(new WebSocketTransportBuilder().setUrlScheme('wss')),
   )
   .configureReconnection((builder) =>
-    builder.setSchemeBuilder(
-      new BasicReconnectionSchemeBuilder()
-        .setDelays([1000])
-        .setMaxAttemptsAfterDelays(-1),
-    ),
+    builder
+      .setControlBuilder(
+        new BasicReconnectionControlBuilder().setMaxAttempts(-1),
+      )
+      .setDelaySchemeBuilder(
+        new BasicReconnectionDelaySchemeBuilder().setDelays([1000]),
+      ),
   )
   .build()
 

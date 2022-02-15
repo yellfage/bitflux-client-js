@@ -12,8 +12,8 @@
     "webpack-dev-server": "^4.4.0"
   },
   "dependencies": {
-    "@yellfage/bitflux-client": "^1.0.0",
-    "@yellfage/bitflux-client-json-protocol": "^1.0.0",
-    "@yellfage/bitflux-client-web-socket-transport": "^1.0.0"
+    "@yellfage/bitflux-client": "^1.0.0-beta.1",
+    "@yellfage/bitflux-client-json-protocol": "^1.0.0-beta.1",
+    "@yellfage/bitflux-client-web-socket-transport": "^1.0.0-beta.1"
   }
 }
