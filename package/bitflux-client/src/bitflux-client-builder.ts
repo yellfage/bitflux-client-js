@@ -2,42 +2,60 @@ import { EventEmitter } from '@yellfage/event-emitter'
 
 import type { BitfluxClient } from './bitflux-client'
 
-import type { CommunicationSettings } from './configuration'
-
-import {
+import type {
+  CommunicationSettings,
   CommunicationSettingsBuilder,
   LoggingSettingsBuilder,
   RegularInvocationSettingsBuilder,
 } from './configuration'
 
-import { ReconnectionSettingsBuilder } from './configuration/reconnection-settings-builder'
+import type { ReconnectionSettingsBuilder } from './configuration/reconnection-settings-builder'
 
 import {
   BasicBitfluxClient,
   BasicBridge,
+  BasicCommunicationSettingsBuilder,
   BasicHandlerMapper,
+  BasicLoggingSettingsBuilder,
   BasicNotifiableInvocationBuilderFactory,
+  BasicReconnectionSettingsBuilder,
   BasicRegularInvocationBuilderFactory,
+  BasicRegularInvocationSettingsBuilder,
   MutableState,
   Negotiator,
 } from './interior'
 
 export class BitfluxClientBuilder {
-  private readonly communicationSettingsBuilder =
-    new CommunicationSettingsBuilder()
-
-  private readonly reconnectionSettingsBuilder =
-    new ReconnectionSettingsBuilder()
-
-  private readonly regularInvocationSettingsBuilder =
-    new RegularInvocationSettingsBuilder()
-
-  private readonly loggingSettingsBuilder = new LoggingSettingsBuilder()
-
   private readonly url: string
 
-  public constructor(url: string) {
+  private readonly communicationSettingsBuilder: CommunicationSettingsBuilder
+
+  private readonly reconnectionSettingsBuilder: ReconnectionSettingsBuilder
+
+  private readonly regularInvocationSettingsBuilder: RegularInvocationSettingsBuilder
+
+  private readonly loggingSettingsBuilder: LoggingSettingsBuilder
+
+  public constructor(url: string)
+  public constructor(
+    url: string,
+    communicationSettingsBuilder: CommunicationSettingsBuilder,
+    reconnectionSettingsBuilder: ReconnectionSettingsBuilder,
+    regularInvocationSettingsBuilder: RegularInvocationSettingsBuilder,
+    loggingSettingsBuilder: LoggingSettingsBuilder,
+  )
+  public constructor(
+    url: string,
+    communicationSettingsBuilder: CommunicationSettingsBuilder = new BasicCommunicationSettingsBuilder(),
+    reconnectionSettingsBuilder: ReconnectionSettingsBuilder = new BasicReconnectionSettingsBuilder(),
+    regularInvocationSettingsBuilder: RegularInvocationSettingsBuilder = new BasicRegularInvocationSettingsBuilder(),
+    loggingSettingsBuilder: LoggingSettingsBuilder = new BasicLoggingSettingsBuilder(),
+  ) {
     this.url = url
+    this.communicationSettingsBuilder = communicationSettingsBuilder
+    this.reconnectionSettingsBuilder = reconnectionSettingsBuilder
+    this.regularInvocationSettingsBuilder = regularInvocationSettingsBuilder
+    this.loggingSettingsBuilder = loggingSettingsBuilder
   }
 
   public configureCommunication(
@@ -111,6 +129,16 @@ export class BitfluxClientBuilder {
         regularInvocationSettings.attemptRejectionDelay,
       ),
       new BasicNotifiableInvocationBuilderFactory(bridge),
+    )
+  }
+
+  public clone(url: string): BitfluxClientBuilder {
+    return new BitfluxClientBuilder(
+      url,
+      this.communicationSettingsBuilder.clone(),
+      this.reconnectionSettingsBuilder.clone(),
+      this.regularInvocationSettingsBuilder.clone(),
+      this.loggingSettingsBuilder.clone(),
     )
   }
 
