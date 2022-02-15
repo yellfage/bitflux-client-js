@@ -1,4 +1,5 @@
 const path = require('path')
+const { SourceMapDevToolPlugin } = require('webpack')
 const ForkTsCheckerPlugin = require('fork-ts-checker-webpack-plugin')
 
 const { NODE_ENV } = process.env
@@ -9,6 +10,7 @@ const TS_CONFIG_PATH = path.resolve(__dirname, 'tsconfig.json')
 
 module.exports = {
   mode: NODE_ENV,
+  devtool: 'source-map',
   entry: {
     index: SRC_PATH,
   },
@@ -40,6 +42,9 @@ module.exports = {
     ],
   },
   plugins: [
+    new SourceMapDevToolPlugin({
+      filename: '[file].map',
+    }),
     new ForkTsCheckerPlugin({
       typescript: { configFile: TS_CONFIG_PATH },
     }),
