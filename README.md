@@ -9,6 +9,7 @@ JavaScript client for [Bitflux](https://github.com/yellfage/bitflux)
 ### Configuration
 
 - Creating multiple client instances for a specific Hub;
+- Sharing a basic configuration for different instances;
 
 ### Interceptors
 
@@ -24,9 +25,8 @@ Intended to extend the library functionality.
 
 ### Reconnection
 
-- Reconnecting after a connection error;
-- Reconnecting after an abnormal disconnection;
-- Delay before reconnecting according to a specific reconnection scheme;
+- Reconnecting after a connection error or an abnormal disconnection;
+- Delay before reconnection according to a specific reconnection delay scheme;
 
 ### Communication
 
