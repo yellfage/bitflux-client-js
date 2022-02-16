@@ -1,6 +1,6 @@
 {
   "name": "@yellfage/bitflux-client-web-socket-transport",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "author": "Yellfage",
   "description": "Bitflux client web socket transport",
   "main": "dist/index.js",
