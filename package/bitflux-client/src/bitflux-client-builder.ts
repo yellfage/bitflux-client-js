@@ -7,9 +7,8 @@ import type {
   CommunicationSettingsBuilder,
   LoggingSettingsBuilder,
   RegularInvocationSettingsBuilder,
+  ReconnectionSettingsBuilder,
 } from './configuration'
-
-import type { ReconnectionSettingsBuilder } from './configuration/reconnection-settings-builder'
 
 import {
   BasicBitfluxClient,
