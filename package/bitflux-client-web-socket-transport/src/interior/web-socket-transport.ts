@@ -77,15 +77,12 @@ export class WebSocketTransport implements Transport {
     code,
     reason,
   }: CloseEvent): Promise<void> => {
-    let finalCode = DisconnectionCode.Abnormal
-
-    if (code === WebSocketDisconnectionCode.Normal) {
-      finalCode = DisconnectionCode.Normal
-    }
-
     await this.eventEmitter.emit('disconnected', {
       target: this,
-      code: finalCode,
+      code:
+        code === WebSocketDisconnectionCode.Normal
+          ? DisconnectionCode.Normal
+          : DisconnectionCode.Abnormal,
       reason,
     })
   }
