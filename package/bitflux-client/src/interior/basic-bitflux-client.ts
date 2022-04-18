@@ -16,11 +16,11 @@ import type { State } from '../state'
 
 import type {
   Bridge,
-  BridgeDisconnectedEvent,
-  BridgeReconnectedEvent,
-  BridgeReconnectingEvent,
-  BridgeTerminatedEvent,
-  BridgeTerminatingEvent,
+  DisconnectedBridgeEvent,
+  ReconnectedBridgeEvent,
+  ReconnectingBridgeEvent,
+  TerminatedBridgeEvent,
+  TerminatingBridgeEvent,
 } from './communication'
 
 import type { HandlerMapper } from './handler-mapper'
@@ -129,7 +129,7 @@ export class BasicBitfluxClient implements BitfluxClient {
   private readonly handleBridgeDisconnectedEvent = async ({
     code,
     reason,
-  }: BridgeDisconnectedEvent): Promise<void> => {
+  }: DisconnectedBridgeEvent): Promise<void> => {
     await this.eventEmitter.emit('disconnected', { target: this, code, reason })
   }
 
@@ -146,7 +146,7 @@ export class BasicBitfluxClient implements BitfluxClient {
   private readonly handleBridgeReconnectingEvent = async ({
     attempts,
     delay,
-  }: BridgeReconnectingEvent): Promise<void> => {
+  }: ReconnectingBridgeEvent): Promise<void> => {
     await this.eventEmitter.emit('reconnecting', {
       target: this,
       attempts,
@@ -156,7 +156,7 @@ export class BasicBitfluxClient implements BitfluxClient {
 
   private readonly handleBridgeReconnectedEvent = async ({
     attempts,
-  }: BridgeReconnectedEvent): Promise<void> => {
+  }: ReconnectedBridgeEvent): Promise<void> => {
     await this.eventEmitter.emit('reconnected', {
       target: this,
       attempts,
@@ -165,13 +165,13 @@ export class BasicBitfluxClient implements BitfluxClient {
 
   private readonly handleBridgeTerminatingEvent = async ({
     reason,
-  }: BridgeTerminatingEvent): Promise<void> => {
+  }: TerminatingBridgeEvent): Promise<void> => {
     await this.eventEmitter.emit('terminating', { target: this, reason })
   }
 
   private readonly handleBridgeTerminatedEvent = async ({
     reason,
-  }: BridgeTerminatedEvent): Promise<void> => {
+  }: TerminatedBridgeEvent): Promise<void> => {
     await this.eventEmitter.emit('terminated', { target: this, reason })
   }
 }

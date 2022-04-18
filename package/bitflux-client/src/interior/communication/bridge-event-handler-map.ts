@@ -1,26 +1,26 @@
-import type { BridgeConnectedEvent } from './bridge-connected-event'
+import type { ConnectedBridgeEvent } from './connected-bridge-event'
 
-import type { BridgeConnectingEvent } from './bridge-connecting-event'
+import type { ConnectingBridgeEvent } from './connecting-bridge-event'
 
-import type { BridgeDisconnectedEvent } from './bridge-disconnected-event'
+import type { DisconnectedBridgeEvent } from './disconnected-bridge-event'
 
-import type { BridgeMessageEvent } from './bridge-message-event'
+import type { MessageBridgeEvent } from './message-bridge-event'
 
-import type { BridgeReconnectedEvent } from './bridge-reconnected-event'
+import type { ReconnectedBridgeEvent } from './reconnected-bridge-event'
 
-import type { BridgeReconnectingEvent } from './bridge-reconnecting-event'
+import type { ReconnectingBridgeEvent } from './reconnecting-bridge-event'
 
-import type { BridgeTerminatedEvent } from './bridge-terminated-event'
+import type { TerminatedBridgeEvent } from './terminated-bridge-event'
 
-import type { BridgeTerminatingEvent } from './bridge-terminating-event'
+import type { TerminatingBridgeEvent } from './terminating-bridge-event'
 
 export type BridgeEventHandlerMap = {
-  disconnected: (event: BridgeDisconnectedEvent) => unknown
-  connecting: (event: BridgeConnectingEvent) => unknown
-  connected: (event: BridgeConnectedEvent) => unknown
-  reconnecting: (event: BridgeReconnectingEvent) => unknown
-  reconnected: (event: BridgeReconnectedEvent) => unknown
-  terminating: (event: BridgeTerminatingEvent) => unknown
-  terminated: (event: BridgeTerminatedEvent) => unknown
-  message: (event: BridgeMessageEvent) => unknown
+  disconnected: (event: DisconnectedBridgeEvent) => unknown
+  connecting: (event: ConnectingBridgeEvent) => unknown
+  connected: (event: ConnectedBridgeEvent) => unknown
+  reconnecting: (event: ReconnectingBridgeEvent) => unknown
+  reconnected: (event: ReconnectedBridgeEvent) => unknown
+  terminating: (event: TerminatingBridgeEvent) => unknown
+  terminated: (event: TerminatedBridgeEvent) => unknown
+  message: (event: MessageBridgeEvent) => unknown
 }

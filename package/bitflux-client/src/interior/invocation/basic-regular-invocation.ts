@@ -6,10 +6,10 @@ import { IncomingMessageType } from '../../communication'
 
 import type {
   Bridge,
-  BridgeMessageEvent,
   IncomingFailedRegularInvocationResultMessage,
   IncomingRegularInvocationResultMessage,
   IncomingSuccessfulRegularInvocationResultMessage,
+  MessageBridgeEvent,
 } from '../communication'
 
 import { OutgoingRegularInvocationMessage } from '../communication'
@@ -162,7 +162,7 @@ export class BasicRegularInvocation<TResult>
 
   private readonly handleMessageEvent = ({
     message,
-  }: BridgeMessageEvent): void => {
+  }: MessageBridgeEvent): void => {
     if (
       !this.isRegularInvocationResultMessage(message) ||
       !this.isInvocationIdMatching(message)

@@ -1,5 +1,5 @@
 import type { BridgeEvent } from './bridge-event'
 
-export interface BridgeTerminatingEvent extends BridgeEvent {
+export interface TerminatingBridgeEvent extends BridgeEvent {
   readonly reason: string
 }

@@ -2,7 +2,7 @@ import type { DisconnectionCode } from '../../communication'
 
 import type { BridgeEvent } from './bridge-event'
 
-export interface BridgeDisconnectedEvent extends BridgeEvent {
+export interface DisconnectedBridgeEvent extends BridgeEvent {
   readonly code: DisconnectionCode
   readonly reason: string
 }

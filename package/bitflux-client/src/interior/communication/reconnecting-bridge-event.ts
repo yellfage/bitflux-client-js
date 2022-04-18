@@ -1,6 +1,6 @@
 import type { BridgeEvent } from './bridge-event'
 
-export interface BridgeReconnectingEvent extends BridgeEvent {
+export interface ReconnectingBridgeEvent extends BridgeEvent {
   readonly attempts: number
   readonly delay: number
 }
