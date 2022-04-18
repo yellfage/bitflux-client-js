@@ -87,7 +87,7 @@ export class BasicBridge implements Bridge {
 
     this.state.setConnecting()
 
-    await this.eventEmitter.emit('connecting', { target: this })
+    await this.eventEmitter.emit('connecting', { bridge: this })
 
     try {
       this.agreement = await this.negotiator.negotiate()
@@ -127,7 +127,7 @@ export class BasicBridge implements Bridge {
     // Otherwise, the cached messages will be cached again
     this.sendCachedMessages()
 
-    await this.eventEmitter.emit('connected', { target: this })
+    await this.eventEmitter.emit('connected', { bridge: this })
   }
 
   public async disconnect(reason?: string): Promise<void> {
@@ -144,7 +144,7 @@ export class BasicBridge implements Bridge {
 
     this.state.setTerminating()
 
-    await this.eventEmitter.emit('terminating', { target: this, reason })
+    await this.eventEmitter.emit('terminating', { bridge: this, reason })
 
     if (wasReconnecting) {
       this.abortReconnection()
@@ -158,7 +158,7 @@ export class BasicBridge implements Bridge {
 
     this.state.setTerminated()
 
-    await this.eventEmitter.emit('terminated', { target: this, reason })
+    await this.eventEmitter.emit('terminated', { bridge: this, reason })
   }
 
   public send(message: OutgoingMessage): void {
@@ -196,7 +196,7 @@ export class BasicBridge implements Bridge {
     this.state.setReconnecting()
 
     await this.eventEmitter.emit('reconnecting', {
-      target: this,
+      bridge: this,
       attempts: this.reconnectionAttempts,
       delay: attemptDelay,
     })
@@ -235,7 +235,7 @@ export class BasicBridge implements Bridge {
     }
 
     await this.eventEmitter.emit('reconnected', {
-      target: this,
+      bridge: this,
       attempts: this.reconnectionAttempts,
     })
 
@@ -306,7 +306,7 @@ export class BasicBridge implements Bridge {
 
     this.state.setDisconnected()
 
-    await this.eventEmitter.emit('disconnected', { target: this, code, reason })
+    await this.eventEmitter.emit('disconnected', { bridge: this, code, reason })
 
     // Check if a "disconnected" event handler has called terminate()
     if (!this.state.isDisconnected) {
@@ -338,7 +338,7 @@ export class BasicBridge implements Bridge {
       message instanceof Blob ? await message.text() : message
 
     await this.eventEmitter.emit('message', {
-      target: this,
+      bridge: this,
       message: this.agreement.protocol.deserialize(finalMessage),
     })
   }
