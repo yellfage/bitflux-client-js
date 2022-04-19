@@ -1,6 +1,7 @@
 export * from './configuration'
 export * from './communication'
 export * from './invocation'
+export * from './event'
 
 export * from './basic-handler-mapper'
 export * from './basic-bitflux-client'

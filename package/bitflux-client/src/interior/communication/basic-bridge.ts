@@ -27,7 +27,17 @@ import type { Bridge } from './bridge'
 
 import { EmptyAgreement } from './empty-agreement'
 
-import type { BridgeEventHandlerMap } from './event'
+import type {
+  BridgeEventHandlerMap,
+  ConnectedBridgeEventFactory,
+  ConnectingBridgeEventFactory,
+  DisconnectedBridgeEventFactory,
+  MessageBridgeEventFactory,
+  ReconnectedBridgeEventFactory,
+  ReconnectingBridgeEventFactory,
+  TerminatedBridgeEventFactory,
+  TerminatingBridgeEventFactory,
+} from './event'
 
 import type { Negotiator } from './negotiator'
 
@@ -44,6 +54,22 @@ export class BasicBridge implements Bridge {
   private readonly negotiator: Negotiator
 
   private readonly eventEmitter: EventEmitter<BridgeEventHandlerMap>
+
+  private readonly connectingEventFactory: ConnectingBridgeEventFactory
+
+  private readonly connectedEventFactory: ConnectedBridgeEventFactory
+
+  private readonly disconnectedEventFactory: DisconnectedBridgeEventFactory
+
+  private readonly reconnectingEventFactory: ReconnectingBridgeEventFactory
+
+  private readonly reconnectedEventFactory: ReconnectedBridgeEventFactory
+
+  private readonly terminatingEventFactory: TerminatingBridgeEventFactory
+
+  private readonly terminatedEventFactory: TerminatedBridgeEventFactory
+
+  private readonly messageEventFactory: MessageBridgeEventFactory
 
   private readonly logger: Logger
 
@@ -64,6 +90,14 @@ export class BasicBridge implements Bridge {
     state: MutableState,
     negotiator: Negotiator,
     eventEmitter: EventEmitter<BridgeEventHandlerMap>,
+    connectingEventFactory: ConnectingBridgeEventFactory,
+    connectedEventFactory: ConnectedBridgeEventFactory,
+    disconnectedEventFactory: DisconnectedBridgeEventFactory,
+    reconnectingEventFactory: ReconnectingBridgeEventFactory,
+    reconnectedEventFactory: ReconnectedBridgeEventFactory,
+    terminatingEventFactory: TerminatingBridgeEventFactory,
+    terminatedEventFactory: TerminatedBridgeEventFactory,
+    messageEventFactory: MessageBridgeEventFactory,
     logger: Logger,
     reconnectionControl: ReconnectionControl,
     reconnectionDelayScheme: ReconnectionDelayScheme,
@@ -72,6 +106,14 @@ export class BasicBridge implements Bridge {
     this.state = state
     this.negotiator = negotiator
     this.eventEmitter = eventEmitter
+    this.connectingEventFactory = connectingEventFactory
+    this.connectedEventFactory = connectedEventFactory
+    this.disconnectedEventFactory = disconnectedEventFactory
+    this.reconnectingEventFactory = reconnectingEventFactory
+    this.reconnectedEventFactory = reconnectedEventFactory
+    this.terminatingEventFactory = terminatingEventFactory
+    this.terminatedEventFactory = terminatedEventFactory
+    this.messageEventFactory = messageEventFactory
     this.logger = logger
     this.reconnectionControl = reconnectionControl
     this.reconnectionDelayScheme = reconnectionDelayScheme
@@ -87,7 +129,9 @@ export class BasicBridge implements Bridge {
 
     this.state.setConnecting()
 
-    await this.eventEmitter.emit('connecting', { bridge: this })
+    const connectingEvent = this.connectingEventFactory.create(this)
+
+    await this.eventEmitter.emit('connecting', connectingEvent)
 
     try {
       this.agreement = await this.negotiator.negotiate()
@@ -127,7 +171,9 @@ export class BasicBridge implements Bridge {
     // Otherwise, the cached messages will be cached again
     this.sendCachedMessages()
 
-    await this.eventEmitter.emit('connected', { bridge: this })
+    const connectedEvent = this.connectedEventFactory.create(this)
+
+    await this.eventEmitter.emit('connected', connectedEvent)
   }
 
   public async disconnect(reason?: string): Promise<void> {
@@ -144,7 +190,9 @@ export class BasicBridge implements Bridge {
 
     this.state.setTerminating()
 
-    await this.eventEmitter.emit('terminating', { bridge: this, reason })
+    const terminatingEvent = this.terminatingEventFactory.create(this, reason)
+
+    await this.eventEmitter.emit('terminating', terminatingEvent)
 
     if (wasReconnecting) {
       this.abortReconnection()
@@ -158,7 +206,9 @@ export class BasicBridge implements Bridge {
 
     this.state.setTerminated()
 
-    await this.eventEmitter.emit('terminated', { bridge: this, reason })
+    const terminatedEvent = this.terminatedEventFactory.create(this, reason)
+
+    await this.eventEmitter.emit('terminated', terminatedEvent)
   }
 
   public send(message: OutgoingMessage): void {
@@ -195,11 +245,13 @@ export class BasicBridge implements Bridge {
 
     this.state.setReconnecting()
 
-    await this.eventEmitter.emit('reconnecting', {
-      bridge: this,
-      attempts: this.reconnectionAttempts,
-      delay: attemptDelay,
-    })
+    const reconnectingEvent = this.reconnectingEventFactory.create(
+      this,
+      this.reconnectionAttempts,
+      attemptDelay,
+    )
+
+    await this.eventEmitter.emit('reconnecting', reconnectingEvent)
 
     // Check if a "reconnecting" event handler has called terminate()
     if (!this.state.isReconnecting) {
@@ -234,10 +286,12 @@ export class BasicBridge implements Bridge {
       return
     }
 
-    await this.eventEmitter.emit('reconnected', {
-      bridge: this,
-      attempts: this.reconnectionAttempts,
-    })
+    const reconnectedEvent = this.reconnectedEventFactory.create(
+      this,
+      this.reconnectionAttempts,
+    )
+
+    await this.eventEmitter.emit('reconnected', reconnectedEvent)
 
     this.resetReconnection()
   }
@@ -306,7 +360,13 @@ export class BasicBridge implements Bridge {
 
     this.state.setDisconnected()
 
-    await this.eventEmitter.emit('disconnected', { bridge: this, code, reason })
+    const disconnectedEvent = this.disconnectedEventFactory.create(
+      this,
+      code,
+      reason,
+    )
+
+    await this.eventEmitter.emit('disconnected', disconnectedEvent)
 
     // Check if a "disconnected" event handler has called terminate()
     if (!this.state.isDisconnected) {
@@ -334,12 +394,12 @@ export class BasicBridge implements Bridge {
   private readonly handleTransportMessageEvent = async ({
     message,
   }: TransportMessageEvent): Promise<void> => {
-    const finalMessage =
-      message instanceof Blob ? await message.text() : message
+    const rawMessage = message instanceof Blob ? await message.text() : message
 
-    await this.eventEmitter.emit('message', {
-      bridge: this,
-      message: this.agreement.protocol.deserialize(finalMessage),
-    })
+    const finalMessage = this.agreement.protocol.deserialize(rawMessage)
+
+    const messageEvent = this.messageEventFactory.create(this, finalMessage)
+
+    await this.eventEmitter.emit('message', messageEvent)
   }
 }
