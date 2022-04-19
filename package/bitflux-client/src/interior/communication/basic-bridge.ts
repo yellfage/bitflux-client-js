@@ -122,8 +122,8 @@ export class BasicBridge implements Bridge {
   /**
    * @throws {@link AbortError}
    */
-  public async connect(url = this.url.toString()): Promise<void> {
-    if (url !== this.url.toString()) {
+  public async connect(url: string | URL = this.url): Promise<void> {
+    if (url.toString() !== this.url.toString()) {
       this.url = new URL(url)
     }
 

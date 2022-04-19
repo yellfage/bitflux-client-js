@@ -11,7 +11,7 @@ export interface Bridge {
   /**
    * @throws {@link AbortError}
    */
-  connect(url?: string): Promise<void>
+  connect(url?: string | URL): Promise<void>
   disconnect(reason?: string): Promise<void>
   terminate(reason?: string): Promise<void>
 

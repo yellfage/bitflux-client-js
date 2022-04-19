@@ -40,7 +40,7 @@ import {
 } from './interior'
 
 export class BitfluxClientBuilder {
-  private readonly url: string
+  private readonly url: string | URL
 
   private readonly communicationSettingsBuilder: CommunicationSettingsBuilder
 
@@ -50,16 +50,16 @@ export class BitfluxClientBuilder {
 
   private readonly loggingSettingsBuilder: LoggingSettingsBuilder
 
-  public constructor(url: string)
+  public constructor(url: string | URL)
   public constructor(
-    url: string,
+    url: string | URL,
     communicationSettingsBuilder: CommunicationSettingsBuilder,
     reconnectionSettingsBuilder: ReconnectionSettingsBuilder,
     regularInvocationSettingsBuilder: RegularInvocationSettingsBuilder,
     loggingSettingsBuilder: LoggingSettingsBuilder,
   )
   public constructor(
-    url: string,
+    url: string | URL,
     communicationSettingsBuilder: CommunicationSettingsBuilder = new BasicCommunicationSettingsBuilder(),
     reconnectionSettingsBuilder: ReconnectionSettingsBuilder = new BasicReconnectionSettingsBuilder(),
     regularInvocationSettingsBuilder: RegularInvocationSettingsBuilder = new BasicRegularInvocationSettingsBuilder(),
@@ -161,7 +161,7 @@ export class BitfluxClientBuilder {
     )
   }
 
-  public clone(url: string): BitfluxClientBuilder {
+  public clone(url: string | URL): BitfluxClientBuilder {
     return new BitfluxClientBuilder(
       url,
       this.communicationSettingsBuilder.clone(),

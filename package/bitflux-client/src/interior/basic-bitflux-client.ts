@@ -103,7 +103,7 @@ export class BasicBitfluxClient implements BitfluxClient {
     this.registerBridgeEventHandlers()
   }
 
-  public async connect(url?: string): Promise<void> {
+  public async connect(url?: string | URL): Promise<void> {
     await this.bridge.connect(url)
   }
 
