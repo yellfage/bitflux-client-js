@@ -2,7 +2,7 @@ import type { EventEmitter } from '@yellfage/event-emitter'
 
 import type { BitfluxClient } from '../bitflux-client'
 
-import type { EventHandlerMap } from '../event-handler-map'
+import type { EventHandlerMap } from '../event'
 
 import type {
   InvocationHandler,

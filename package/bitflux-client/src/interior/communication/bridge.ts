@@ -2,7 +2,7 @@ import type { OutgoingMessage } from '../../communication'
 
 import type { State } from '../../state'
 
-import type { BridgeEventHandlerMap } from './bridge-event-handler-map'
+import type { BridgeEventHandlerMap } from './event'
 
 export interface Bridge {
   readonly url: URL

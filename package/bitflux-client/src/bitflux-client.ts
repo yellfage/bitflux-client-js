@@ -1,4 +1,4 @@
-import type { EventHandlerMap } from './event-handler-map'
+import type { EventHandlerMap } from './event'
 
 import type {
   InvocationHandler,

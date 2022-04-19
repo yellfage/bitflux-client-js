@@ -25,9 +25,9 @@ import type { Agreement } from './agreement'
 
 import type { Bridge } from './bridge'
 
-import type { BridgeEventHandlerMap } from './bridge-event-handler-map'
-
 import { EmptyAgreement } from './empty-agreement'
+
+import type { BridgeEventHandlerMap } from './event'
 
 import type { Negotiator } from './negotiator'
 
