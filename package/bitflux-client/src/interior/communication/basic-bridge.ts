@@ -136,8 +136,7 @@ export class BasicBridge implements Bridge {
     try {
       this.agreement = await this.negotiator.negotiate()
 
-      // We can register the same event handlers multiple times
-      // because the event emitter ignores the same event handlers
+      this.unregisterTransportEvents()
       this.registerTransportEvents()
 
       this.setUrlConnectionParams()
