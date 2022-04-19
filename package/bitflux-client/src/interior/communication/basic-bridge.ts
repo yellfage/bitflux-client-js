@@ -167,13 +167,13 @@ export class BasicBridge implements Bridge {
 
     this.state.setConnected()
 
-    // We need to send cached messages only after the "connected" state is setted
-    // Otherwise, the cached messages will be cached again
-    this.sendCachedMessages()
-
     const connectedEvent = this.connectedEventFactory.create(this)
 
     await this.eventEmitter.emit('connected', connectedEvent)
+
+    // We need to send cached messages only after the "connected" state is setted
+    // Otherwise, the cached messages will be cached again
+    this.sendCachedMessages()
   }
 
   public async disconnect(reason?: string): Promise<void> {
