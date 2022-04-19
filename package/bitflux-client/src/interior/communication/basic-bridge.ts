@@ -139,6 +139,7 @@ export class BasicBridge implements Bridge {
       this.unregisterTransportEvents()
       this.registerTransportEvents()
 
+      this.deleteUrlConnectionParams()
       this.setUrlConnectionParams()
 
       await this.agreement.transport.connect(this.url)
