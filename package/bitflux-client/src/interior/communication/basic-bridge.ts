@@ -171,9 +171,9 @@ export class BasicBridge implements Bridge {
 
     await this.eventEmitter.emit('connected', connectedEvent)
 
-    // We need to send cached messages only after the "connected" state is setted
+    // We need to release cached messages only after the "connected" state is setted
     // Otherwise, the cached messages will be cached again
-    this.sendCachedMessages()
+    this.releaseCachedMessages()
   }
 
   public async disconnect(reason?: string): Promise<void> {
@@ -296,7 +296,7 @@ export class BasicBridge implements Bridge {
     this.resetReconnection()
   }
 
-  private sendCachedMessages(): void {
+  private releaseCachedMessages(): void {
     this.cachedMessages.forEach((message) => this.send(message))
 
     this.cachedMessages.clear()
