@@ -6,7 +6,7 @@ import type {
   RegularInvocationBuilder,
 } from './invocation'
 
-import type { PluginBuilder } from './plugin-builder'
+import type { PluginBuilder } from './plugin'
 
 import type { State } from './state'
 
