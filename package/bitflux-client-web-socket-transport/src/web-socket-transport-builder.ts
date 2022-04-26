@@ -1,8 +1,6 @@
 import type { Transport, TransportBuilder } from '@yellfage/bitflux-client'
 
-import { EventEmitter } from '@yellfage/event-emitter'
-
-import { PromisfiedWebSocket, WebSocketTransport } from './interior'
+import { WebSocketTransport } from './interior'
 
 import type { WebSocketUrlScheme } from './web-socket-url-scheme'
 
@@ -16,10 +14,6 @@ export class WebSocketTransportBuilder implements TransportBuilder {
   }
 
   public build(): Transport {
-    return new WebSocketTransport(
-      new EventEmitter(),
-      new PromisfiedWebSocket(),
-      this.urlScheme,
-    )
+    return new WebSocketTransport(this.urlScheme)
   }
 }

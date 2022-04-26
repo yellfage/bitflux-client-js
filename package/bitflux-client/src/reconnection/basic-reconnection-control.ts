@@ -1,5 +1,3 @@
-import type { ErrorReconnectionConfirmationContext } from './error-reconnection-confirmation-context'
-
 import type { ReconnectionConfirmationContext } from './reconnection-confirmation-context'
 
 import type { ReconnectionControl } from './reconnection-control'
@@ -13,9 +11,5 @@ export class BasicReconnectionControl implements ReconnectionControl {
 
   public confirm({ attempts }: ReconnectionConfirmationContext): boolean {
     return this.maxAttempts < 0 || attempts < this.maxAttempts
-  }
-
-  public confirmError(context: ErrorReconnectionConfirmationContext): boolean {
-    return this.confirm(context)
   }
 }

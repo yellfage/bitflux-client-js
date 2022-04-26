@@ -1,8 +1,8 @@
 export interface State {
-  readonly isDisconnected: boolean
+  readonly currentName: string
   readonly isConnecting: boolean
   readonly isConnected: boolean
+  readonly isDisconnecting: boolean
+  readonly isDisconnected: boolean
   readonly isReconnecting: boolean
-  readonly isTerminating: boolean
-  readonly isTerminated: boolean
 }

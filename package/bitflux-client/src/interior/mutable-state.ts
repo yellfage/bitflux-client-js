@@ -1,17 +1,16 @@
 import type { State } from '../state'
 
 enum Value {
-  Disconnected = 0,
-  Connecting = 1,
-  Connected = 2,
-  Reconnecting = 3,
-  Terminating = 4,
-  Terminated = 5,
+  Connecting = 0,
+  Connected = 1,
+  Disconnecting = 2,
+  Disconnected = 3,
+  Reconnecting = 4,
 }
 
 export class MutableState implements State {
-  public get isDisconnected(): boolean {
-    return this.value === Value.Disconnected
+  public get currentName(): string {
+    return Value[this.value]
   }
 
   public get isConnecting(): boolean {
@@ -22,23 +21,19 @@ export class MutableState implements State {
     return this.value === Value.Connected
   }
 
+  public get isDisconnecting(): boolean {
+    return this.value === Value.Disconnecting
+  }
+
+  public get isDisconnected(): boolean {
+    return this.value === Value.Disconnected
+  }
+
   public get isReconnecting(): boolean {
     return this.value === Value.Reconnecting
   }
 
-  public get isTerminating(): boolean {
-    return this.value === Value.Terminating
-  }
-
-  public get isTerminated(): boolean {
-    return this.value === Value.Terminated
-  }
-
   private value = Value.Disconnected
-
-  public setDisconnected(): void {
-    this.value = Value.Disconnected
-  }
 
   public setConnecting(): void {
     this.value = Value.Connecting
@@ -48,15 +43,15 @@ export class MutableState implements State {
     this.value = Value.Connected
   }
 
+  public setDisconnecting(): void {
+    this.value = Value.Disconnecting
+  }
+
+  public setDisconnected(): void {
+    this.value = Value.Disconnected
+  }
+
   public setReconnecting(): void {
     this.value = Value.Reconnecting
-  }
-
-  public setTerminating(): void {
-    this.value = Value.Terminating
-  }
-
-  public setTerminated(): void {
-    this.value = Value.Terminated
   }
 }

@@ -8,8 +8,11 @@ import { DisconnectionCode } from '../../communication'
 
 import type {
   OutgoingMessage,
-  TransportDisconnectedEvent,
   TransportMessageEvent,
+  Transport,
+  Protocol,
+  TransportCloseEvent,
+  TransportOpenEvent,
 } from '../../communication'
 
 import type { Logger } from '../../logging'
@@ -19,39 +22,39 @@ import type {
   ReconnectionDelayScheme,
 } from '../../reconnection'
 
-import type { MutableState } from '../mutable-state'
+import { DeferredPromise } from '../deferred-promise'
 
-import type { Agreement } from './agreement'
+import type { MutableState } from '../mutable-state'
 
 import type { Bridge } from './bridge'
 
-import { EmptyAgreement } from './empty-agreement'
+import { EmptyProtocol } from './empty-protocol'
+
+import { EmptyTransport } from './empty-transport'
 
 import type {
   BridgeEventHandlerMap,
   ConnectedBridgeEventFactory,
   ConnectingBridgeEventFactory,
   DisconnectedBridgeEventFactory,
+  DisconnectingBridgeEventFactory,
   MessageBridgeEventFactory,
-  ReconnectedBridgeEventFactory,
   ReconnectingBridgeEventFactory,
-  TerminatedBridgeEventFactory,
-  TerminatingBridgeEventFactory,
 } from './event'
 
-import type { Negotiator } from './negotiator'
-
 const TRANSPORT_PARAM_NAME = 'transport'
-const PROTOCOL_PARAM_NAME = 'protocol'
 
-const DEFAULT_AGREEMENT = new EmptyAgreement()
+const EMPTY_TRANSPORT = new EmptyTransport()
+const EMPTY_PROTOCOL = new EmptyProtocol()
 
 export class BasicBridge implements Bridge {
   public url: URL
 
   public readonly state: MutableState
 
-  private readonly negotiator: Negotiator
+  private readonly transports: Transport[]
+
+  private readonly protocols: Protocol[]
 
   private readonly eventEmitter: EventEmitter<BridgeEventHandlerMap>
 
@@ -59,15 +62,11 @@ export class BasicBridge implements Bridge {
 
   private readonly connectedEventFactory: ConnectedBridgeEventFactory
 
+  private readonly disconnectingEventFactory: DisconnectingBridgeEventFactory
+
   private readonly disconnectedEventFactory: DisconnectedBridgeEventFactory
 
   private readonly reconnectingEventFactory: ReconnectingBridgeEventFactory
-
-  private readonly reconnectedEventFactory: ReconnectedBridgeEventFactory
-
-  private readonly terminatingEventFactory: TerminatingBridgeEventFactory
-
-  private readonly terminatedEventFactory: TerminatedBridgeEventFactory
 
   private readonly messageEventFactory: MessageBridgeEventFactory
 
@@ -79,7 +78,13 @@ export class BasicBridge implements Bridge {
 
   private readonly cachedMessages = new Set<OutgoingMessage>()
 
-  private agreement: Agreement = DEFAULT_AGREEMENT
+  private connectionDeferredPromise: DeferredPromise<void> | null = null
+
+  private disconnectionDeferredPromise: DeferredPromise<void> | null = null
+
+  private transport: Transport = EMPTY_TRANSPORT
+
+  private protocol: Protocol = EMPTY_PROTOCOL
 
   private reconnectionAttempts = 0
 
@@ -88,15 +93,14 @@ export class BasicBridge implements Bridge {
   public constructor(
     url: URL,
     state: MutableState,
-    negotiator: Negotiator,
+    transports: Transport[],
+    protocols: Protocol[],
     eventEmitter: EventEmitter<BridgeEventHandlerMap>,
     connectingEventFactory: ConnectingBridgeEventFactory,
     connectedEventFactory: ConnectedBridgeEventFactory,
+    disconnectingEventFactory: DisconnectingBridgeEventFactory,
     disconnectedEventFactory: DisconnectedBridgeEventFactory,
     reconnectingEventFactory: ReconnectingBridgeEventFactory,
-    reconnectedEventFactory: ReconnectedBridgeEventFactory,
-    terminatingEventFactory: TerminatingBridgeEventFactory,
-    terminatedEventFactory: TerminatedBridgeEventFactory,
     messageEventFactory: MessageBridgeEventFactory,
     logger: Logger,
     reconnectionControl: ReconnectionControl,
@@ -104,15 +108,14 @@ export class BasicBridge implements Bridge {
   ) {
     this.url = url
     this.state = state
-    this.negotiator = negotiator
+    this.transports = transports
+    this.protocols = protocols
     this.eventEmitter = eventEmitter
     this.connectingEventFactory = connectingEventFactory
     this.connectedEventFactory = connectedEventFactory
+    this.disconnectingEventFactory = disconnectingEventFactory
     this.disconnectedEventFactory = disconnectedEventFactory
     this.reconnectingEventFactory = reconnectingEventFactory
-    this.reconnectedEventFactory = reconnectedEventFactory
-    this.terminatingEventFactory = terminatingEventFactory
-    this.terminatedEventFactory = terminatedEventFactory
     this.messageEventFactory = messageEventFactory
     this.logger = logger
     this.reconnectionControl = reconnectionControl
@@ -123,8 +126,18 @@ export class BasicBridge implements Bridge {
    * @throws {@link AbortError}
    */
   public async connect(url: string | URL = this.url): Promise<void> {
+    if (!this.state.isDisconnected && !this.state.isReconnecting) {
+      throw new Error(
+        `Unable to connect at the current state: ${this.state.currentName}`,
+      )
+    }
+
     if (url.toString() !== this.url.toString()) {
       this.url = new URL(url)
+    }
+
+    if (this.state.isReconnecting) {
+      this.abortReconnection()
     }
 
     this.state.setConnecting()
@@ -133,82 +146,117 @@ export class BasicBridge implements Bridge {
 
     await this.eventEmitter.emit('connecting', connectingEvent)
 
-    try {
-      this.agreement = await this.negotiator.negotiate()
+    if (!this.state.isConnecting) {
+      throw new AbortError('Connection has been aborted')
+    }
 
-      this.unregisterTransportEvents()
-      this.registerTransportEvents()
+    this.transport = this.resolveFirstAvailableTransport()
 
-      this.deleteUrlConnectionParams()
-      this.setUrlConnectionParams()
+    this.registerTransportEvents()
 
-      await this.agreement.transport.connect(this.url)
-    } catch (error: unknown) {
-      if (this.state.isTerminating) {
-        throw new AbortError('The connection has been aborted: termination')
+    this.setUrlConnectionParams()
+
+    const protocolNames = this.resolveProtocolNames()
+
+    this.transport.open(this.url, protocolNames)
+
+    if (!this.connectionDeferredPromise) {
+      this.connectionDeferredPromise = new DeferredPromise()
+    }
+
+    return this.connectionDeferredPromise.promise
+  }
+
+  public async reconnect(url: string | URL = this.url): Promise<void> {
+    if (this.state.isConnecting) {
+      this.transport.close()
+
+      return this.connect(url)
+    }
+
+    if (this.state.isConnected) {
+      await this.disconnect()
+
+      return this.connect(url)
+    }
+
+    this.reconnectionAttempts += 1
+
+    if (this.state.isReconnecting) {
+      this.abortReconnection()
+      this.resetReconnectionDelay()
+    } else {
+      const attemptDelay = this.reconnectionDelayScheme.moveNext()
+
+      this.state.setReconnecting()
+
+      const reconnectingEvent = this.reconnectingEventFactory.create(
+        this,
+        this.reconnectionAttempts,
+        attemptDelay,
+      )
+
+      await this.eventEmitter.emit('reconnecting', reconnectingEvent)
+
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (!this.state.isReconnecting) {
+        throw new AbortError('Reconnection has been aborted')
       }
 
-      if (
-        !this.reconnectionControl.confirmError({
-          attempts: this.reconnectionAttempts,
-          error,
+      if (this.reconnectionAbortController.signal.aborted) {
+        this.reconnectionAbortController = new AbortController()
+      }
+
+      try {
+        await delay(attemptDelay, {
+          signal: this.reconnectionAbortController.signal,
         })
-      ) {
+      } catch (error: unknown) {
+        if (this.reconnectionAbortController.signal.aborted) {
+          throw new AbortError('Reconnection has been aborted')
+        }
+
         throw error
       }
-
-      this.logger.logError(error)
-
-      await this.reconnect()
-
-      // We do no need to continue because a connection is already established
-      return
     }
 
-    this.state.setConnected()
+    await this.connect()
 
-    const connectedEvent = this.connectedEventFactory.create(this)
-
-    await this.eventEmitter.emit('connected', connectedEvent)
-
-    // We need to release cached messages only after the "connected" state is setted
-    // Otherwise, the cached messages will be cached again
-    this.releaseCachedMessages()
+    this.resetReconnection()
   }
 
-  public async disconnect(reason?: string): Promise<void> {
-    if (!this.state.isConnected) {
-      throw new Error('Unable to disconnect: already disconnected')
+  public async disconnect(reason = ''): Promise<void> {
+    if (this.state.isDisconnecting || this.state.isDisconnected) {
+      throw new Error(
+        `Unable to disconnect at the current state: ${this.state.currentName}`,
+      )
     }
 
-    await this.agreement.transport.disconnect(reason)
-  }
-
-  public async terminate(reason = 'Termination'): Promise<void> {
     const wasReconnecting = this.state.isReconnecting
-    const wasConnected = this.state.isConnected
 
-    this.state.setTerminating()
+    this.state.setDisconnecting()
 
-    const terminatingEvent = this.terminatingEventFactory.create(this, reason)
+    const disconnectingEvent = this.disconnectingEventFactory.create(
+      this,
+      reason,
+    )
 
-    await this.eventEmitter.emit('terminating', terminatingEvent)
+    await this.eventEmitter.emit('disconnecting', disconnectingEvent)
+
+    this.clearCachedMessages()
 
     if (wasReconnecting) {
       this.abortReconnection()
-
       this.resetReconnection()
+    } else {
+      this.transport.close(reason)
     }
 
-    if (wasConnected) {
-      await this.disconnect(reason)
+    if (!this.disconnectionDeferredPromise) {
+      this.disconnectionDeferredPromise = new DeferredPromise()
     }
 
-    this.state.setTerminated()
-
-    const terminatedEvent = this.terminatedEventFactory.create(this, reason)
-
-    await this.eventEmitter.emit('terminated', terminatedEvent)
+    return this.disconnectionDeferredPromise.promise
   }
 
   public send(message: OutgoingMessage): void {
@@ -218,7 +266,7 @@ export class BasicBridge implements Bridge {
       return
     }
 
-    this.agreement.transport.send(this.agreement.protocol.serialize(message))
+    this.transport.send(this.protocol.serialize(message))
   }
 
   public on<TEventName extends keyof BridgeEventHandlerMap>(
@@ -235,128 +283,176 @@ export class BasicBridge implements Bridge {
     this.eventEmitter.off(eventName, handler)
   }
 
-  /**
-   * @throws {@link AbortError}
-   */
-  private async reconnect(): Promise<void> {
-    this.reconnectionAttempts += 1
+  private resolveFirstAvailableTransport(): Transport {
+    const transports = this.resolveAvailableTransports()
 
-    const attemptDelay = this.reconnectionDelayScheme.moveNext()
-
-    this.state.setReconnecting()
-
-    const reconnectingEvent = this.reconnectingEventFactory.create(
-      this,
-      this.reconnectionAttempts,
-      attemptDelay,
-    )
-
-    await this.eventEmitter.emit('reconnecting', reconnectingEvent)
-
-    // Check if a "reconnecting" event handler has called terminate()
-    if (!this.state.isReconnecting) {
-      throw new AbortError('The reconnection has been aborted: termination')
+    if (!transports.length) {
+      throw new Error(
+        'The provided transports are not supported in the current environment',
+      )
     }
 
-    // We need to recreate the AbortController in case
-    // if we are recovering from the "terminated" state
-    if (this.reconnectionAbortController.signal.aborted) {
-      this.reconnectionAbortController = new AbortController()
+    const [transport] = transports
+
+    return transport
+  }
+
+  private resolveAvailableTransports(): Transport[] {
+    return this.transports.filter((transport) => transport.survey())
+  }
+
+  private resolveProtocolNames(): string[] {
+    return this.protocols.map(({ name }) => name)
+  }
+
+  private resolveProtocol(targetName: string): Protocol {
+    const protocol = this.protocols.find(({ name }) => name === targetName)
+
+    if (!protocol) {
+      throw new Error(`A protocol with the '${targetName}' name not found`)
     }
 
-    try {
-      await delay(attemptDelay, {
-        signal: this.reconnectionAbortController.signal,
-      })
-    } catch (error: unknown) {
-      if (this.state.isTerminating) {
-        throw new AbortError(
-          'The reconnection has been aborted: termination during delay',
-        )
-      }
+    return protocol
+  }
 
-      throw error
-    }
+  private resolveConnectionPromise(): void {
+    this.connectionDeferredPromise?.resolve()
 
-    await this.connect()
+    this.connectionDeferredPromise = null
+  }
 
-    if (this.reconnectionAttempts <= 0) {
-      // We don't need to continue because we have already
-      // completed all the necessary operations after reconnecting
-      return
-    }
+  private rejectConnectionPromise(error: Error): void {
+    this.connectionDeferredPromise?.reject(error)
 
-    const reconnectedEvent = this.reconnectedEventFactory.create(
-      this,
-      this.reconnectionAttempts,
-    )
+    this.connectionDeferredPromise = null
+  }
 
-    await this.eventEmitter.emit('reconnected', reconnectedEvent)
+  private resolveDisconnectionPromise(): void {
+    this.disconnectionDeferredPromise?.resolve()
 
-    this.resetReconnection()
+    this.disconnectionDeferredPromise = null
+  }
+
+  private rejectDisconnectionPromise(error: Error): void {
+    this.disconnectionDeferredPromise?.reject(error)
+
+    this.disconnectionDeferredPromise = null
   }
 
   private releaseCachedMessages(): void {
-    this.cachedMessages.forEach((message) => this.send(message))
+    this.sendCachedMessages()
+    this.clearCachedMessages()
+  }
 
+  private sendCachedMessages(): void {
+    this.cachedMessages.forEach((message) => this.send(message))
+  }
+
+  private clearCachedMessages(): void {
     this.cachedMessages.clear()
   }
 
   private abortReconnection(): void {
-    if (!this.state.isReconnecting) {
-      throw new Error(
-        'Unable to abort reconnection: a reconnection is not performing',
-      )
-    }
-
     this.reconnectionAbortController.abort()
   }
 
   private resetReconnection(): void {
-    this.reconnectionAttempts = 0
+    this.resetReconnectionAttempts()
+    this.resetReconnectionDelay()
+  }
 
+  private resetReconnectionAttempts(): void {
+    this.reconnectionAttempts = 0
+  }
+
+  private resetReconnectionDelay(): void {
     this.reconnectionDelayScheme.reset()
   }
 
-  private resetAgreement(): void {
-    this.agreement = DEFAULT_AGREEMENT
+  private resetTransport(): void {
+    this.transport = EMPTY_TRANSPORT
+  }
+
+  private resetProtocol(): void {
+    this.protocol = EMPTY_PROTOCOL
   }
 
   private registerTransportEvents(): void {
-    const { transport } = this.agreement
-
-    transport.on('disconnected', this.handleTransportDisconnectedEvent)
-    transport.on('message', this.handleTransportMessageEvent)
+    this.transport.onopen = this.handleOpenEvent
+    this.transport.onclose = this.handleCloseEvent
+    this.transport.onmessage = this.handleMessageEvent
   }
 
   private unregisterTransportEvents(): void {
-    const { transport } = this.agreement
-
-    transport.off('disconnected', this.handleTransportDisconnectedEvent)
-    transport.off('message', this.handleTransportMessageEvent)
+    this.transport.onopen = null
+    this.transport.onclose = null
+    this.transport.onmessage = null
   }
 
   private setUrlConnectionParams(): void {
-    const { transport, protocol } = this.agreement
-
-    this.url.searchParams.set(TRANSPORT_PARAM_NAME, transport.name)
-    this.url.searchParams.set(PROTOCOL_PARAM_NAME, protocol.name)
+    this.url.searchParams.set(TRANSPORT_PARAM_NAME, this.transport.name)
   }
 
   private deleteUrlConnectionParams(): void {
     this.url.searchParams.delete(TRANSPORT_PARAM_NAME)
-    this.url.searchParams.delete(PROTOCOL_PARAM_NAME)
   }
 
-  private readonly handleTransportDisconnectedEvent = async ({
+  private confirmReconnection(code: DisconnectionCode): boolean {
+    return (
+      code === DisconnectionCode.Abnormal &&
+      this.reconnectionControl.confirm({ attempts: this.reconnectionAttempts })
+    )
+  }
+
+  private readonly handleOpenEvent = async ({
+    protocol: protocolName,
+  }: TransportOpenEvent): Promise<void> => {
+    if (protocolName == null) {
+      this.rejectConnectionPromise(
+        new Error(
+          'The provided protocols are not supported on the server side',
+        ),
+      )
+
+      return
+    }
+
+    this.protocol = this.resolveProtocol(protocolName)
+
+    this.state.setConnected()
+
+    const connectedEvent = this.connectedEventFactory.create(this)
+
+    await this.eventEmitter.emit('connected', connectedEvent)
+
+    if (!this.state.isConnected) {
+      this.rejectConnectionPromise(
+        new AbortError('Connection has been aborted'),
+      )
+
+      return
+    }
+
+    // We need to release cached messages only after the "connected" state is setted
+    // Otherwise, the cached messages will be cached again
+    this.releaseCachedMessages()
+
+    this.resolveConnectionPromise()
+  }
+
+  private readonly handleCloseEvent = async ({
     code,
     reason,
-  }: TransportDisconnectedEvent): Promise<void> => {
+  }: TransportCloseEvent): Promise<void> => {
     this.unregisterTransportEvents()
 
     this.deleteUrlConnectionParams()
 
-    this.resetAgreement()
+    this.resetTransport()
+
+    this.resetProtocol()
+
+    const wasDisconnecting = this.state.isDisconnecting
 
     this.state.setDisconnected()
 
@@ -368,38 +464,48 @@ export class BasicBridge implements Bridge {
 
     await this.eventEmitter.emit('disconnected', disconnectedEvent)
 
-    // Check if a "disconnected" event handler has called terminate()
     if (!this.state.isDisconnected) {
+      this.rejectDisconnectionPromise(
+        new AbortError('Disconnection has been aborted'),
+      )
+
       return
     }
 
-    if (
-      code === DisconnectionCode.Normal ||
-      !this.reconnectionControl.confirm({ attempts: this.reconnectionAttempts })
-    ) {
-      return
-    }
+    if (!wasDisconnecting && this.confirmReconnection(code)) {
+      try {
+        await this.reconnect()
+      } catch (error: unknown) {
+        if (error instanceof AbortError) {
+          if (this.state.isConnecting) {
+            return
+          }
 
-    try {
-      await this.reconnect()
-    } catch (error: unknown) {
-      if (error instanceof AbortError) {
-        return
+          if (this.state.isDisconnecting) {
+            this.state.setDisconnected()
+
+            await this.eventEmitter.emit('disconnected', disconnectedEvent)
+          }
+        } else {
+          throw error
+        }
       }
-
-      throw error
     }
+
+    this.resolveDisconnectionPromise()
+
+    this.rejectConnectionPromise(new AbortError('Connection has been aborted'))
   }
 
-  private readonly handleTransportMessageEvent = async ({
+  private readonly handleMessageEvent = async ({
     message,
   }: TransportMessageEvent): Promise<void> => {
     const rawMessage = message instanceof Blob ? await message.text() : message
 
-    const finalMessage = this.agreement.protocol.deserialize(rawMessage)
+    const finalMessage = this.protocol.deserialize(rawMessage)
 
     const messageEvent = this.messageEventFactory.create(this, finalMessage)
 
-    await this.eventEmitter.emit('message', messageEvent)
+    return this.eventEmitter.emit('message', messageEvent)
   }
 }

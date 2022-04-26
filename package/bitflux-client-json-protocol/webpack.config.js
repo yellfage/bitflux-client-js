@@ -6,7 +6,6 @@ const { NODE_ENV } = process.env
 
 const SRC_PATH = path.resolve(__dirname, 'src')
 const OUTPUT_PATH = path.resolve(__dirname, 'dist')
-const TS_CONFIG_PATH = path.resolve(__dirname, 'tsconfig.json')
 
 module.exports = {
   mode: NODE_ENV,
@@ -32,9 +31,10 @@ module.exports = {
         include: [SRC_PATH],
         use: [
           {
-            loader: 'ts-loader',
+            loader: 'esbuild-loader',
             options: {
-              transpileOnly: true,
+              loader: 'ts',
+              target: 'esnext',
             },
           },
         ],
@@ -45,8 +45,6 @@ module.exports = {
     new SourceMapDevToolPlugin({
       filename: '[file].map',
     }),
-    new ForkTsCheckerPlugin({
-      typescript: { configFile: TS_CONFIG_PATH },
-    }),
+    new ForkTsCheckerPlugin(),
   ],
 }

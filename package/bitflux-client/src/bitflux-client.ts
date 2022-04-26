@@ -18,8 +18,14 @@ export interface BitfluxClient {
    * @throws {@link AbortError}
    */
   connect(url?: string | URL): Promise<void>
+  /**
+   * @throws {@link AbortError}
+   */
+  reconnect(url?: string | URL): Promise<void>
+  /**
+   * @throws {@link AbortError}
+   */
   disconnect(reason?: string): Promise<void>
-  terminate(reason?: string): Promise<void>
 
   use(builder: PluginBuilder)
 

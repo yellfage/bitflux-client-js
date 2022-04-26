@@ -6,7 +6,7 @@ import type { DisconnectedBridgeEvent } from './disconnected-bridge-event'
 
 export interface DisconnectedBridgeEventFactory {
   create(
-    bridge: Bridge,
+    target: Bridge,
     code: DisconnectionCode,
     reason: string,
   ): DisconnectedBridgeEvent

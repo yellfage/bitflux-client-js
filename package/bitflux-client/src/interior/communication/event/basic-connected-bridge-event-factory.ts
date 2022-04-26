@@ -9,7 +9,7 @@ import type { ConnectedBridgeEventFactory } from './connected-bridge-event-facto
 export class BasicConnectedBridgeEventFactory
   implements ConnectedBridgeEventFactory
 {
-  public create(bridge: Bridge): ConnectedBridgeEvent {
-    return new BasicConnectedBridgeEvent(bridge)
+  public create(target: Bridge): ConnectedBridgeEvent {
+    return new BasicConnectedBridgeEvent(target)
   }
 }

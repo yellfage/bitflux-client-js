@@ -30,10 +30,8 @@ const client = new BitfluxClientBuilder('https://localhost:5001/ws')
 client.on('connecting', (event) => console.log('Connecting', event))
 client.on('connected', (event) => console.log('Connected', event))
 client.on('reconnecting', (event) => console.log('Reconnecting', event))
+client.on('disconnecting', (event) => console.log('Disconnecting', event))
 client.on('disconnected', (event) => console.log('Disconnected', event))
-client.on('terminating', (event) => console.log('Terminating', event))
-client.on('terminated', (event) => console.log('Terminated', event))
-client.on('reconnected', (event) => console.log('Reconnected', event))
 
 client.map('Notify', (message: string) => {
   console.log(`The incoming message: ${message}`)

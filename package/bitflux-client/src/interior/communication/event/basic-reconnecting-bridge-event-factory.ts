@@ -10,10 +10,10 @@ export class BasicReconnectingBridgeEventFactory
   implements ReconnectingBridgeEventFactory
 {
   public create(
-    bridge: Bridge,
+    target: Bridge,
     attempts: number,
     delay: number,
   ): ReconnectingBridgeEvent {
-    return new BasicReconnectingBridgeEvent(bridge, attempts, delay)
+    return new BasicReconnectingBridgeEvent(target, attempts, delay)
   }
 }

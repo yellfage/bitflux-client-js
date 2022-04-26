@@ -12,8 +12,8 @@ export class BasicMessageBridgeEvent
 {
   public readonly message: IncomingMessage
 
-  public constructor(bridge: Bridge, message: IncomingMessage) {
-    super(bridge)
+  public constructor(target: Bridge, message: IncomingMessage) {
+    super(target)
 
     this.message = message
   }

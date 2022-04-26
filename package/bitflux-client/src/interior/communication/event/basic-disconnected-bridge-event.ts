@@ -14,8 +14,8 @@ export class BasicDisconnectedBridgeEvent
 
   public readonly reason: string
 
-  public constructor(bridge: Bridge, code: DisconnectionCode, reason: string) {
-    super(bridge)
+  public constructor(target: Bridge, code: DisconnectionCode, reason: string) {
+    super(target)
 
     this.code = code
     this.reason = reason

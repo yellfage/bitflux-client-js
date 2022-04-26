@@ -13,7 +13,7 @@ JavaScript client for [Bitflux](https://github.com/yellfage/bitflux)
 
 ### Interceptors
 
-Intended to perform some operations at specific stages (connecting, connected, disconnected, reconnecting, reconnected, terminating, terminated);
+Intended to perform some operations at specific stages (connecting, connected, reconnecting, disconnecting, disconnected);
 
 - Flexible modification of URI (params, path, etc);
 

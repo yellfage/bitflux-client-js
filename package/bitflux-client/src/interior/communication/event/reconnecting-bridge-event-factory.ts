@@ -4,7 +4,7 @@ import type { ReconnectingBridgeEvent } from './reconnecting-bridge-event'
 
 export interface ReconnectingBridgeEventFactory {
   create(
-    bridge: Bridge,
+    target: Bridge,
     attempts: number,
     delay: number,
   ): ReconnectingBridgeEvent

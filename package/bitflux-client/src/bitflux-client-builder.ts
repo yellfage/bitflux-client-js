@@ -20,23 +20,18 @@ import {
   BasicConnectingEventFactory,
   BasicDisconnectedBridgeEventFactory,
   BasicDisconnectedEventFactory,
+  BasicDisconnectingBridgeEventFactory,
+  BasicDisconnectingEventFactory,
   BasicHandlerMapper,
   BasicLoggingSettingsBuilder,
   BasicMessageBridgeEventFactory,
   BasicNotifiableInvocationBuilderFactory,
-  BasicReconnectedBridgeEventFactory,
-  BasicReconnectedEventFactory,
   BasicReconnectingBridgeEventFactory,
   BasicReconnectingEventFactory,
   BasicReconnectionSettingsBuilder,
   BasicRegularInvocationBuilderFactory,
   BasicRegularInvocationSettingsBuilder,
-  BasicTerminatedBridgeEventFactory,
-  BasicTerminatedEventFactory,
-  BasicTerminatingBridgeEventFactory,
-  BasicTerminatingEventFactory,
   MutableState,
-  Negotiator,
 } from './interior'
 
 export class BitfluxClientBuilder {
@@ -122,19 +117,14 @@ export class BitfluxClientBuilder {
     const bridge = new BasicBridge(
       url,
       new MutableState(),
-      new Negotiator(
-        url,
-        communicationSettings.transports,
-        communicationSettings.protocols,
-      ),
+      communicationSettings.transports,
+      communicationSettings.protocols,
       new EventEmitter(),
       new BasicConnectingBridgeEventFactory(),
       new BasicConnectedBridgeEventFactory(),
+      new BasicDisconnectingBridgeEventFactory(),
       new BasicDisconnectedBridgeEventFactory(),
       new BasicReconnectingBridgeEventFactory(),
-      new BasicReconnectedBridgeEventFactory(),
-      new BasicTerminatingBridgeEventFactory(),
-      new BasicTerminatedBridgeEventFactory(),
       new BasicMessageBridgeEventFactory(),
       loggingSettings.logger,
       reconnectionSettings.control,
@@ -146,11 +136,9 @@ export class BitfluxClientBuilder {
       new EventEmitter(),
       new BasicConnectingEventFactory(),
       new BasicConnectedEventFactory(),
+      new BasicDisconnectingEventFactory(),
       new BasicDisconnectedEventFactory(),
       new BasicReconnectingEventFactory(),
-      new BasicReconnectedEventFactory(),
-      new BasicTerminatingEventFactory(),
-      new BasicTerminatedEventFactory(),
       new BasicHandlerMapper(bridge, loggingSettings.logger),
       new BasicRegularInvocationBuilderFactory(
         bridge,
@@ -173,13 +161,13 @@ export class BitfluxClientBuilder {
 
   private ensureTransportsProvided(settings: CommunicationSettings): void {
     if (!settings.transports.length) {
-      throw new Error('Unable to build the client: none Transport is provided')
+      throw new Error('At least one transport must be provided')
     }
   }
 
   private ensureProtocolsProvided(settings: CommunicationSettings): void {
     if (!settings.protocols.length) {
-      throw new Error('Unable to build the client: none Protocol is provided')
+      throw new Error('At least one protocol must be provided')
     }
   }
 }

@@ -12,8 +12,8 @@ export class BasicReconnectingBridgeEvent
 
   public readonly delay: number
 
-  public constructor(bridge: Bridge, attempts: number, delay: number) {
-    super(bridge)
+  public constructor(target: Bridge, attempts: number, delay: number) {
+    super(target)
 
     this.attempts = attempts
     this.delay = delay

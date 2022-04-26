@@ -1,98 +1,94 @@
 import { DisconnectionCode } from '@yellfage/bitflux-client'
 
 import type {
-  TransportEventHandlerMap,
   Transport,
+  TransportMessageEventHandler,
+  TransportCloseEventHandler,
+  TransportOpenEventHandler,
 } from '@yellfage/bitflux-client'
 
-import type { EventEmitter } from '@yellfage/event-emitter'
-
 import type { WebSocketUrlScheme } from '../web-socket-url-scheme'
-
-import type { PromisfiedWebSocket } from './promisfied-web-socket'
 
 import { WebSocketDisconnectionCode } from './web-socket-disconnection-code'
 
 export class WebSocketTransport implements Transport {
   public readonly name = 'web-socket'
 
-  private readonly eventEmitter: EventEmitter<TransportEventHandlerMap>
+  public onopen: TransportOpenEventHandler | null
 
-  private readonly webSocket: PromisfiedWebSocket
+  public onclose: TransportCloseEventHandler | null
+
+  public onmessage: TransportMessageEventHandler | null = null
 
   private readonly urlScheme: WebSocketUrlScheme
 
-  public constructor(
-    eventEmitter: EventEmitter<TransportEventHandlerMap>,
-    webSocket: PromisfiedWebSocket,
-    urlScheme: WebSocketUrlScheme,
-  ) {
-    this.eventEmitter = eventEmitter
-    this.webSocket = webSocket
-    this.urlScheme = urlScheme
+  private webSocket: WebSocket | null = null
 
-    this.webSocket.onclose = this.handleWebSocketCloseEvent
-    this.webSocket.onmessage = this.handleWebSocketMessageEvent
+  public constructor(urlScheme: WebSocketUrlScheme) {
+    this.urlScheme = urlScheme
   }
 
   public survey(): boolean {
     return typeof WebSocket === 'function'
   }
 
-  public async connect(url: URL): Promise<void> {
+  public open(url: URL, protocols: string[]): void {
     const { host, pathname, search } = url
 
-    await this.webSocket.connect(
+    this.webSocket = new WebSocket(
       `${this.urlScheme}://${host}${pathname}${search}`,
+      protocols,
     )
+
+    this.webSocket.binaryType = 'blob'
+
+    this.webSocket.onopen = this.handleOpenEvent
+    this.webSocket.onclose = this.handleCloseEvent
+    this.webSocket.onmessage = this.handleMessageEvent
   }
 
-  public async disconnect(reason?: string): Promise<void> {
-    await this.webSocket.disconnect(reason)
-  }
-
-  public async terminate(reason?: string): Promise<void> {
-    await this.disconnect(reason)
+  public close(reason?: string): void {
+    this.webSocket?.close(WebSocketDisconnectionCode.Normal, reason)
   }
 
   public send(message: string): void {
-    this.webSocket.send(message)
+    this.webSocket?.send(message)
   }
 
-  public on<TEventName extends keyof TransportEventHandlerMap>(
-    eventName: TEventName,
-    handler: TransportEventHandlerMap[TEventName],
-  ): TransportEventHandlerMap[TEventName] {
-    return this.eventEmitter.on(eventName, handler)
+  private readonly handleOpenEvent = async (): Promise<void> => {
+    if (!this.onopen) {
+      return
+    }
+
+    return this.onopen({
+      target: this,
+      protocol: this.webSocket?.protocol ?? null,
+    })
   }
 
-  public off<TEventName extends keyof TransportEventHandlerMap>(
-    eventName: TEventName,
-    handler: TransportEventHandlerMap[TEventName],
-  ): void {
-    this.eventEmitter.off(eventName, handler)
-  }
-
-  private readonly handleWebSocketCloseEvent = async ({
+  private readonly handleCloseEvent = async ({
     code,
     reason,
   }: CloseEvent): Promise<void> => {
-    await this.eventEmitter.emit('disconnected', {
-      target: this,
-      code:
-        code === WebSocketDisconnectionCode.Normal
-          ? DisconnectionCode.Normal
-          : DisconnectionCode.Abnormal,
-      reason,
-    })
+    if (!this.onclose) {
+      return
+    }
+
+    const finalCode =
+      code === WebSocketDisconnectionCode.Normal
+        ? DisconnectionCode.Normal
+        : DisconnectionCode.Abnormal
+
+    return this.onclose({ target: this, code: finalCode, reason })
   }
 
-  private readonly handleWebSocketMessageEvent = async ({
+  private readonly handleMessageEvent = async ({
     data,
   }: MessageEvent<string | Blob>): Promise<void> => {
-    await this.eventEmitter.emit('message', {
-      target: this,
-      message: data,
-    })
+    if (!this.onmessage) {
+      return
+    }
+
+    return this.onmessage({ target: this, message: data })
   }
 }

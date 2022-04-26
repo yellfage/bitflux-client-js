@@ -17,28 +17,24 @@ import type { State } from '../state'
 import type {
   Bridge,
   DisconnectedBridgeEvent,
-  ReconnectedBridgeEvent,
+  DisconnectingBridgeEvent,
   ReconnectingBridgeEvent,
-  TerminatedBridgeEvent,
-  TerminatingBridgeEvent,
 } from './communication'
 
 import type {
   ConnectedEventFactory,
   ConnectingEventFactory,
   DisconnectedEventFactory,
-  ReconnectedEventFactory,
+  DisconnectingEventFactory,
   ReconnectingEventFactory,
-  TerminatedEventFactory,
-  TerminatingEventFactory,
 } from './event'
-
-import type { HandlerMapper } from './handler-mapper'
 
 import type {
   NotifiableInvocationBuilderFactory,
   RegularInvocationBuilderFactory,
 } from './invocation'
+
+import type { HandlerMapper } from './mapping'
 
 export class BasicBitfluxClient implements BitfluxClient {
   public get url(): URL {
@@ -57,15 +53,11 @@ export class BasicBitfluxClient implements BitfluxClient {
 
   private readonly connectedEventFactory: ConnectedEventFactory
 
+  private readonly disconnectingEventFactory: DisconnectingEventFactory
+
   private readonly disconnectedEventFactory: DisconnectedEventFactory
 
   private readonly reconnectingEventFactory: ReconnectingEventFactory
-
-  private readonly reconnectedEventFactory: ReconnectedEventFactory
-
-  private readonly terminatingEventFactory: TerminatingEventFactory
-
-  private readonly terminatedEventFactory: TerminatedEventFactory
 
   private readonly handlerMapper: HandlerMapper
 
@@ -78,11 +70,9 @@ export class BasicBitfluxClient implements BitfluxClient {
     eventEmitter: EventEmitter<EventHandlerMap>,
     connectingEventFactory: ConnectingEventFactory,
     connectedEventFactory: ConnectedEventFactory,
+    disconnectingEventFactory: DisconnectingEventFactory,
     disconnectedEventFactory: DisconnectedEventFactory,
     reconnectingEventFactory: ReconnectingEventFactory,
-    reconnectedEventFactory: ReconnectedEventFactory,
-    terminatingEventFactory: TerminatingEventFactory,
-    terminatedEventFactory: TerminatedEventFactory,
     handlerMapper: HandlerMapper,
     regularInvocationBuilderFactory: RegularInvocationBuilderFactory,
     notifiableInvocationBuilderFactory: NotifiableInvocationBuilderFactory,
@@ -91,11 +81,9 @@ export class BasicBitfluxClient implements BitfluxClient {
     this.eventEmitter = eventEmitter
     this.connectingEventFactory = connectingEventFactory
     this.connectedEventFactory = connectedEventFactory
+    this.disconnectingEventFactory = disconnectingEventFactory
     this.disconnectedEventFactory = disconnectedEventFactory
     this.reconnectingEventFactory = reconnectingEventFactory
-    this.reconnectedEventFactory = reconnectedEventFactory
-    this.terminatingEventFactory = terminatingEventFactory
-    this.terminatedEventFactory = terminatedEventFactory
     this.handlerMapper = handlerMapper
     this.regularInvocationBuilderFactory = regularInvocationBuilderFactory
     this.notifiableInvocationBuilderFactory = notifiableInvocationBuilderFactory
@@ -103,16 +91,16 @@ export class BasicBitfluxClient implements BitfluxClient {
     this.registerBridgeEventHandlers()
   }
 
-  public async connect(url?: string | URL): Promise<void> {
-    await this.bridge.connect(url)
+  public connect(url?: string | URL): Promise<void> {
+    return this.bridge.connect(url)
   }
 
-  public async disconnect(reason?: string): Promise<void> {
-    await this.bridge.disconnect(reason)
+  public reconnect(url?: string | URL): Promise<void> {
+    return this.bridge.reconnect(url)
   }
 
-  public async terminate(reason?: string): Promise<void> {
-    await this.bridge.terminate(reason)
+  public disconnect(reason?: string): Promise<void> {
+    return this.bridge.disconnect(reason)
   }
 
   public use(builder: PluginBuilder): void {
@@ -147,74 +135,56 @@ export class BasicBitfluxClient implements BitfluxClient {
     this.eventEmitter.off(eventName, handler)
   }
 
-  public async emit<TEventName extends keyof EventHandlerMap>(
+  public emit<TEventName extends keyof EventHandlerMap>(
     eventName: TEventName,
     ...args: Parameters<EventHandlerMap[TEventName]>
   ): Promise<void> {
-    await this.eventEmitter.emit(eventName, ...args)
+    return this.eventEmitter.emit(eventName, ...args)
   }
 
   private registerBridgeEventHandlers(): void {
-    this.bridge.on('disconnected', this.handleBridgeDisconnectedEvent)
     this.bridge.on('connecting', this.handleBridgeConnectingEvent)
     this.bridge.on('connected', this.handleBridgeConnectedEvent)
+    this.bridge.on('disconnecting', this.handleBridgeDisconnectingEvent)
+    this.bridge.on('disconnected', this.handleBridgeDisconnectedEvent)
     this.bridge.on('reconnecting', this.handleBridgeReconnectingEvent)
-    this.bridge.on('reconnected', this.handleBridgeReconnectedEvent)
-    this.bridge.on('terminating', this.handleBridgeTerminatingEvent)
-    this.bridge.on('terminated', this.handleBridgeTerminatedEvent)
   }
 
-  private readonly handleBridgeDisconnectedEvent = async ({
+  private readonly handleBridgeConnectingEvent = (): Promise<void> => {
+    const event = this.connectingEventFactory.create(this)
+
+    return this.eventEmitter.emit('connecting', event)
+  }
+
+  private readonly handleBridgeConnectedEvent = (): Promise<void> => {
+    const event = this.connectedEventFactory.create(this)
+
+    return this.eventEmitter.emit('connected', event)
+  }
+
+  private readonly handleBridgeDisconnectingEvent = ({
+    reason,
+  }: DisconnectingBridgeEvent): Promise<void> => {
+    const event = this.disconnectingEventFactory.create(this, reason)
+
+    return this.eventEmitter.emit('disconnecting', event)
+  }
+
+  private readonly handleBridgeDisconnectedEvent = ({
     code,
     reason,
   }: DisconnectedBridgeEvent): Promise<void> => {
     const event = this.disconnectedEventFactory.create(this, code, reason)
 
-    await this.eventEmitter.emit('disconnected', event)
+    return this.eventEmitter.emit('disconnected', event)
   }
 
-  private readonly handleBridgeConnectingEvent = async (): Promise<void> => {
-    const event = this.connectingEventFactory.create(this)
-
-    await this.eventEmitter.emit('connecting', event)
-  }
-
-  private readonly handleBridgeConnectedEvent = async (): Promise<void> => {
-    const event = this.connectedEventFactory.create(this)
-
-    await this.eventEmitter.emit('connected', event)
-  }
-
-  private readonly handleBridgeReconnectingEvent = async ({
+  private readonly handleBridgeReconnectingEvent = ({
     attempts,
     delay,
   }: ReconnectingBridgeEvent): Promise<void> => {
     const event = this.reconnectingEventFactory.create(this, attempts, delay)
 
-    await this.eventEmitter.emit('reconnecting', event)
-  }
-
-  private readonly handleBridgeReconnectedEvent = async ({
-    attempts,
-  }: ReconnectedBridgeEvent): Promise<void> => {
-    const event = this.reconnectedEventFactory.create(this, attempts)
-
-    await this.eventEmitter.emit('reconnected', event)
-  }
-
-  private readonly handleBridgeTerminatingEvent = async ({
-    reason,
-  }: TerminatingBridgeEvent): Promise<void> => {
-    const event = this.terminatingEventFactory.create(this, reason)
-
-    await this.eventEmitter.emit('terminating', event)
-  }
-
-  private readonly handleBridgeTerminatedEvent = async ({
-    reason,
-  }: TerminatedBridgeEvent): Promise<void> => {
-    const event = this.terminatedEventFactory.create(this, reason)
-
-    await this.eventEmitter.emit('terminated', event)
+    return this.eventEmitter.emit('reconnecting', event)
   }
 }

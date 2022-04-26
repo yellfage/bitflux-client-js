@@ -12,10 +12,10 @@ export class BasicDisconnectedBridgeEventFactory
   implements DisconnectedBridgeEventFactory
 {
   public create(
-    bridge: Bridge,
+    target: Bridge,
     code: DisconnectionCode,
     reason: string,
   ): DisconnectedBridgeEvent {
-    return new BasicDisconnectedBridgeEvent(bridge, code, reason)
+    return new BasicDisconnectedBridgeEvent(target, code, reason)
   }
 }
