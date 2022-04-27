@@ -1,5 +1,5 @@
 import type { BitfluxClient } from '../bitflux-client'
 
-export interface Event {
+export interface ClientEvent {
   readonly target: BitfluxClient
 }

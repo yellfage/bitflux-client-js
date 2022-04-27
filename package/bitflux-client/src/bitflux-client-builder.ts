@@ -10,6 +10,8 @@ import type {
   ReconnectionSettingsBuilder,
 } from './configuration'
 
+import type { EventHandlerMap } from './event'
+
 import {
   BasicBitfluxClient,
   BasicBridge,
@@ -23,6 +25,8 @@ import {
   BasicDisconnectingBridgeEventFactory,
   BasicDisconnectingEventFactory,
   BasicHandlerMapper,
+  BasicInvocationEventFactory,
+  BasicInvocationResultEventFactory,
   BasicLoggingSettingsBuilder,
   BasicMessageBridgeEventFactory,
   BasicNotifiableInvocationBuilderFactory,
@@ -131,9 +135,15 @@ export class BitfluxClientBuilder {
       reconnectionSettings.delayScheme,
     )
 
+    const eventEmitter = new EventEmitter<EventHandlerMap>()
+
+    const invocationEventFactory = new BasicInvocationEventFactory()
+
+    const invocationResultEventFactory = new BasicInvocationResultEventFactory()
+
     return new BasicBitfluxClient(
       bridge,
-      new EventEmitter(),
+      eventEmitter,
       new BasicConnectingEventFactory(),
       new BasicConnectedEventFactory(),
       new BasicDisconnectingEventFactory(),
@@ -141,11 +151,18 @@ export class BitfluxClientBuilder {
       new BasicReconnectingEventFactory(),
       new BasicHandlerMapper(bridge, loggingSettings.logger),
       new BasicRegularInvocationBuilderFactory(
-        bridge,
         regularInvocationSettings.rejectionDelay,
         regularInvocationSettings.attemptRejectionDelay,
+        eventEmitter,
+        invocationEventFactory,
+        invocationResultEventFactory,
+        bridge,
       ),
-      new BasicNotifiableInvocationBuilderFactory(bridge),
+      new BasicNotifiableInvocationBuilderFactory(
+        eventEmitter,
+        invocationEventFactory,
+        bridge,
+      ),
     )
   }
 

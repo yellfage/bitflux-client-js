@@ -1,5 +1,7 @@
 import type { ConnectedEvent } from '../../../event'
 
-import { BasicEvent } from '../basic-event'
+import { BasicClientEvent } from '../basic-client-event'
 
-export class BasicConnectedEvent extends BasicEvent implements ConnectedEvent {}
+export class BasicConnectedEvent
+  extends BasicClientEvent
+  implements ConnectedEvent {}

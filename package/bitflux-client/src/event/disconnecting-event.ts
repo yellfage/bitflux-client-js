@@ -1,5 +1,5 @@
-import type { Event } from './event'
+import type { ClientEvent } from './client-event'
 
-export interface DisconnectingEvent extends Event {
+export interface DisconnectingEvent extends ClientEvent {
   readonly reason: string
 }

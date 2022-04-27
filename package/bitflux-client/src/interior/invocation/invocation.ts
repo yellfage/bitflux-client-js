@@ -1,3 +1,7 @@
+import type { InvocationShape } from './invocation-shape'
+
 export interface Invocation<TResult> {
-  perform(): TResult
+  readonly shape: InvocationShape
+
+  perform(): Promise<TResult>
 }

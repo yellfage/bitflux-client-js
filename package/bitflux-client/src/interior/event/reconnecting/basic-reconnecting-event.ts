@@ -2,10 +2,10 @@ import type { BitfluxClient } from '../../../bitflux-client'
 
 import type { ReconnectingEvent } from '../../../event'
 
-import { BasicEvent } from '../basic-event'
+import { BasicClientEvent } from '../basic-client-event'
 
 export class BasicReconnectingEvent
-  extends BasicEvent
+  extends BasicClientEvent
   implements ReconnectingEvent
 {
   public readonly attempts: number

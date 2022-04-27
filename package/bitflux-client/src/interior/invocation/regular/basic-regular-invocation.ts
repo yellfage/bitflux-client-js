@@ -1,8 +1,12 @@
+import type { EventEmitter } from '@yellfage/event-emitter'
+
 import { AbortError } from '../../../abort-error'
 
 import type { IncomingMessage } from '../../../communication'
 
 import { IncomingMessageType } from '../../../communication'
+
+import type { InvocationEventHandlerMap } from '../../../event'
 
 import type {
   Bridge,
@@ -16,6 +20,11 @@ import { OutgoingRegularInvocationMessage } from '../../communication'
 
 import { DeferredPromise } from '../../deferred-promise'
 
+import type {
+  InvocationEventFactory,
+  InvocationResultEventFactory,
+} from '../../event'
+
 import type { RegularInvocation } from './regular-invocation'
 
 import type { RegularInvocationShape } from './regular-invocation-shape'
@@ -23,9 +32,15 @@ import type { RegularInvocationShape } from './regular-invocation-shape'
 export class BasicRegularInvocation<TResult>
   implements RegularInvocation<TResult>
 {
-  private readonly bridge: Bridge
+  public readonly shape: RegularInvocationShape
 
-  private readonly shape: RegularInvocationShape
+  private readonly eventEmitter: EventEmitter<InvocationEventHandlerMap>
+
+  private readonly invocationEventFactory: InvocationEventFactory
+
+  private readonly invocationResultEventFactory: InvocationResultEventFactory
+
+  private readonly bridge: Bridge
 
   private readonly message: OutgoingRegularInvocationMessage
 
@@ -35,9 +50,18 @@ export class BasicRegularInvocation<TResult>
 
   private attemptRejectionTimeoutId = 0
 
-  public constructor(bridge: Bridge, shape: RegularInvocationShape) {
-    this.bridge = bridge
+  public constructor(
+    shape: RegularInvocationShape,
+    eventEmitter: EventEmitter<InvocationEventHandlerMap>,
+    invocationEventFactory: InvocationEventFactory,
+    invocationResultEventFactory: InvocationResultEventFactory,
+    bridge: Bridge,
+  ) {
     this.shape = shape
+    this.eventEmitter = eventEmitter
+    this.invocationEventFactory = invocationEventFactory
+    this.invocationResultEventFactory = invocationResultEventFactory
+    this.bridge = bridge
 
     this.message = new OutgoingRegularInvocationMessage(
       shape.id,
@@ -46,7 +70,7 @@ export class BasicRegularInvocation<TResult>
     )
   }
 
-  public perform(): Promise<TResult> {
+  public async perform(): Promise<TResult> {
     if (this.shape.abortController.signal.aborted) {
       throw new Error(
         'Unable to perform regular invocation: the provided AbortController is already aborted',
@@ -59,9 +83,22 @@ export class BasicRegularInvocation<TResult>
 
     this.runRejectionTimeout()
 
+    const invocationEvent = this.invocationEventFactory.create(this)
+
+    await this.eventEmitter.emit('invocation', invocationEvent)
+
     this.sendMessage()
 
-    return this.deferredPromise.promise
+    const result = await this.deferredPromise.promise
+
+    const invocationResultEvent = this.invocationResultEventFactory.create(
+      result,
+      this,
+    )
+
+    await this.eventEmitter.emit('invocationResult', invocationResultEvent)
+
+    return invocationResultEvent.result
   }
 
   private registerBridgeEventHandlers(): void {

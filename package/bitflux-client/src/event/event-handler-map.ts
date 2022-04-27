@@ -1,17 +1,5 @@
-import type { ConnectedEvent } from './connected-event'
+import type { ClientEventHandlerMap } from './client-event-handler-map'
 
-import type { ConnectingEvent } from './connecting-event'
+import type { InvocationEventHandlerMap } from './invocation-event-handler-map'
 
-import type { DisconnectedEvent } from './disconnected-event'
-
-import type { DisconnectingEvent } from './disconnecting-event'
-
-import type { ReconnectingEvent } from './reconnecting-event'
-
-export type EventHandlerMap = {
-  connecting: (event: ConnectingEvent) => unknown
-  connected: (event: ConnectedEvent) => unknown
-  disconnecting: (event: DisconnectingEvent) => unknown
-  disconnected: (event: DisconnectedEvent) => unknown
-  reconnecting: (event: ReconnectingEvent) => unknown
-}
+export type EventHandlerMap = ClientEventHandlerMap & InvocationEventHandlerMap

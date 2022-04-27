@@ -2,10 +2,10 @@ import type { BitfluxClient } from '../../../bitflux-client'
 
 import type { DisconnectingEvent } from '../../../event'
 
-import { BasicEvent } from '../basic-event'
+import { BasicClientEvent } from '../basic-client-event'
 
 export class BasicDisconnectingEvent
-  extends BasicEvent
+  extends BasicClientEvent
   implements DisconnectingEvent
 {
   public readonly reason: string

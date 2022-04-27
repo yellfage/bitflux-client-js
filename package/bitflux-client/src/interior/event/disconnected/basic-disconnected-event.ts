@@ -4,10 +4,10 @@ import type { DisconnectionCode } from '../../../communication'
 
 import type { DisconnectedEvent } from '../../../event'
 
-import { BasicEvent } from '../basic-event'
+import { BasicClientEvent } from '../basic-client-event'
 
 export class BasicDisconnectedEvent
-  extends BasicEvent
+  extends BasicClientEvent
   implements DisconnectedEvent
 {
   public readonly code: DisconnectionCode

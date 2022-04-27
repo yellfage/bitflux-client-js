@@ -1,7 +1,7 @@
 import type { ConnectingEvent } from '../../../event'
 
-import { BasicEvent } from '../basic-event'
+import { BasicClientEvent } from '../basic-client-event'
 
 export class BasicConnectingEvent
-  extends BasicEvent
+  extends BasicClientEvent
   implements ConnectingEvent {}

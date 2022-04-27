@@ -1,3 +1,3 @@
-import type { Event } from './event'
+import type { ClientEvent } from './client-event'
 
-export interface ConnectingEvent extends Event {}
+export interface ConnectingEvent extends ClientEvent {}
