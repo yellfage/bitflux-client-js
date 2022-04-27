@@ -32,6 +32,10 @@ client.on('connected', (event) => console.log('Connected', event))
 client.on('reconnecting', (event) => console.log('Reconnecting', event))
 client.on('disconnecting', (event) => console.log('Disconnecting', event))
 client.on('disconnected', (event) => console.log('Disconnected', event))
+client.on('invocation', (event) => console.log('Invocation', event))
+client.on('invocationResult', (event) =>
+  console.log('Invocation Result', event),
+)
 
 client.map('Notify', (message: string) => {
   console.log(`The incoming message: ${message}`)
@@ -39,7 +43,7 @@ client.map('Notify', (message: string) => {
 
 //
 ;(async () => {
-  client
+  await client
     .notify('Notify')
     .setArgs({
       message: 'The cached notifiable invocation message',
@@ -59,21 +63,21 @@ client.map('Notify', (message: string) => {
 
   console.log(`The invocation result: ${result}`)
 
-  client
+  await client
     .notify('Notify')
     .setArgs({
       message: 'The notifiable invocation message #1',
     })
     .perform()
 
-  client
+  await client
     .notify('Notify')
     .setArgs({
       message: 'The notifiable invocation message #2',
     })
     .perform()
 
-  client
+  await client
     .notify('Notify')
     .setArgs({
       message: 'The notifiable invocation message #3',
