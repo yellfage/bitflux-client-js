@@ -7,4 +7,3 @@ export * from './message'
 
 export * from './bridge-event'
 export * from './basic-bridge-event'
-export * from './bridge-event-handler-map'

@@ -1,5 +1,3 @@
-import type { EventEmitter } from '@yellfage/event-emitter'
-
 import delay from 'delay'
 
 import { AbortError } from '../../abort-error'
@@ -33,12 +31,17 @@ import { EmptyProtocol } from './empty-protocol'
 import { EmptyTransport } from './empty-transport'
 
 import type {
-  BridgeEventHandlerMap,
+  ConnectedBridgeEventChannel,
   ConnectedBridgeEventFactory,
+  ConnectingBridgeEventChannel,
   ConnectingBridgeEventFactory,
+  DisconnectedBridgeEventChannel,
   DisconnectedBridgeEventFactory,
+  DisconnectingBridgeEventChannel,
   DisconnectingBridgeEventFactory,
+  MessageBridgeEventChannel,
   MessageBridgeEventFactory,
+  ReconnectingBridgeEventChannel,
   ReconnectingBridgeEventFactory,
 } from './event'
 
@@ -52,11 +55,17 @@ export class BasicBridge implements Bridge {
 
   public readonly state: MutableState
 
-  private readonly transports: Transport[]
+  public readonly connecting: ConnectingBridgeEventChannel
 
-  private readonly protocols: Protocol[]
+  public readonly connected: ConnectedBridgeEventChannel
 
-  private readonly eventEmitter: EventEmitter<BridgeEventHandlerMap>
+  public readonly disconnecting: DisconnectingBridgeEventChannel
+
+  public readonly disconnected: DisconnectedBridgeEventChannel
+
+  public readonly reconnecting: ReconnectingBridgeEventChannel
+
+  public readonly message: MessageBridgeEventChannel
 
   private readonly connectingEventFactory: ConnectingBridgeEventFactory
 
@@ -70,11 +79,15 @@ export class BasicBridge implements Bridge {
 
   private readonly messageEventFactory: MessageBridgeEventFactory
 
-  private readonly logger: Logger
+  private readonly transports: Transport[]
+
+  private readonly protocols: Protocol[]
 
   private readonly reconnectionControl: ReconnectionControl
 
   private readonly reconnectionDelayScheme: ReconnectionDelayScheme
+
+  private readonly logger: Logger
 
   private readonly cachedMessages = new Set<OutgoingMessage>()
 
@@ -93,33 +106,43 @@ export class BasicBridge implements Bridge {
   public constructor(
     url: URL,
     state: MutableState,
-    transports: Transport[],
-    protocols: Protocol[],
-    eventEmitter: EventEmitter<BridgeEventHandlerMap>,
+    connectingEventChannel: ConnectingBridgeEventChannel,
+    connectedEventChannel: ConnectedBridgeEventChannel,
+    disconnectingEventChannel: DisconnectingBridgeEventChannel,
+    disconnectedEventChannel: DisconnectedBridgeEventChannel,
+    reconnectingEventChannel: ReconnectingBridgeEventChannel,
+    messageEventChannel: MessageBridgeEventChannel,
     connectingEventFactory: ConnectingBridgeEventFactory,
     connectedEventFactory: ConnectedBridgeEventFactory,
     disconnectingEventFactory: DisconnectingBridgeEventFactory,
     disconnectedEventFactory: DisconnectedBridgeEventFactory,
     reconnectingEventFactory: ReconnectingBridgeEventFactory,
     messageEventFactory: MessageBridgeEventFactory,
-    logger: Logger,
+    transports: Transport[],
+    protocols: Protocol[],
     reconnectionControl: ReconnectionControl,
     reconnectionDelayScheme: ReconnectionDelayScheme,
+    logger: Logger,
   ) {
     this.url = url
     this.state = state
-    this.transports = transports
-    this.protocols = protocols
-    this.eventEmitter = eventEmitter
+    this.connecting = connectingEventChannel
+    this.connected = connectedEventChannel
+    this.disconnecting = disconnectingEventChannel
+    this.disconnected = disconnectedEventChannel
+    this.reconnecting = reconnectingEventChannel
+    this.message = messageEventChannel
     this.connectingEventFactory = connectingEventFactory
     this.connectedEventFactory = connectedEventFactory
     this.disconnectingEventFactory = disconnectingEventFactory
     this.disconnectedEventFactory = disconnectedEventFactory
     this.reconnectingEventFactory = reconnectingEventFactory
     this.messageEventFactory = messageEventFactory
-    this.logger = logger
+    this.transports = transports
+    this.protocols = protocols
     this.reconnectionControl = reconnectionControl
     this.reconnectionDelayScheme = reconnectionDelayScheme
+    this.logger = logger
   }
 
   /**
@@ -144,7 +167,7 @@ export class BasicBridge implements Bridge {
 
     const connectingEvent = this.connectingEventFactory.create(this)
 
-    await this.eventEmitter.emit('connecting', connectingEvent)
+    await this.connecting.emit(connectingEvent)
 
     if (!this.state.isConnecting) {
       throw new AbortError('Connection has been aborted')
@@ -196,7 +219,7 @@ export class BasicBridge implements Bridge {
         attemptDelay,
       )
 
-      await this.eventEmitter.emit('reconnecting', reconnectingEvent)
+      await this.reconnecting.emit(reconnectingEvent)
 
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (!this.state.isReconnecting) {
@@ -241,7 +264,7 @@ export class BasicBridge implements Bridge {
       reason,
     )
 
-    await this.eventEmitter.emit('disconnecting', disconnectingEvent)
+    await this.disconnecting.emit(disconnectingEvent)
 
     this.clearCachedMessages()
 
@@ -267,20 +290,6 @@ export class BasicBridge implements Bridge {
     }
 
     this.transport.send(this.protocol.serialize(message))
-  }
-
-  public on<TEventName extends keyof BridgeEventHandlerMap>(
-    eventName: TEventName,
-    handler: BridgeEventHandlerMap[TEventName],
-  ): BridgeEventHandlerMap[TEventName] {
-    return this.eventEmitter.on(eventName, handler)
-  }
-
-  public off<TEventName extends keyof BridgeEventHandlerMap>(
-    eventName: TEventName,
-    handler: BridgeEventHandlerMap[TEventName],
-  ): void {
-    this.eventEmitter.off(eventName, handler)
   }
 
   private resolveFirstAvailableTransport(): Transport {
@@ -423,7 +432,7 @@ export class BasicBridge implements Bridge {
 
     const connectedEvent = this.connectedEventFactory.create(this)
 
-    await this.eventEmitter.emit('connected', connectedEvent)
+    await this.connected.emit(connectedEvent)
 
     if (!this.state.isConnected) {
       this.rejectConnectionPromise(
@@ -462,7 +471,7 @@ export class BasicBridge implements Bridge {
       reason,
     )
 
-    await this.eventEmitter.emit('disconnected', disconnectedEvent)
+    await this.disconnected.emit(disconnectedEvent)
 
     if (!this.state.isDisconnected) {
       this.rejectDisconnectionPromise(
@@ -484,7 +493,7 @@ export class BasicBridge implements Bridge {
           if (this.state.isDisconnecting) {
             this.state.setDisconnected()
 
-            await this.eventEmitter.emit('disconnected', disconnectedEvent)
+            await this.disconnected.emit(disconnectedEvent)
           }
         } else {
           throw error
@@ -506,6 +515,6 @@ export class BasicBridge implements Bridge {
 
     const messageEvent = this.messageEventFactory.create(this, finalMessage)
 
-    return this.eventEmitter.emit('message', messageEvent)
+    return this.message.emit(messageEvent)
   }
 }

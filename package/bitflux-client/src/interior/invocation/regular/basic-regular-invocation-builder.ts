@@ -1,15 +1,13 @@
-import type { EventEmitter } from '@yellfage/event-emitter'
-
 import { nanoid } from 'nanoid'
-
-import type { InvocationEventHandlerMap } from '../../../event'
 
 import type { RegularInvocationBuilder } from '../../../invocation'
 
 import type { Bridge } from '../../communication'
 
 import type {
+  InvocationEventChannel,
   InvocationEventFactory,
+  InvocationResultEventChannel,
   InvocationResultEventFactory,
 } from '../../event'
 
@@ -28,7 +26,9 @@ export class BasicRegularInvocationBuilder<TResult>
 
   private attemptRejectionDelay: number
 
-  private readonly eventEmitter: EventEmitter<InvocationEventHandlerMap>
+  private readonly invocationEventChannel: InvocationEventChannel
+
+  private readonly invocationResultEventChannel: InvocationResultEventChannel
 
   private readonly invocationEventFactory: InvocationEventFactory
 
@@ -40,7 +40,8 @@ export class BasicRegularInvocationBuilder<TResult>
     handlerName: string,
     defaultRejectionDelay: number,
     defaultAttempRejectionDelay: number,
-    eventEmitter: EventEmitter<InvocationEventHandlerMap>,
+    invocationEventChannel: InvocationEventChannel,
+    invocationResultEventChannel: InvocationResultEventChannel,
     invocationEventFactory: InvocationEventFactory,
     invocationResultEventFactory: InvocationResultEventFactory,
     bridge: Bridge,
@@ -48,7 +49,8 @@ export class BasicRegularInvocationBuilder<TResult>
     this.handlerName = handlerName
     this.rejectionDelay = defaultRejectionDelay
     this.attemptRejectionDelay = defaultAttempRejectionDelay
-    this.eventEmitter = eventEmitter
+    this.invocationEventChannel = invocationEventChannel
+    this.invocationResultEventChannel = invocationResultEventChannel
     this.invocationEventFactory = invocationEventFactory
     this.invocationResultEventFactory = invocationResultEventFactory
     this.bridge = bridge
@@ -88,7 +90,8 @@ export class BasicRegularInvocationBuilder<TResult>
         attemptRejectionDelay: this.attemptRejectionDelay,
         abortController: this.abortController,
       },
-      this.eventEmitter,
+      this.invocationEventChannel,
+      this.invocationResultEventChannel,
       this.invocationEventFactory,
       this.invocationResultEventFactory,
       this.bridge,

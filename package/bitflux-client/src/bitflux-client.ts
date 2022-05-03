@@ -1,4 +1,12 @@
-import type { EventHandlerMap } from './event'
+import type {
+  ConnectedEventPool,
+  ConnectingEventPool,
+  DisconnectedEventPool,
+  DisconnectingEventPool,
+  InvocationEventPool,
+  InvocationResultEventPool,
+  ReconnectingEventPool,
+} from './event'
 
 import type {
   InvocationHandler,
@@ -13,6 +21,15 @@ import type { State } from './state'
 export interface BitfluxClient {
   readonly url: URL
   readonly state: State
+
+  readonly connecting: ConnectingEventPool
+  readonly connected: ConnectedEventPool
+  readonly disconnecting: DisconnectingEventPool
+  readonly disconnected: DisconnectedEventPool
+  readonly reconnecting: ReconnectingEventPool
+
+  readonly invocation: InvocationEventPool
+  readonly invocationResult: InvocationResultEventPool
 
   /**
    * @throws {@link AbortError}
@@ -34,14 +51,4 @@ export interface BitfluxClient {
   invoke<TResult>(handlerName: string): RegularInvocationBuilder<TResult>
 
   notify(handlerName: string): NotifiableInvocationBuilder
-
-  on<TEventName extends keyof EventHandlerMap>(
-    eventName: TEventName,
-    handler: EventHandlerMap[TEventName],
-  ): EventHandlerMap[TEventName]
-
-  off<TEventName extends keyof EventHandlerMap>(
-    eventName: TEventName,
-    handler: EventHandlerMap[TEventName],
-  ): void
 }

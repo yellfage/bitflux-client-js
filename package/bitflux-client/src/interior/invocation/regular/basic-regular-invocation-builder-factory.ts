@@ -1,13 +1,11 @@
-import type { EventEmitter } from '@yellfage/event-emitter'
-
-import type { InvocationEventHandlerMap } from '../../../event'
-
 import type { RegularInvocationBuilder } from '../../../invocation'
 
 import type { Bridge } from '../../communication'
 
 import type {
+  InvocationEventChannel,
   InvocationEventFactory,
+  InvocationResultEventChannel,
   InvocationResultEventFactory,
 } from '../../event'
 
@@ -22,7 +20,9 @@ export class BasicRegularInvocationBuilderFactory
 
   private readonly attemptRejectionDelay: number
 
-  private readonly eventEmitter: EventEmitter<InvocationEventHandlerMap>
+  private readonly invocationEventChannel: InvocationEventChannel
+
+  private readonly invocationResultEventChannel: InvocationResultEventChannel
 
   private readonly invocationEventFactory: InvocationEventFactory
 
@@ -33,15 +33,17 @@ export class BasicRegularInvocationBuilderFactory
   public constructor(
     rejectionDelay: number,
     attempRejectionDelay: number,
-    eventEmitter: EventEmitter<InvocationEventHandlerMap>,
+    invocationEventChannel: InvocationEventChannel,
+    invocationResultEventChannel: InvocationResultEventChannel,
     invocationEventFactory: InvocationEventFactory,
     invocationResultEventFactory: InvocationResultEventFactory,
     bridge: Bridge,
   ) {
     this.rejectionDelay = rejectionDelay
     this.attemptRejectionDelay = attempRejectionDelay
-    this.eventEmitter = eventEmitter
+    this.invocationEventChannel = invocationEventChannel
     this.invocationEventFactory = invocationEventFactory
+    this.invocationResultEventChannel = invocationResultEventChannel
     this.invocationResultEventFactory = invocationResultEventFactory
     this.bridge = bridge
   }
@@ -53,7 +55,8 @@ export class BasicRegularInvocationBuilderFactory
       handlerName,
       this.rejectionDelay,
       this.attemptRejectionDelay,
-      this.eventEmitter,
+      this.invocationEventChannel,
+      this.invocationResultEventChannel,
       this.invocationEventFactory,
       this.invocationResultEventFactory,
       this.bridge,

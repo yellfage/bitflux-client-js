@@ -1,12 +1,8 @@
-import type { EventEmitter } from '@yellfage/event-emitter'
-
 import { AbortError } from '../../../abort-error'
 
 import type { IncomingMessage } from '../../../communication'
 
 import { IncomingMessageType } from '../../../communication'
-
-import type { InvocationEventHandlerMap } from '../../../event'
 
 import type {
   Bridge,
@@ -21,7 +17,9 @@ import { OutgoingRegularInvocationMessage } from '../../communication'
 import { DeferredPromise } from '../../deferred-promise'
 
 import type {
+  InvocationEventChannel,
   InvocationEventFactory,
+  InvocationResultEventChannel,
   InvocationResultEventFactory,
 } from '../../event'
 
@@ -34,7 +32,9 @@ export class BasicRegularInvocation<TResult>
 {
   public readonly shape: RegularInvocationShape
 
-  private readonly eventEmitter: EventEmitter<InvocationEventHandlerMap>
+  public readonly invocation: InvocationEventChannel
+
+  public readonly invocationResult: InvocationResultEventChannel
 
   private readonly invocationEventFactory: InvocationEventFactory
 
@@ -52,13 +52,15 @@ export class BasicRegularInvocation<TResult>
 
   public constructor(
     shape: RegularInvocationShape,
-    eventEmitter: EventEmitter<InvocationEventHandlerMap>,
+    invocationEventChannel: InvocationEventChannel,
+    invocationResultEventChannel: InvocationResultEventChannel,
     invocationEventFactory: InvocationEventFactory,
     invocationResultEventFactory: InvocationResultEventFactory,
     bridge: Bridge,
   ) {
     this.shape = shape
-    this.eventEmitter = eventEmitter
+    this.invocation = invocationEventChannel
+    this.invocationResult = invocationResultEventChannel
     this.invocationEventFactory = invocationEventFactory
     this.invocationResultEventFactory = invocationResultEventFactory
     this.bridge = bridge
@@ -85,7 +87,7 @@ export class BasicRegularInvocation<TResult>
 
     const invocationEvent = this.invocationEventFactory.create(this)
 
-    await this.eventEmitter.emit('invocation', invocationEvent)
+    await this.invocation.emit(invocationEvent)
 
     this.sendMessage()
 
@@ -96,23 +98,23 @@ export class BasicRegularInvocation<TResult>
       this,
     )
 
-    await this.eventEmitter.emit('invocationResult', invocationResultEvent)
+    await this.invocationResult.emit(invocationResultEvent)
 
     return invocationResultEvent.result
   }
 
   private registerBridgeEventHandlers(): void {
-    this.bridge.on('connected', this.handleConnectedEvent)
-    this.bridge.on('disconnecting', this.handleDisconnectingEvent)
-    this.bridge.on('disconnected', this.handleDisconnectedEvent)
-    this.bridge.on('message', this.handleMessageEvent)
+    this.bridge.connected.add(this.handleConnectedEvent)
+    this.bridge.disconnecting.add(this.handleDisconnectingEvent)
+    this.bridge.disconnected.add(this.handleDisconnectedEvent)
+    this.bridge.message.add(this.handleMessageEvent)
   }
 
   private unregisterBridgeEventHandlers(): void {
-    this.bridge.off('connected', this.handleConnectedEvent)
-    this.bridge.off('disconnecting', this.handleDisconnectingEvent)
-    this.bridge.off('disconnected', this.handleDisconnectedEvent)
-    this.bridge.off('message', this.handleMessageEvent)
+    this.bridge.connected.remove(this.handleConnectedEvent)
+    this.bridge.disconnecting.remove(this.handleDisconnectingEvent)
+    this.bridge.disconnected.remove(this.handleDisconnectedEvent)
+    this.bridge.message.remove(this.handleMessageEvent)
   }
 
   private registerAbortionHandler(): void {

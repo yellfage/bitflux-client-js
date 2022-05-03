@@ -2,11 +2,25 @@ import type { OutgoingMessage } from '../../communication'
 
 import type { State } from '../../state'
 
-import type { BridgeEventHandlerMap } from './event'
+import type {
+  ConnectedBridgeEventPool,
+  ConnectingBridgeEventPool,
+  DisconnectedBridgeEventPool,
+  DisconnectingBridgeEventPool,
+  MessageBridgeEventPool,
+  ReconnectingBridgeEventPool,
+} from './event'
 
 export interface Bridge {
   readonly url: URL
   readonly state: State
+
+  readonly connecting: ConnectingBridgeEventPool
+  readonly connected: ConnectedBridgeEventPool
+  readonly disconnecting: DisconnectingBridgeEventPool
+  readonly disconnected: DisconnectedBridgeEventPool
+  readonly reconnecting: ReconnectingBridgeEventPool
+  readonly message: MessageBridgeEventPool
 
   /**
    * @throws {@link AbortError}
@@ -22,14 +36,4 @@ export interface Bridge {
   disconnect(reason?: string): Promise<void>
 
   send(message: OutgoingMessage): void
-
-  on<TEventName extends keyof BridgeEventHandlerMap>(
-    eventName: TEventName,
-    handler: BridgeEventHandlerMap[TEventName],
-  ): BridgeEventHandlerMap[TEventName]
-
-  off<TEventName extends keyof BridgeEventHandlerMap>(
-    eventName: TEventName,
-    handler: BridgeEventHandlerMap[TEventName],
-  ): void
 }

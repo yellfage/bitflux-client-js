@@ -1,4 +1,4 @@
-import { EventEmitter } from '@yellfage/event-emitter'
+import { BasicEventChannel } from '@yellfage/events'
 
 import type { BitfluxClient } from './bitflux-client'
 
@@ -10,7 +10,21 @@ import type {
   ReconnectionSettingsBuilder,
 } from './configuration'
 
-import type { EventHandlerMap } from './event'
+import type {
+  ConnectedBridgeEventChannel,
+  ConnectedEventChannel,
+  ConnectingBridgeEventChannel,
+  ConnectingEventChannel,
+  DisconnectedBridgeEventChannel,
+  DisconnectedEventChannel,
+  DisconnectingBridgeEventChannel,
+  DisconnectingEventChannel,
+  InvocationEventChannel,
+  InvocationResultEventChannel,
+  MessageBridgeEventChannel,
+  ReconnectingBridgeEventChannel,
+  ReconnectingEventChannel,
+} from './interior'
 
 import {
   BasicBitfluxClient,
@@ -118,51 +132,135 @@ export class BitfluxClientBuilder {
 
     const url = new URL(this.url)
 
+    const state = new MutableState()
+
+    const connectingBridgeEventChannel: ConnectingBridgeEventChannel =
+      new BasicEventChannel()
+
+    const connectedBridgeEventChannel: ConnectedBridgeEventChannel =
+      new BasicEventChannel()
+
+    const disconnectingBridgeEventChannel: DisconnectingBridgeEventChannel =
+      new BasicEventChannel()
+
+    const disconnectedBridgeEventChannel: DisconnectedBridgeEventChannel =
+      new BasicEventChannel()
+
+    const reconnectingBridgeEventChannel: ReconnectingBridgeEventChannel =
+      new BasicEventChannel()
+
+    const messageBridgeEventChannel: MessageBridgeEventChannel =
+      new BasicEventChannel()
+
+    const connectingBridgeEventFactory = new BasicConnectingBridgeEventFactory()
+
+    const connectedBridgeEventFactory = new BasicConnectedBridgeEventFactory()
+
+    const disconnectingBridgeEventFactory =
+      new BasicDisconnectingBridgeEventFactory()
+
+    const disconnectedBridgeEventFactory =
+      new BasicDisconnectedBridgeEventFactory()
+
+    const reconnectingBridgeEventFactory =
+      new BasicReconnectingBridgeEventFactory()
+
+    const messageBridgeEventFactory = new BasicMessageBridgeEventFactory()
+
     const bridge = new BasicBridge(
       url,
-      new MutableState(),
+      state,
+      connectingBridgeEventChannel,
+      connectedBridgeEventChannel,
+      disconnectingBridgeEventChannel,
+      disconnectedBridgeEventChannel,
+      reconnectingBridgeEventChannel,
+      messageBridgeEventChannel,
+      connectingBridgeEventFactory,
+      connectedBridgeEventFactory,
+      disconnectingBridgeEventFactory,
+      disconnectedBridgeEventFactory,
+      reconnectingBridgeEventFactory,
+      messageBridgeEventFactory,
       communicationSettings.transports,
       communicationSettings.protocols,
-      new EventEmitter(),
-      new BasicConnectingBridgeEventFactory(),
-      new BasicConnectedBridgeEventFactory(),
-      new BasicDisconnectingBridgeEventFactory(),
-      new BasicDisconnectedBridgeEventFactory(),
-      new BasicReconnectingBridgeEventFactory(),
-      new BasicMessageBridgeEventFactory(),
-      loggingSettings.logger,
       reconnectionSettings.control,
       reconnectionSettings.delayScheme,
+      loggingSettings.logger,
     )
 
-    const eventEmitter = new EventEmitter<EventHandlerMap>()
+    const connectingEventChannel: ConnectingEventChannel =
+      new BasicEventChannel()
+
+    const connectedEventChannel: ConnectedEventChannel = new BasicEventChannel()
+
+    const disconnectingEventChannel: DisconnectingEventChannel =
+      new BasicEventChannel()
+
+    const disconnectedEventChannel: DisconnectedEventChannel =
+      new BasicEventChannel()
+
+    const reconnectingEventChannel: ReconnectingEventChannel =
+      new BasicEventChannel()
+
+    const invocationEventChannel: InvocationEventChannel =
+      new BasicEventChannel()
+
+    const invocationResultEventChannel: InvocationResultEventChannel =
+      new BasicEventChannel()
+
+    const connectingEventFactory = new BasicConnectingEventFactory()
+
+    const connectedEventFactory = new BasicConnectedEventFactory()
+
+    const disconnectingEventFactory = new BasicDisconnectingEventFactory()
+
+    const disconnectedEventFactory = new BasicDisconnectedEventFactory()
+
+    const reconnectingEventFactory = new BasicReconnectingEventFactory()
 
     const invocationEventFactory = new BasicInvocationEventFactory()
 
     const invocationResultEventFactory = new BasicInvocationResultEventFactory()
 
-    return new BasicBitfluxClient(
-      bridge,
-      eventEmitter,
-      new BasicConnectingEventFactory(),
-      new BasicConnectedEventFactory(),
-      new BasicDisconnectingEventFactory(),
-      new BasicDisconnectedEventFactory(),
-      new BasicReconnectingEventFactory(),
-      new BasicHandlerMapper(bridge, loggingSettings.logger),
+    const handlerMapper = new BasicHandlerMapper(bridge, loggingSettings.logger)
+
+    const regularInvocationBuilderFactory =
       new BasicRegularInvocationBuilderFactory(
         regularInvocationSettings.rejectionDelay,
         regularInvocationSettings.attemptRejectionDelay,
-        eventEmitter,
+        invocationEventChannel,
+        invocationResultEventChannel,
         invocationEventFactory,
         invocationResultEventFactory,
         bridge,
-      ),
+      )
+
+    const notifiableInvocationBuilderFactory =
       new BasicNotifiableInvocationBuilderFactory(
-        eventEmitter,
+        invocationEventChannel,
+        invocationResultEventChannel,
         invocationEventFactory,
         bridge,
-      ),
+      )
+
+    return new BasicBitfluxClient(
+      connectingEventChannel,
+      connectedEventChannel,
+      disconnectingEventChannel,
+      disconnectedEventChannel,
+      reconnectingEventChannel,
+      invocationEventChannel,
+      invocationResultEventChannel,
+      connectingEventFactory,
+      connectedEventFactory,
+      disconnectingEventFactory,
+      disconnectedEventFactory,
+      reconnectingEventFactory,
+      bridge,
+      handlerMapper,
+      regularInvocationBuilderFactory,
+      notifiableInvocationBuilderFactory,
     )
   }
 

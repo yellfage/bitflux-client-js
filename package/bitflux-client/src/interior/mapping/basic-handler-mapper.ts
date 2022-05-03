@@ -9,7 +9,6 @@ import type { Logger } from '../../logging'
 import type {
   Bridge,
   IncomingNotifiableInvocationMessage,
-  MessageBridgeEvent,
 } from '../communication'
 
 import type { HandlerMapper } from './handler-mapper'
@@ -25,7 +24,7 @@ export class BasicHandlerMapper implements HandlerMapper {
   }
 
   public map(handlerName: string, handler: InvocationHandler): void {
-    this.bridge.on('message', async ({ message }: MessageBridgeEvent) => {
+    this.bridge.message.add(async ({ message }) => {
       if (!this.isNotifiableInvocationMessage(message)) {
         return
       }

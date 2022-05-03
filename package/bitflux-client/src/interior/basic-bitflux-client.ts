@@ -1,8 +1,4 @@
-import type { EventEmitter } from '@yellfage/event-emitter'
-
 import type { BitfluxClient } from '../bitflux-client'
-
-import type { EventHandlerMap } from '../event'
 
 import type {
   InvocationHandler,
@@ -22,10 +18,17 @@ import type {
 } from './communication'
 
 import type {
+  ConnectedEventChannel,
   ConnectedEventFactory,
+  ConnectingEventChannel,
   ConnectingEventFactory,
+  DisconnectedEventChannel,
   DisconnectedEventFactory,
+  DisconnectingEventChannel,
   DisconnectingEventFactory,
+  InvocationEventChannel,
+  InvocationResultEventChannel,
+  ReconnectingEventChannel,
   ReconnectingEventFactory,
 } from './event'
 
@@ -45,9 +48,19 @@ export class BasicBitfluxClient implements BitfluxClient {
     return this.bridge.state
   }
 
-  private readonly bridge: Bridge
+  public readonly connecting: ConnectingEventChannel
 
-  private readonly eventEmitter: EventEmitter<EventHandlerMap>
+  public readonly connected: ConnectedEventChannel
+
+  public readonly disconnecting: DisconnectingEventChannel
+
+  public readonly disconnected: DisconnectedEventChannel
+
+  public readonly reconnecting: ReconnectingEventChannel
+
+  public readonly invocation: InvocationEventChannel
+
+  public readonly invocationResult: InvocationResultEventChannel
 
   private readonly connectingEventFactory: ConnectingEventFactory
 
@@ -59,6 +72,8 @@ export class BasicBitfluxClient implements BitfluxClient {
 
   private readonly reconnectingEventFactory: ReconnectingEventFactory
 
+  private readonly bridge: Bridge
+
   private readonly handlerMapper: HandlerMapper
 
   private readonly regularInvocationBuilderFactory: RegularInvocationBuilderFactory
@@ -66,24 +81,36 @@ export class BasicBitfluxClient implements BitfluxClient {
   private readonly notifiableInvocationBuilderFactory: NotifiableInvocationBuilderFactory
 
   public constructor(
-    bridge: Bridge,
-    eventEmitter: EventEmitter<EventHandlerMap>,
+    connectingEventChannel: ConnectingEventChannel,
+    connectedEventChannel: ConnectedEventChannel,
+    disconnectingEventChannel: DisconnectingEventChannel,
+    disconnectedEventChannel: DisconnectedEventChannel,
+    reconnectingEventChannel: ReconnectingEventChannel,
+    invocationEventChannel: InvocationEventChannel,
+    invocationResultEventChannel: InvocationResultEventChannel,
     connectingEventFactory: ConnectingEventFactory,
     connectedEventFactory: ConnectedEventFactory,
     disconnectingEventFactory: DisconnectingEventFactory,
     disconnectedEventFactory: DisconnectedEventFactory,
     reconnectingEventFactory: ReconnectingEventFactory,
+    bridge: Bridge,
     handlerMapper: HandlerMapper,
     regularInvocationBuilderFactory: RegularInvocationBuilderFactory,
     notifiableInvocationBuilderFactory: NotifiableInvocationBuilderFactory,
   ) {
-    this.bridge = bridge
-    this.eventEmitter = eventEmitter
+    this.connecting = connectingEventChannel
+    this.connected = connectedEventChannel
+    this.disconnecting = disconnectingEventChannel
+    this.disconnected = disconnectedEventChannel
+    this.reconnecting = reconnectingEventChannel
+    this.invocation = invocationEventChannel
+    this.invocationResult = invocationResultEventChannel
     this.connectingEventFactory = connectingEventFactory
     this.connectedEventFactory = connectedEventFactory
     this.disconnectingEventFactory = disconnectingEventFactory
     this.disconnectedEventFactory = disconnectedEventFactory
     this.reconnectingEventFactory = reconnectingEventFactory
+    this.bridge = bridge
     this.handlerMapper = handlerMapper
     this.regularInvocationBuilderFactory = regularInvocationBuilderFactory
     this.notifiableInvocationBuilderFactory = notifiableInvocationBuilderFactory
@@ -121,45 +148,24 @@ export class BasicBitfluxClient implements BitfluxClient {
     return this.notifiableInvocationBuilderFactory.create(handlerName)
   }
 
-  public on<TEventName extends keyof EventHandlerMap>(
-    eventName: TEventName,
-    handler: EventHandlerMap[TEventName],
-  ): EventHandlerMap[TEventName] {
-    return this.eventEmitter.on(eventName, handler)
-  }
-
-  public off<TEventName extends keyof EventHandlerMap>(
-    eventName: TEventName,
-    handler: EventHandlerMap[TEventName],
-  ): void {
-    this.eventEmitter.off(eventName, handler)
-  }
-
-  public emit<TEventName extends keyof EventHandlerMap>(
-    eventName: TEventName,
-    ...args: Parameters<EventHandlerMap[TEventName]>
-  ): Promise<void> {
-    return this.eventEmitter.emit(eventName, ...args)
-  }
-
   private registerBridgeEventHandlers(): void {
-    this.bridge.on('connecting', this.handleBridgeConnectingEvent)
-    this.bridge.on('connected', this.handleBridgeConnectedEvent)
-    this.bridge.on('disconnecting', this.handleBridgeDisconnectingEvent)
-    this.bridge.on('disconnected', this.handleBridgeDisconnectedEvent)
-    this.bridge.on('reconnecting', this.handleBridgeReconnectingEvent)
+    this.bridge.connecting.add(this.handleBridgeConnectingEvent)
+    this.bridge.connected.add(this.handleBridgeConnectedEvent)
+    this.bridge.disconnecting.add(this.handleBridgeDisconnectingEvent)
+    this.bridge.disconnected.add(this.handleBridgeDisconnectedEvent)
+    this.bridge.reconnecting.add(this.handleBridgeReconnectingEvent)
   }
 
   private readonly handleBridgeConnectingEvent = (): Promise<void> => {
     const event = this.connectingEventFactory.create(this)
 
-    return this.eventEmitter.emit('connecting', event)
+    return this.connecting.emit(event)
   }
 
   private readonly handleBridgeConnectedEvent = (): Promise<void> => {
     const event = this.connectedEventFactory.create(this)
 
-    return this.eventEmitter.emit('connected', event)
+    return this.connected.emit(event)
   }
 
   private readonly handleBridgeDisconnectingEvent = ({
@@ -167,7 +173,7 @@ export class BasicBitfluxClient implements BitfluxClient {
   }: DisconnectingBridgeEvent): Promise<void> => {
     const event = this.disconnectingEventFactory.create(this, reason)
 
-    return this.eventEmitter.emit('disconnecting', event)
+    return this.disconnecting.emit(event)
   }
 
   private readonly handleBridgeDisconnectedEvent = ({
@@ -176,7 +182,7 @@ export class BasicBitfluxClient implements BitfluxClient {
   }: DisconnectedBridgeEvent): Promise<void> => {
     const event = this.disconnectedEventFactory.create(this, code, reason)
 
-    return this.eventEmitter.emit('disconnected', event)
+    return this.disconnected.emit(event)
   }
 
   private readonly handleBridgeReconnectingEvent = ({
@@ -185,6 +191,6 @@ export class BasicBitfluxClient implements BitfluxClient {
   }: ReconnectingBridgeEvent): Promise<void> => {
     const event = this.reconnectingEventFactory.create(this, attempts, delay)
 
-    return this.eventEmitter.emit('reconnecting', event)
+    return this.reconnecting.emit(event)
   }
 }
