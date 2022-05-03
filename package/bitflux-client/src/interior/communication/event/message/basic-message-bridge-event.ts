@@ -1,8 +1,8 @@
-import type { IncomingMessage } from '../../../communication'
+import type { IncomingMessage } from '../../../../communication'
 
-import type { Bridge } from '../bridge'
+import type { Bridge } from '../../bridge'
 
-import { BasicBridgeEvent } from './basic-bridge-event'
+import { BasicBridgeEvent } from '../basic-bridge-event'
 
 import type { MessageBridgeEvent } from './message-bridge-event'
 

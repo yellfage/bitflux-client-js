@@ -1,14 +1,14 @@
-import type { ConnectedBridgeEvent } from './connected-bridge-event'
+import type { ConnectedBridgeEvent } from './connected'
 
-import type { ConnectingBridgeEvent } from './connecting-bridge-event'
+import type { ConnectingBridgeEvent } from './connecting'
 
-import type { DisconnectedBridgeEvent } from './disconnected-bridge-event'
+import type { DisconnectedBridgeEvent } from './disconnected'
 
-import type { DisconnectingBridgeEvent } from './disconnecting-bridge-event'
+import type { DisconnectingBridgeEvent } from './disconnecting'
 
-import type { MessageBridgeEvent } from './message-bridge-event'
+import type { MessageBridgeEvent } from './message'
 
-import type { ReconnectingBridgeEvent } from './reconnecting-bridge-event'
+import type { ReconnectingBridgeEvent } from './reconnecting'
 
 export type BridgeEventHandlerMap = {
   connecting: (event: ConnectingBridgeEvent) => unknown

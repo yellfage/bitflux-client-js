@@ -1,6 +1,6 @@
-import type { DisconnectionCode } from '../../../communication'
+import type { DisconnectionCode } from '../../../../communication'
 
-import type { Bridge } from '../bridge'
+import type { Bridge } from '../../bridge'
 
 import { BasicDisconnectedBridgeEvent } from './basic-disconnected-bridge-event'
 

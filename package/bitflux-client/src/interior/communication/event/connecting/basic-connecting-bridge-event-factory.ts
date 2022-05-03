@@ -1,4 +1,4 @@
-import type { Bridge } from '../bridge'
+import type { Bridge } from '../../bridge'
 
 import { BasicConnectingBridgeEvent } from './basic-connecting-bridge-event'
 
