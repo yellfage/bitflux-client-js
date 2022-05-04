@@ -3,9 +3,9 @@ import type {
   ConnectingEventPool,
   DisconnectedEventPool,
   DisconnectingEventPool,
-  InvocationEventPool,
-  InvocationResultEventPool,
+  InquiryEventPool,
   ReconnectingEventPool,
+  ReplyEventPool,
 } from './event'
 
 import type {
@@ -28,8 +28,8 @@ export interface BitfluxClient {
   readonly disconnected: DisconnectedEventPool
   readonly reconnecting: ReconnectingEventPool
 
-  readonly invocation: InvocationEventPool
-  readonly invocationResult: InvocationResultEventPool
+  readonly inquiry: InquiryEventPool
+  readonly reply: ReplyEventPool
 
   /**
    * @throws {@link AbortError}

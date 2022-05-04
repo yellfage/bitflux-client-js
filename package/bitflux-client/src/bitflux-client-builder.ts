@@ -19,14 +19,16 @@ import type {
   DisconnectedEventChannel,
   DisconnectingBridgeEventChannel,
   DisconnectingEventChannel,
-  InvocationEventChannel,
-  InvocationResultEventChannel,
+  InquiryEventChannel,
   MessageBridgeEventChannel,
   ReconnectingBridgeEventChannel,
   ReconnectingEventChannel,
+  ReplyEventChannel,
 } from './interior'
 
 import {
+  BasicInquiryEventFactory,
+  BasicReplyEventFactory,
   BasicBitfluxClient,
   BasicBridge,
   BasicCommunicationSettingsBuilder,
@@ -39,8 +41,6 @@ import {
   BasicDisconnectingBridgeEventFactory,
   BasicDisconnectingEventFactory,
   BasicHandlerMapper,
-  BasicInvocationEventFactory,
-  BasicInvocationResultEventFactory,
   BasicLoggingSettingsBuilder,
   BasicMessageBridgeEventFactory,
   BasicNotifiableInvocationBuilderFactory,
@@ -203,11 +203,9 @@ export class BitfluxClientBuilder {
     const reconnectingEventChannel: ReconnectingEventChannel =
       new BasicEventChannel()
 
-    const invocationEventChannel: InvocationEventChannel =
-      new BasicEventChannel()
+    const inquiryEventChannel: InquiryEventChannel = new BasicEventChannel()
 
-    const invocationResultEventChannel: InvocationResultEventChannel =
-      new BasicEventChannel()
+    const replyEventChannel: ReplyEventChannel = new BasicEventChannel()
 
     const connectingEventFactory = new BasicConnectingEventFactory()
 
@@ -219,9 +217,9 @@ export class BitfluxClientBuilder {
 
     const reconnectingEventFactory = new BasicReconnectingEventFactory()
 
-    const invocationEventFactory = new BasicInvocationEventFactory()
+    const inquiryEventFactory = new BasicInquiryEventFactory()
 
-    const invocationResultEventFactory = new BasicInvocationResultEventFactory()
+    const replyEventFactory = new BasicReplyEventFactory()
 
     const handlerMapper = new BasicHandlerMapper(bridge, loggingSettings.logger)
 
@@ -229,18 +227,18 @@ export class BitfluxClientBuilder {
       new BasicRegularInvocationBuilderFactory(
         regularInvocationSettings.rejectionDelay,
         regularInvocationSettings.attemptRejectionDelay,
-        invocationEventChannel,
-        invocationResultEventChannel,
-        invocationEventFactory,
-        invocationResultEventFactory,
+        inquiryEventChannel,
+        replyEventChannel,
+        inquiryEventFactory,
+        replyEventFactory,
         bridge,
       )
 
     const notifiableInvocationBuilderFactory =
       new BasicNotifiableInvocationBuilderFactory(
-        invocationEventChannel,
-        invocationResultEventChannel,
-        invocationEventFactory,
+        inquiryEventChannel,
+        replyEventChannel,
+        inquiryEventFactory,
         bridge,
       )
 
@@ -250,8 +248,8 @@ export class BitfluxClientBuilder {
       disconnectingEventChannel,
       disconnectedEventChannel,
       reconnectingEventChannel,
-      invocationEventChannel,
-      invocationResultEventChannel,
+      inquiryEventChannel,
+      replyEventChannel,
       connectingEventFactory,
       connectedEventFactory,
       disconnectingEventFactory,

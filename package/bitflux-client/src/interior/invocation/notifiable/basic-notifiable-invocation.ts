@@ -3,9 +3,9 @@ import type { Bridge } from '../../communication'
 import { OutgoingNotifiableInvocationMessage } from '../../communication'
 
 import type {
-  InvocationEventChannel,
-  InvocationEventFactory,
-  InvocationResultEventChannel,
+  InquiryEventChannel,
+  InquiryEventFactory,
+  ReplyEventChannel,
 } from '../../event'
 
 import type { NotifiableInvocation } from './notifiable-invocation'
@@ -15,32 +15,32 @@ import type { NotifiableInvocationShape } from './notifiable-invocation-shape'
 export class BasicNotifiableInvocation implements NotifiableInvocation {
   public readonly shape: NotifiableInvocationShape
 
-  public readonly invocation: InvocationEventChannel
+  public readonly inquiry: InquiryEventChannel
 
-  public readonly invocationResult: InvocationResultEventChannel
+  public readonly reply: ReplyEventChannel
 
-  private readonly invocationEventFactory: InvocationEventFactory
+  private readonly inquiryEventFactory: InquiryEventFactory
 
   private readonly bridge: Bridge
 
   public constructor(
     shape: NotifiableInvocationShape,
-    invocationEventChannel: InvocationEventChannel,
-    invocationResultEventChannel: InvocationResultEventChannel,
-    invocationEventFactory: InvocationEventFactory,
+    inquiryEventChannel: InquiryEventChannel,
+    replyEventChannel: ReplyEventChannel,
+    inquiryEventFactory: InquiryEventFactory,
     bridge: Bridge,
   ) {
     this.shape = shape
-    this.invocation = invocationEventChannel
-    this.invocationResult = invocationResultEventChannel
-    this.invocationEventFactory = invocationEventFactory
+    this.inquiry = inquiryEventChannel
+    this.reply = replyEventChannel
+    this.inquiryEventFactory = inquiryEventFactory
     this.bridge = bridge
   }
 
   public async perform(): Promise<void> {
-    const invocationEvent = this.invocationEventFactory.create(this)
+    const invocationEvent = this.inquiryEventFactory.create(this)
 
-    await this.invocation.emit(invocationEvent)
+    await this.inquiry.emit(invocationEvent)
 
     this.bridge.send(
       new OutgoingNotifiableInvocationMessage(

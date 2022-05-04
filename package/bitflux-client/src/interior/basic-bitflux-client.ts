@@ -26,10 +26,10 @@ import type {
   DisconnectedEventFactory,
   DisconnectingEventChannel,
   DisconnectingEventFactory,
-  InvocationEventChannel,
-  InvocationResultEventChannel,
+  InquiryEventChannel,
   ReconnectingEventChannel,
   ReconnectingEventFactory,
+  ReplyEventChannel,
 } from './event'
 
 import type {
@@ -58,9 +58,9 @@ export class BasicBitfluxClient implements BitfluxClient {
 
   public readonly reconnecting: ReconnectingEventChannel
 
-  public readonly invocation: InvocationEventChannel
+  public readonly inquiry: InquiryEventChannel
 
-  public readonly invocationResult: InvocationResultEventChannel
+  public readonly reply: ReplyEventChannel
 
   private readonly connectingEventFactory: ConnectingEventFactory
 
@@ -86,8 +86,8 @@ export class BasicBitfluxClient implements BitfluxClient {
     disconnectingEventChannel: DisconnectingEventChannel,
     disconnectedEventChannel: DisconnectedEventChannel,
     reconnectingEventChannel: ReconnectingEventChannel,
-    invocationEventChannel: InvocationEventChannel,
-    invocationResultEventChannel: InvocationResultEventChannel,
+    inquiryEventChannel: InquiryEventChannel,
+    replyEventChannel: ReplyEventChannel,
     connectingEventFactory: ConnectingEventFactory,
     connectedEventFactory: ConnectedEventFactory,
     disconnectingEventFactory: DisconnectingEventFactory,
@@ -103,8 +103,8 @@ export class BasicBitfluxClient implements BitfluxClient {
     this.disconnecting = disconnectingEventChannel
     this.disconnected = disconnectedEventChannel
     this.reconnecting = reconnectingEventChannel
-    this.invocation = invocationEventChannel
-    this.invocationResult = invocationResultEventChannel
+    this.inquiry = inquiryEventChannel
+    this.reply = replyEventChannel
     this.connectingEventFactory = connectingEventFactory
     this.connectedEventFactory = connectedEventFactory
     this.disconnectingEventFactory = disconnectingEventFactory

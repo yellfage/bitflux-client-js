@@ -3,9 +3,9 @@ import type { NotifiableInvocationBuilder } from '../../../invocation'
 import type { Bridge } from '../../communication'
 
 import type {
-  InvocationEventChannel,
-  InvocationEventFactory,
-  InvocationResultEventChannel,
+  InquiryEventChannel,
+  InquiryEventFactory,
+  ReplyEventChannel,
 } from '../../event'
 
 import { BasicNotifiableInvocation } from './basic-notifiable-invocation'
@@ -17,25 +17,25 @@ export class BasicNotifiableInvocationBuilder
 
   private args: unknown[] = []
 
-  private readonly invocationEventChannel: InvocationEventChannel
+  private readonly inquiryEventChannel: InquiryEventChannel
 
-  private readonly invocationResultEventChannel: InvocationResultEventChannel
+  private readonly replyEventChannel: ReplyEventChannel
 
-  private readonly invocationEventFactory: InvocationEventFactory
+  private readonly inquiryEventFactory: InquiryEventFactory
 
   private readonly bridge: Bridge
 
   public constructor(
     handlerName: string,
-    invocationEventChannel: InvocationEventChannel,
-    invocationResultEventChannel: InvocationResultEventChannel,
-    invocationEventFactory: InvocationEventFactory,
+    inquiryEventChannel: InquiryEventChannel,
+    replyEventChannel: ReplyEventChannel,
+    inquiryEventFactory: InquiryEventFactory,
     bridge: Bridge,
   ) {
     this.handlerName = handlerName
-    this.invocationEventChannel = invocationEventChannel
-    this.invocationResultEventChannel = invocationResultEventChannel
-    this.invocationEventFactory = invocationEventFactory
+    this.inquiryEventChannel = inquiryEventChannel
+    this.replyEventChannel = replyEventChannel
+    this.inquiryEventFactory = inquiryEventFactory
     this.bridge = bridge
   }
 
@@ -51,9 +51,9 @@ export class BasicNotifiableInvocationBuilder
         handlerName: this.handlerName,
         args: this.args,
       },
-      this.invocationEventChannel,
-      this.invocationResultEventChannel,
-      this.invocationEventFactory,
+      this.inquiryEventChannel,
+      this.replyEventChannel,
+      this.inquiryEventFactory,
       this.bridge,
     ).perform()
   }

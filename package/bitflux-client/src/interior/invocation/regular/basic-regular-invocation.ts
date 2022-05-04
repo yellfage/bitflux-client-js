@@ -17,10 +17,10 @@ import { OutgoingRegularInvocationMessage } from '../../communication'
 import { DeferredPromise } from '../../deferred-promise'
 
 import type {
-  InvocationEventChannel,
-  InvocationEventFactory,
-  InvocationResultEventChannel,
-  InvocationResultEventFactory,
+  InquiryEventChannel,
+  InquiryEventFactory,
+  ReplyEventChannel,
+  ReplyEventFactory,
 } from '../../event'
 
 import type { RegularInvocation } from './regular-invocation'
@@ -32,13 +32,13 @@ export class BasicRegularInvocation<TResult>
 {
   public readonly shape: RegularInvocationShape
 
-  public readonly invocation: InvocationEventChannel
+  public readonly inquiry: InquiryEventChannel
 
-  public readonly invocationResult: InvocationResultEventChannel
+  public readonly reply: ReplyEventChannel
 
-  private readonly invocationEventFactory: InvocationEventFactory
+  private readonly inquiryEventFactory: InquiryEventFactory
 
-  private readonly invocationResultEventFactory: InvocationResultEventFactory
+  private readonly replyEventFactory: ReplyEventFactory
 
   private readonly bridge: Bridge
 
@@ -52,17 +52,17 @@ export class BasicRegularInvocation<TResult>
 
   public constructor(
     shape: RegularInvocationShape,
-    invocationEventChannel: InvocationEventChannel,
-    invocationResultEventChannel: InvocationResultEventChannel,
-    invocationEventFactory: InvocationEventFactory,
-    invocationResultEventFactory: InvocationResultEventFactory,
+    inquiryEventChannel: InquiryEventChannel,
+    replyEventChannel: ReplyEventChannel,
+    inquiryEventFactory: InquiryEventFactory,
+    replyEventFactory: ReplyEventFactory,
     bridge: Bridge,
   ) {
     this.shape = shape
-    this.invocation = invocationEventChannel
-    this.invocationResult = invocationResultEventChannel
-    this.invocationEventFactory = invocationEventFactory
-    this.invocationResultEventFactory = invocationResultEventFactory
+    this.inquiry = inquiryEventChannel
+    this.reply = replyEventChannel
+    this.inquiryEventFactory = inquiryEventFactory
+    this.replyEventFactory = replyEventFactory
     this.bridge = bridge
 
     this.message = new OutgoingRegularInvocationMessage(
@@ -85,22 +85,19 @@ export class BasicRegularInvocation<TResult>
 
     this.runRejectionTimeout()
 
-    const invocationEvent = this.invocationEventFactory.create(this)
+    const inquiryEvent = this.inquiryEventFactory.create(this)
 
-    await this.invocation.emit(invocationEvent)
+    await this.inquiry.emit(inquiryEvent)
 
     this.sendMessage()
 
     const result = await this.deferredPromise.promise
 
-    const invocationResultEvent = this.invocationResultEventFactory.create(
-      result,
-      this,
-    )
+    const replyEvent = this.replyEventFactory.create(this, result)
 
-    await this.invocationResult.emit(invocationResultEvent)
+    await this.reply.emit(replyEvent)
 
-    return invocationResultEvent.result
+    return replyEvent.result
   }
 
   private registerBridgeEventHandlers(): void {

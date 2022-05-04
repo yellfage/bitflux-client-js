@@ -3,9 +3,9 @@ import type { NotifiableInvocationBuilder } from '../../../invocation'
 import type { Bridge } from '../../communication'
 
 import type {
-  InvocationEventChannel,
-  InvocationEventFactory,
-  InvocationResultEventChannel,
+  InquiryEventChannel,
+  InquiryEventFactory,
+  ReplyEventChannel,
 } from '../../event'
 
 import { BasicNotifiableInvocationBuilder } from './basic-notifiable-invocation-builder'
@@ -15,32 +15,32 @@ import type { NotifiableInvocationBuilderFactory } from './notifiable-invocation
 export class BasicNotifiableInvocationBuilderFactory
   implements NotifiableInvocationBuilderFactory
 {
-  private readonly invocationEventChannel: InvocationEventChannel
+  private readonly inquiryEventChannel: InquiryEventChannel
 
-  private readonly invocationResultEventChannel: InvocationResultEventChannel
+  private readonly replyEventChannel: ReplyEventChannel
 
-  private readonly invocationEventFactory: InvocationEventFactory
+  private readonly inquiryEventFactory: InquiryEventFactory
 
   private readonly bridge: Bridge
 
   public constructor(
-    invocationEventChannel: InvocationEventChannel,
-    invocationResultEventChannel: InvocationResultEventChannel,
-    invocationEventFactory: InvocationEventFactory,
+    inquiryEventChannel: InquiryEventChannel,
+    replyEventChannel: ReplyEventChannel,
+    inquiryEventFactory: InquiryEventFactory,
     bridge: Bridge,
   ) {
-    this.invocationEventChannel = invocationEventChannel
-    this.invocationResultEventChannel = invocationResultEventChannel
-    this.invocationEventFactory = invocationEventFactory
+    this.inquiryEventChannel = inquiryEventChannel
+    this.replyEventChannel = replyEventChannel
+    this.inquiryEventFactory = inquiryEventFactory
     this.bridge = bridge
   }
 
   public create(handlerName: string): NotifiableInvocationBuilder {
     return new BasicNotifiableInvocationBuilder(
       handlerName,
-      this.invocationEventChannel,
-      this.invocationResultEventChannel,
-      this.invocationEventFactory,
+      this.inquiryEventChannel,
+      this.replyEventChannel,
+      this.inquiryEventFactory,
       this.bridge,
     )
   }

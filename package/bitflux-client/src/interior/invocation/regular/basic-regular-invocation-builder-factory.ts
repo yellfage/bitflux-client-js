@@ -3,10 +3,10 @@ import type { RegularInvocationBuilder } from '../../../invocation'
 import type { Bridge } from '../../communication'
 
 import type {
-  InvocationEventChannel,
-  InvocationEventFactory,
-  InvocationResultEventChannel,
-  InvocationResultEventFactory,
+  InquiryEventChannel,
+  InquiryEventFactory,
+  ReplyEventChannel,
+  ReplyEventFactory,
 } from '../../event'
 
 import { BasicRegularInvocationBuilder } from './basic-regular-invocation-builder'
@@ -20,31 +20,31 @@ export class BasicRegularInvocationBuilderFactory
 
   private readonly attemptRejectionDelay: number
 
-  private readonly invocationEventChannel: InvocationEventChannel
+  private readonly inquiryEventChannel: InquiryEventChannel
 
-  private readonly invocationResultEventChannel: InvocationResultEventChannel
+  private readonly replyEventChannel: ReplyEventChannel
 
-  private readonly invocationEventFactory: InvocationEventFactory
+  private readonly inquiryEventFactory: InquiryEventFactory
 
-  private readonly invocationResultEventFactory: InvocationResultEventFactory
+  private readonly replyEventFactory: ReplyEventFactory
 
   private readonly bridge: Bridge
 
   public constructor(
     rejectionDelay: number,
     attempRejectionDelay: number,
-    invocationEventChannel: InvocationEventChannel,
-    invocationResultEventChannel: InvocationResultEventChannel,
-    invocationEventFactory: InvocationEventFactory,
-    invocationResultEventFactory: InvocationResultEventFactory,
+    inquiryEventChannel: InquiryEventChannel,
+    replyEventChannel: ReplyEventChannel,
+    inquiryEventFactory: InquiryEventFactory,
+    replyEventFactory: ReplyEventFactory,
     bridge: Bridge,
   ) {
     this.rejectionDelay = rejectionDelay
     this.attemptRejectionDelay = attempRejectionDelay
-    this.invocationEventChannel = invocationEventChannel
-    this.invocationEventFactory = invocationEventFactory
-    this.invocationResultEventChannel = invocationResultEventChannel
-    this.invocationResultEventFactory = invocationResultEventFactory
+    this.inquiryEventChannel = inquiryEventChannel
+    this.replyEventChannel = replyEventChannel
+    this.inquiryEventFactory = inquiryEventFactory
+    this.replyEventFactory = replyEventFactory
     this.bridge = bridge
   }
 
@@ -55,10 +55,10 @@ export class BasicRegularInvocationBuilderFactory
       handlerName,
       this.rejectionDelay,
       this.attemptRejectionDelay,
-      this.invocationEventChannel,
-      this.invocationResultEventChannel,
-      this.invocationEventFactory,
-      this.invocationResultEventFactory,
+      this.inquiryEventChannel,
+      this.replyEventChannel,
+      this.inquiryEventFactory,
+      this.replyEventFactory,
       this.bridge,
     )
   }
