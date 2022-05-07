@@ -1,4 +1,4 @@
-import type { InquiryEventPool, ReplyEventPool } from '../event'
+import type { InquiryEventPool, ReplyEventPool, RetryEventPool } from '../event'
 
 export interface Invocation {
   readonly handlerName: string
@@ -6,6 +6,7 @@ export interface Invocation {
 
   readonly inquiry: InquiryEventPool
   readonly reply: ReplyEventPool
+  readonly retry: RetryEventPool
 
   readonly abortController: AbortController
 

@@ -5,6 +5,7 @@ export * from './disconnected'
 export * from './reconnecting'
 export * from './inquiry'
 export * from './reply'
+export * from './retry'
 
 export * from './client-event'
 export * from './invocation-event'

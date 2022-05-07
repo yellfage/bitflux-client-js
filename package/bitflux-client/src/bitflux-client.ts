@@ -6,6 +6,7 @@ import type {
   InquiryEventPool,
   ReconnectingEventPool,
   ReplyEventPool,
+  RetryEventPool,
 } from './event'
 
 import type { InvocationBuilder, InvocationHandler } from './invocation'
@@ -26,6 +27,7 @@ export interface BitfluxClient {
 
   readonly inquiry: InquiryEventPool
   readonly reply: ReplyEventPool
+  readonly retry: RetryEventPool
 
   /**
    * @throws {@link AbortError}

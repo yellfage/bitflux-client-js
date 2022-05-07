@@ -24,9 +24,11 @@ import type {
   ReconnectingBridgeEventChannel,
   ReconnectingEventChannel,
   ReplyEventChannel,
+  RetryEventChannel,
 } from './interior'
 
 import {
+  BasicRetryEventFactory,
   BasicInvocationBuilderFactory,
   BasicInquiryEventFactory,
   BasicReplyEventFactory,
@@ -206,6 +208,8 @@ export class BitfluxClientBuilder {
 
     const replyEventChannel: ReplyEventChannel = new BasicEventChannel()
 
+    const retryEventChannel: RetryEventChannel = new BasicEventChannel()
+
     const connectingEventFactory = new BasicConnectingEventFactory()
 
     const connectedEventFactory = new BasicConnectedEventFactory()
@@ -220,16 +224,22 @@ export class BitfluxClientBuilder {
 
     const replyEventFactory = new BasicReplyEventFactory()
 
+    const retryEventFactory = new BasicRetryEventFactory()
+
     const handlerMapper = new BasicHandlerMapper(bridge, loggingSettings.logger)
 
     const invocationBuilderFactory = new BasicInvocationBuilderFactory(
       inquiryEventChannel,
       replyEventChannel,
+      retryEventChannel,
       inquiryEventFactory,
       replyEventFactory,
+      retryEventFactory,
       bridge,
       invocationSettings.rejectionDelay,
       invocationSettings.attemptRejectionDelay,
+      invocationSettings.retryControl,
+      invocationSettings.retryDelayScheme,
     )
 
     return new BasicBitfluxClient(
@@ -240,6 +250,7 @@ export class BitfluxClientBuilder {
       reconnectingEventChannel,
       inquiryEventChannel,
       replyEventChannel,
+      retryEventChannel,
       connectingEventFactory,
       connectedEventFactory,
       disconnectingEventFactory,

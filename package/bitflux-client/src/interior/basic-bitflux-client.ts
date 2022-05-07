@@ -26,6 +26,7 @@ import type {
   ReconnectingEventChannel,
   ReconnectingEventFactory,
   ReplyEventChannel,
+  RetryEventChannel,
 } from './event'
 
 import type { InvocationBuilderFactory } from './invocation'
@@ -60,6 +61,8 @@ export class BasicBitfluxClient implements BitfluxClient {
 
   public readonly reply: ReplyEventChannel
 
+  public readonly retry: RetryEventChannel
+
   private readonly connectingEventFactory: ConnectingEventFactory
 
   private readonly connectedEventFactory: ConnectedEventFactory
@@ -84,6 +87,7 @@ export class BasicBitfluxClient implements BitfluxClient {
     reconnectingEventChannel: ReconnectingEventChannel,
     inquiryEventChannel: InquiryEventChannel,
     replyEventChannel: ReplyEventChannel,
+    retryEventChannel: RetryEventChannel,
     connectingEventFactory: ConnectingEventFactory,
     connectedEventFactory: ConnectedEventFactory,
     disconnectingEventFactory: DisconnectingEventFactory,
@@ -100,6 +104,7 @@ export class BasicBitfluxClient implements BitfluxClient {
     this.reconnecting = reconnectingEventChannel
     this.inquiry = inquiryEventChannel
     this.reply = replyEventChannel
+    this.retry = retryEventChannel
     this.connectingEventFactory = connectingEventFactory
     this.connectedEventFactory = connectedEventFactory
     this.disconnectingEventFactory = disconnectingEventFactory
