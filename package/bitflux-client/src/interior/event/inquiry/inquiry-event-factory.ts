@@ -1,7 +1,7 @@
-import type { InvocationEvent } from '../../../event'
+import type { InquiryEvent } from '../../../event'
 
-import type { Invocation } from '../../invocation'
+import type { Invocation } from '../../../invocation'
 
 export interface InquiryEventFactory {
-  create(target: Invocation<unknown>): InvocationEvent
+  create(target: Invocation): InquiryEvent
 }

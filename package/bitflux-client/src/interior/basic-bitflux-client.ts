@@ -1,12 +1,8 @@
 import type { BitfluxClient } from '../bitflux-client'
 
-import type {
-  InvocationHandler,
-  NotifiableInvocationBuilder,
-  RegularInvocationBuilder,
-} from '../invocation'
+import type { InvocationBuilder, InvocationHandler } from '../invocation'
 
-import type { PluginBuilder } from '../plugin'
+import type { ClientPluginBuilder } from '../plugin'
 
 import type { State } from '../state'
 
@@ -32,9 +28,11 @@ import type {
   ReplyEventChannel,
 } from './event'
 
-import type {
-  NotifiableInvocationBuilderFactory,
-  RegularInvocationBuilderFactory,
+import type { InvocationBuilderFactory } from './invocation'
+
+import {
+  NotifiableInvocationFactory,
+  RegularInvocationFactory,
 } from './invocation'
 
 import type { HandlerMapper } from './mapping'
@@ -76,9 +74,7 @@ export class BasicBitfluxClient implements BitfluxClient {
 
   private readonly handlerMapper: HandlerMapper
 
-  private readonly regularInvocationBuilderFactory: RegularInvocationBuilderFactory
-
-  private readonly notifiableInvocationBuilderFactory: NotifiableInvocationBuilderFactory
+  private readonly invocationBuilderFactory: InvocationBuilderFactory
 
   public constructor(
     connectingEventChannel: ConnectingEventChannel,
@@ -95,8 +91,7 @@ export class BasicBitfluxClient implements BitfluxClient {
     reconnectingEventFactory: ReconnectingEventFactory,
     bridge: Bridge,
     handlerMapper: HandlerMapper,
-    regularInvocationBuilderFactory: RegularInvocationBuilderFactory,
-    notifiableInvocationBuilderFactory: NotifiableInvocationBuilderFactory,
+    invocationBuilderFactory: InvocationBuilderFactory,
   ) {
     this.connecting = connectingEventChannel
     this.connected = connectedEventChannel
@@ -112,8 +107,7 @@ export class BasicBitfluxClient implements BitfluxClient {
     this.reconnectingEventFactory = reconnectingEventFactory
     this.bridge = bridge
     this.handlerMapper = handlerMapper
-    this.regularInvocationBuilderFactory = regularInvocationBuilderFactory
-    this.notifiableInvocationBuilderFactory = notifiableInvocationBuilderFactory
+    this.invocationBuilderFactory = invocationBuilderFactory
 
     this.registerBridgeEventHandlers()
   }
@@ -130,8 +124,8 @@ export class BasicBitfluxClient implements BitfluxClient {
     return this.bridge.disconnect(reason)
   }
 
-  public use(builder: PluginBuilder): void {
-    builder.build().initialize(this)
+  public use(builder: ClientPluginBuilder): void {
+    builder.build(this).initialize()
   }
 
   public map(handlerName: string, handler: InvocationHandler): void {
@@ -140,12 +134,20 @@ export class BasicBitfluxClient implements BitfluxClient {
 
   public invoke<TResult>(
     handlerName: string,
-  ): RegularInvocationBuilder<TResult> {
-    return this.regularInvocationBuilderFactory.create(handlerName)
+    ...args: unknown[]
+  ): InvocationBuilder<TResult> {
+    return this.invocationBuilderFactory.create(
+      new RegularInvocationFactory(handlerName, args),
+    )
   }
 
-  public notify(handlerName: string): NotifiableInvocationBuilder {
-    return this.notifiableInvocationBuilderFactory.create(handlerName)
+  public notify(
+    handlerName: string,
+    ...args: unknown[]
+  ): InvocationBuilder<void> {
+    return this.invocationBuilderFactory.create(
+      new NotifiableInvocationFactory(handlerName, args),
+    )
   }
 
   private registerBridgeEventHandlers(): void {

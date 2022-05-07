@@ -1,10 +1,7 @@
 import type { ReplyEvent } from '../../../event'
 
-import type { Invocation } from '../../invocation'
+import type { Invocation } from '../../../invocation'
 
 export interface ReplyEventFactory {
-  create<TResult>(
-    target: Invocation<TResult>,
-    result: TResult,
-  ): ReplyEvent<TResult>
+  create(target: Invocation, result: unknown): ReplyEvent
 }

@@ -1,8 +1,7 @@
 import type { InvocationEvent } from '../invocation-event'
 
-export interface ReplyEvent<TResult = unknown>
-  extends InvocationEvent<TResult> {
-  readonly result: TResult
+export interface ReplyEvent extends InvocationEvent {
+  readonly result: unknown
 
-  replaceResult(result: TResult): void
+  replaceResult(result: unknown): void
 }

@@ -1,5 +1,5 @@
-import type { Invocation } from '../interior'
+import type { Invocation } from '../invocation'
 
-export interface InvocationEvent<TResult = unknown> {
-  readonly target: Invocation<TResult>
+export interface InvocationEvent {
+  readonly target: Invocation
 }

@@ -8,13 +8,9 @@ import type {
   ReplyEventPool,
 } from './event'
 
-import type {
-  InvocationHandler,
-  NotifiableInvocationBuilder,
-  RegularInvocationBuilder,
-} from './invocation'
+import type { InvocationBuilder, InvocationHandler } from './invocation'
 
-import type { PluginBuilder } from './plugin'
+import type { ClientPluginBuilder } from './plugin'
 
 import type { State } from './state'
 
@@ -44,11 +40,14 @@ export interface BitfluxClient {
    */
   disconnect(reason?: string): Promise<void>
 
-  use(builder: PluginBuilder)
+  use(builder: ClientPluginBuilder)
 
   map(handlerName: string, handler: InvocationHandler): void
 
-  invoke<TResult>(handlerName: string): RegularInvocationBuilder<TResult>
+  invoke<TResult>(
+    handlerName: string,
+    ...args: unknown[]
+  ): InvocationBuilder<TResult>
 
-  notify(handlerName: string): NotifiableInvocationBuilder
+  notify(handlerName: string, ...args: unknown[]): InvocationBuilder<void>
 }

@@ -27,6 +27,7 @@ import type {
 } from './interior'
 
 import {
+  BasicInvocationBuilderFactory,
   BasicInquiryEventFactory,
   BasicReplyEventFactory,
   BasicBitfluxClient,
@@ -43,11 +44,9 @@ import {
   BasicHandlerMapper,
   BasicLoggingSettingsBuilder,
   BasicMessageBridgeEventFactory,
-  BasicNotifiableInvocationBuilderFactory,
   BasicReconnectingBridgeEventFactory,
   BasicReconnectingEventFactory,
   BasicReconnectionSettingsBuilder,
-  BasicRegularInvocationBuilderFactory,
   BasicRegularInvocationSettingsBuilder,
   MutableState,
 } from './interior'
@@ -223,24 +222,15 @@ export class BitfluxClientBuilder {
 
     const handlerMapper = new BasicHandlerMapper(bridge, loggingSettings.logger)
 
-    const regularInvocationBuilderFactory =
-      new BasicRegularInvocationBuilderFactory(
-        regularInvocationSettings.rejectionDelay,
-        regularInvocationSettings.attemptRejectionDelay,
-        inquiryEventChannel,
-        replyEventChannel,
-        inquiryEventFactory,
-        replyEventFactory,
-        bridge,
-      )
-
-    const notifiableInvocationBuilderFactory =
-      new BasicNotifiableInvocationBuilderFactory(
-        inquiryEventChannel,
-        replyEventChannel,
-        inquiryEventFactory,
-        bridge,
-      )
+    const invocationBuilderFactory = new BasicInvocationBuilderFactory(
+      inquiryEventChannel,
+      replyEventChannel,
+      inquiryEventFactory,
+      replyEventFactory,
+      bridge,
+      regularInvocationSettings.rejectionDelay,
+      regularInvocationSettings.attemptRejectionDelay,
+    )
 
     return new BasicBitfluxClient(
       connectingEventChannel,
@@ -257,8 +247,7 @@ export class BitfluxClientBuilder {
       reconnectingEventFactory,
       bridge,
       handlerMapper,
-      regularInvocationBuilderFactory,
-      notifiableInvocationBuilderFactory,
+      invocationBuilderFactory,
     )
   }
 
