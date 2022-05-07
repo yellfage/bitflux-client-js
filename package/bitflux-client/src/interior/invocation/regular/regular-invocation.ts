@@ -97,6 +97,10 @@ export class RegularInvocation implements Invocation {
 
     this.runRejectionTimeout()
 
+    if (this.bridge.state.isConnected) {
+      this.runAttemptRejectionTimeout()
+    }
+
     const inquiryEvent = this.inquiryEventFactory.create(this)
 
     await this.inquiry.emit(inquiryEvent)
@@ -172,8 +176,6 @@ export class RegularInvocation implements Invocation {
 
   private sendMessage(): void {
     this.bridge.send(this.message)
-
-    this.runAttemptRejectionTimeout()
   }
 
   private readonly handleResult = (result: unknown): void => {
@@ -196,6 +198,8 @@ export class RegularInvocation implements Invocation {
 
   private readonly handleConnectedEvent = (): void => {
     this.sendMessage()
+
+    this.runAttemptRejectionTimeout()
   }
 
   private readonly handleDisconnectingEvent = (): void => {
