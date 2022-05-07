@@ -91,9 +91,9 @@ export class RegularInvocation implements Invocation {
       throw new Error('The provided AbortController is already aborted')
     }
 
-    this.registerBridgeEventHandlers()
+    this.registerEventHandlers()
 
-    this.registerAbortionHandler()
+    this.registerAbortEventHandler()
 
     this.runRejectionTimeout()
 
@@ -117,28 +117,28 @@ export class RegularInvocation implements Invocation {
     return replyEvent.result
   }
 
-  private registerBridgeEventHandlers(): void {
+  private registerEventHandlers(): void {
     this.bridge.connected.add(this.handleConnectedEvent)
     this.bridge.disconnecting.add(this.handleDisconnectingEvent)
     this.bridge.disconnected.add(this.handleDisconnectedEvent)
     this.bridge.message.add(this.handleMessageEvent)
   }
 
-  private unregisterBridgeEventHandlers(): void {
+  private unregisterEventHandlers(): void {
     this.bridge.connected.remove(this.handleConnectedEvent)
     this.bridge.disconnecting.remove(this.handleDisconnectingEvent)
     this.bridge.disconnected.remove(this.handleDisconnectedEvent)
     this.bridge.message.remove(this.handleMessageEvent)
   }
 
-  private registerAbortionHandler(): void {
-    this.abortController.signal.addEventListener('abort', this.handleAbortion)
+  private registerAbortEventHandler(): void {
+    this.abortController.signal.addEventListener('abort', this.handleAbortEvent)
   }
 
-  private unregisterAbortionHandler(): void {
+  private unregisterAbortEventHandler(): void {
     this.abortController.signal.removeEventListener(
       'abort',
-      this.handleAbortion,
+      this.handleAbortEvent,
     )
   }
 
@@ -180,8 +180,8 @@ export class RegularInvocation implements Invocation {
     this.clearRejectionTimeout()
     this.clearAttemptRejectionTimeout()
 
-    this.unregisterBridgeEventHandlers()
-    this.unregisterAbortionHandler()
+    this.unregisterEventHandlers()
+    this.unregisterAbortEventHandler()
 
     if (result instanceof Error) {
       this.deferredPromise.reject(result)
@@ -190,8 +190,8 @@ export class RegularInvocation implements Invocation {
     }
   }
 
-  private readonly handleAbortion = (): void => {
-    this.handleResult(new AbortError('The invocation aborted'))
+  private readonly handleAbortEvent = (): void => {
+    this.handleResult(new AbortError('The invocation has been aborted'))
   }
 
   private readonly handleConnectedEvent = (): void => {
