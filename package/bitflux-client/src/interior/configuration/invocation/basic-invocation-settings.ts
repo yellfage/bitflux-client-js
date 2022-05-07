@@ -1,8 +1,6 @@
-import type { RegularInvocationSettings } from '../../../configuration'
+import type { InvocationSettings } from '../../../configuration'
 
-export class BasicRegularInvocationSettings
-  implements RegularInvocationSettings
-{
+export class BasicInvocationSettings implements InvocationSettings {
   public readonly rejectionDelay: number
 
   public readonly attemptRejectionDelay: number

@@ -5,8 +5,8 @@ import type { BitfluxClient } from './bitflux-client'
 import type {
   CommunicationSettings,
   CommunicationSettingsBuilder,
+  InvocationSettingsBuilder,
   LoggingSettingsBuilder,
-  RegularInvocationSettingsBuilder,
   ReconnectionSettingsBuilder,
 } from './configuration'
 
@@ -47,9 +47,10 @@ import {
   BasicReconnectingBridgeEventFactory,
   BasicReconnectingEventFactory,
   BasicReconnectionSettingsBuilder,
-  BasicRegularInvocationSettingsBuilder,
   MutableState,
 } from './interior'
+
+import { BasicInvocationSettingsBuilder } from './interior/configuration/invocation'
 
 export class BitfluxClientBuilder {
   private readonly url: string | URL
@@ -58,7 +59,7 @@ export class BitfluxClientBuilder {
 
   private readonly reconnectionSettingsBuilder: ReconnectionSettingsBuilder
 
-  private readonly regularInvocationSettingsBuilder: RegularInvocationSettingsBuilder
+  private readonly invocationSettingsBuilder: InvocationSettingsBuilder
 
   private readonly loggingSettingsBuilder: LoggingSettingsBuilder
 
@@ -67,20 +68,20 @@ export class BitfluxClientBuilder {
     url: string | URL,
     communicationSettingsBuilder: CommunicationSettingsBuilder,
     reconnectionSettingsBuilder: ReconnectionSettingsBuilder,
-    regularInvocationSettingsBuilder: RegularInvocationSettingsBuilder,
+    invocationSettingsBuilder: InvocationSettingsBuilder,
     loggingSettingsBuilder: LoggingSettingsBuilder,
   )
   public constructor(
     url: string | URL,
     communicationSettingsBuilder: CommunicationSettingsBuilder = new BasicCommunicationSettingsBuilder(),
     reconnectionSettingsBuilder: ReconnectionSettingsBuilder = new BasicReconnectionSettingsBuilder(),
-    regularInvocationSettingsBuilder: RegularInvocationSettingsBuilder = new BasicRegularInvocationSettingsBuilder(),
+    invocationSettingsBuilder: InvocationSettingsBuilder = new BasicInvocationSettingsBuilder(),
     loggingSettingsBuilder: LoggingSettingsBuilder = new BasicLoggingSettingsBuilder(),
   ) {
     this.url = url
     this.communicationSettingsBuilder = communicationSettingsBuilder
     this.reconnectionSettingsBuilder = reconnectionSettingsBuilder
-    this.regularInvocationSettingsBuilder = regularInvocationSettingsBuilder
+    this.invocationSettingsBuilder = invocationSettingsBuilder
     this.loggingSettingsBuilder = loggingSettingsBuilder
   }
 
@@ -100,10 +101,10 @@ export class BitfluxClientBuilder {
     return this
   }
 
-  public configureRegularInvocation(
-    configure: (builder: RegularInvocationSettingsBuilder) => void,
+  public configureInvocation(
+    configure: (builder: InvocationSettingsBuilder) => void,
   ): this {
-    configure(this.regularInvocationSettingsBuilder)
+    configure(this.invocationSettingsBuilder)
 
     return this
   }
@@ -121,8 +122,7 @@ export class BitfluxClientBuilder {
 
     const reconnectionSettings = this.reconnectionSettingsBuilder.build()
 
-    const regularInvocationSettings =
-      this.regularInvocationSettingsBuilder.build()
+    const invocationSettings = this.invocationSettingsBuilder.build()
 
     const loggingSettings = this.loggingSettingsBuilder.build()
 
@@ -228,8 +228,8 @@ export class BitfluxClientBuilder {
       inquiryEventFactory,
       replyEventFactory,
       bridge,
-      regularInvocationSettings.rejectionDelay,
-      regularInvocationSettings.attemptRejectionDelay,
+      invocationSettings.rejectionDelay,
+      invocationSettings.attemptRejectionDelay,
     )
 
     return new BasicBitfluxClient(
@@ -256,7 +256,7 @@ export class BitfluxClientBuilder {
       url,
       this.communicationSettingsBuilder.clone(),
       this.reconnectionSettingsBuilder.clone(),
-      this.regularInvocationSettingsBuilder.clone(),
+      this.invocationSettingsBuilder.clone(),
       this.loggingSettingsBuilder.clone(),
     )
   }

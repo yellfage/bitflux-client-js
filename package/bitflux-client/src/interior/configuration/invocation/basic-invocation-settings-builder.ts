@@ -1,12 +1,12 @@
 import type {
-  RegularInvocationSettings,
-  RegularInvocationSettingsBuilder,
+  InvocationSettings,
+  InvocationSettingsBuilder,
 } from '../../../configuration'
 
-import { BasicRegularInvocationSettings } from './basic-regular-invocation-settings'
+import { BasicInvocationSettings } from './basic-invocation-settings'
 
-export class BasicRegularInvocationSettingsBuilder
-  implements RegularInvocationSettingsBuilder
+export class BasicInvocationSettingsBuilder
+  implements InvocationSettingsBuilder
 {
   private rejectionDelay = 30000
 
@@ -31,15 +31,15 @@ export class BasicRegularInvocationSettingsBuilder
     return this
   }
 
-  public build(): RegularInvocationSettings {
-    return new BasicRegularInvocationSettings(
+  public build(): InvocationSettings {
+    return new BasicInvocationSettings(
       this.rejectionDelay,
       this.attemptRejectionDelay,
     )
   }
 
-  public clone(): RegularInvocationSettingsBuilder {
-    return new BasicRegularInvocationSettingsBuilder(
+  public clone(): InvocationSettingsBuilder {
+    return new BasicInvocationSettingsBuilder(
       this.rejectionDelay,
       this.attemptRejectionDelay,
     )
