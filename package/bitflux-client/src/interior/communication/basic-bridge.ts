@@ -409,7 +409,7 @@ export class BasicBridge implements Bridge {
   private confirmReconnection(code: DisconnectionCode): boolean {
     return (
       code === DisconnectionCode.Abnormal &&
-      this.reconnectionControl.confirm({ attempts: this.reconnectionAttempts })
+      this.reconnectionControl.confirm(this.reconnectionAttempts)
     )
   }
 

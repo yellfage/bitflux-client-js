@@ -1,5 +1,3 @@
-import type { ReconnectionConfirmationContext } from './reconnection-confirmation-context'
-
 import type { ReconnectionControl } from './reconnection-control'
 
 export class BasicReconnectionControl implements ReconnectionControl {
@@ -9,7 +7,7 @@ export class BasicReconnectionControl implements ReconnectionControl {
     this.maxAttempts = maxAttempts
   }
 
-  public confirm({ attempts }: ReconnectionConfirmationContext): boolean {
+  public confirm(attempts: number): boolean {
     return this.maxAttempts < 0 || attempts < this.maxAttempts
   }
 }
