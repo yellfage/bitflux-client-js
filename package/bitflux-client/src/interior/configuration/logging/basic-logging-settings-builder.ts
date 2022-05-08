@@ -29,6 +29,6 @@ export class BasicLoggingSettingsBuilder implements LoggingSettingsBuilder {
   }
 
   public clone(): LoggingSettingsBuilder {
-    return new BasicLoggingSettingsBuilder(this.loggerBuilder.clone())
+    return new BasicLoggingSettingsBuilder(this.loggerBuilder)
   }
 }

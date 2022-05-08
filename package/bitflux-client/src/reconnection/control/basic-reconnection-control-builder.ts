@@ -22,8 +22,4 @@ export class BasicReconnectionControlBuilder
   public build(): ReconnectionControl {
     return new BasicReconnectionControl(this.maxAttempts)
   }
-
-  public clone(): ReconnectionControlBuilder {
-    return new BasicReconnectionControlBuilder(this.maxAttempts)
-  }
 }

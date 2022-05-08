@@ -52,12 +52,4 @@ export class BasicRetryDelaySchemeBuilder implements RetryDelaySchemeBuilder {
       this.maxDelayOffset,
     )
   }
-
-  public clone(): RetryDelaySchemeBuilder {
-    return new BasicRetryDelaySchemeBuilder(
-      this.delays,
-      this.minDelayOffset,
-      this.maxDelayOffset,
-    )
-  }
 }

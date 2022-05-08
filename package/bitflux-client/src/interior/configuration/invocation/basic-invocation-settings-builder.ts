@@ -82,8 +82,8 @@ export class BasicInvocationSettingsBuilder
     return new BasicInvocationSettingsBuilder(
       this.rejectionDelay,
       this.attemptRejectionDelay,
-      this.retryControlBuilder.clone(),
-      this.retryDelaySchemeBuilder.clone(),
+      this.retryControlBuilder,
+      this.retryDelaySchemeBuilder,
     )
   }
 }

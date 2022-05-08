@@ -8,8 +8,4 @@ export class BasicRetryControlBuilder implements RetryControlBuilder {
   public build(): RetryControl {
     return new BasicRetryControl()
   }
-
-  public clone(): RetryControlBuilder {
-    return new BasicRetryControlBuilder()
-  }
 }

@@ -22,8 +22,4 @@ export class ConsoleLoggerBuilder implements LoggerBuilder {
   public build(): Logger {
     return new ConsoleLogger(this.level)
   }
-
-  public clone(): LoggerBuilder {
-    return new ConsoleLoggerBuilder(this.level)
-  }
 }

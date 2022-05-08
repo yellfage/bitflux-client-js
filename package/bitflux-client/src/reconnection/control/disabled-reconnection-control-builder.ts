@@ -10,8 +10,4 @@ export class DisabledReconnectionControlBuilder
   public build(): ReconnectionControl {
     return new DisabledReconnectionControl()
   }
-
-  public clone(): ReconnectionControlBuilder {
-    return new DisabledReconnectionControlBuilder()
-  }
 }

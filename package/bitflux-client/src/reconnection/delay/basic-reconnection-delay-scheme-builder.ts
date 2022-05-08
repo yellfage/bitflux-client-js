@@ -54,12 +54,4 @@ export class BasicReconnectionDelaySchemeBuilder
       this.maxDelayOffset,
     )
   }
-
-  public clone(): ReconnectionDelaySchemeBuilder {
-    return new BasicReconnectionDelaySchemeBuilder(
-      this.delays,
-      this.minDelayOffset,
-      this.maxDelayOffset,
-    )
-  }
 }
