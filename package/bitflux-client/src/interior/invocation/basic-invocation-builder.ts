@@ -1,9 +1,7 @@
 import type {
   InvocationBuilder,
   RetryControl,
-  RetryControlBuilder,
   RetryDelayScheme,
-  RetryDelaySchemeBuilder,
 } from '../../invocation'
 
 import type { InvocationPluginBuilder } from '../../plugin'
@@ -40,17 +38,17 @@ export class BasicInvocationBuilder<TResult>
 
   private readonly bridge: Bridge
 
+  private readonly pluginBuilders: InvocationPluginBuilder[] = []
+
   private abortController: AbortController
 
   private rejectionDelay: number
 
   private attemptRejectionDelay: number
 
-  private retryControl: RetryControl
+  private readonly retryControl: RetryControl
 
-  private retryDelayScheme: RetryDelayScheme
-
-  private readonly pluginBuilders: InvocationPluginBuilder[] = []
+  private readonly retryDelayScheme: RetryDelayScheme
 
   public constructor(
     invocationFactory: InvocationFactory,
@@ -102,18 +100,6 @@ export class BasicInvocationBuilder<TResult>
 
   public setAttemptRejectionDelay(delay: number): this {
     this.attemptRejectionDelay = delay
-
-    return this
-  }
-
-  public setRetryControl(builder: RetryControlBuilder): this {
-    this.retryControl = builder.build()
-
-    return this
-  }
-
-  public setRetryDelayScheme(builder: RetryDelaySchemeBuilder): this {
-    this.retryDelayScheme = builder.build()
 
     return this
   }
