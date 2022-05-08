@@ -130,7 +130,7 @@ export class BasicBitfluxClient implements BitfluxClient {
   }
 
   public use(builder: ClientPluginBuilder): void {
-    builder.build(this).initialize()
+    builder.build().initialize(this)
   }
 
   public map(handlerName: string, handler: InvocationHandler): void {

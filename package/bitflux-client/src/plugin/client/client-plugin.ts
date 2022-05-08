@@ -1,3 +1,5 @@
+import type { BitfluxClient } from '../../bitflux-client'
+
 export interface ClientPlugin {
-  initialize(): void
+  initialize(client: BitfluxClient): void
 }
