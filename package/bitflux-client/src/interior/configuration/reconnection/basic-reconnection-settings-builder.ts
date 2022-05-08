@@ -35,13 +35,13 @@ export class BasicReconnectionSettingsBuilder
     this.delaySchemeBuilder = delaySchemeBuilder
   }
 
-  public setControlBuilder(builder: ReconnectionControlBuilder): this {
+  public setControl(builder: ReconnectionControlBuilder): this {
     this.controlBuilder = builder
 
     return this
   }
 
-  public setDelaySchemeBuilder(builder: ReconnectionDelaySchemeBuilder): this {
+  public setDelayScheme(builder: ReconnectionDelaySchemeBuilder): this {
     this.delaySchemeBuilder = builder
 
     return this
@@ -56,8 +56,8 @@ export class BasicReconnectionSettingsBuilder
 
   public clone(): ReconnectionSettingsBuilder {
     return new BasicReconnectionSettingsBuilder(
-      this.controlBuilder.clone(),
-      this.delaySchemeBuilder.clone(),
+      this.controlBuilder,
+      this.delaySchemeBuilder,
     )
   }
 }

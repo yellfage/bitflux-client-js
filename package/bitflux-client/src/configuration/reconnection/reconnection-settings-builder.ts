@@ -6,8 +6,8 @@ import type {
 import type { ReconnectionSettings } from './reconnection-settings'
 
 export interface ReconnectionSettingsBuilder {
-  setControlBuilder(builder: ReconnectionControlBuilder): this
-  setDelaySchemeBuilder(builder: ReconnectionDelaySchemeBuilder): this
+  setControl(builder: ReconnectionControlBuilder): this
+  setDelayScheme(builder: ReconnectionDelaySchemeBuilder): this
   build(): ReconnectionSettings
   clone(): ReconnectionSettingsBuilder
 }
