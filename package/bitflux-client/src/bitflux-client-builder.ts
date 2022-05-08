@@ -281,7 +281,7 @@ export class BitfluxClientBuilder {
 
   public clone(url: string | URL): BitfluxClientBuilder {
     return new BitfluxClientBuilder(
-      url,
+      new URL(url),
       this.pluginBuilders.slice(),
       this.communicationSettingsBuilder.clone(),
       this.reconnectionSettingsBuilder.clone(),
