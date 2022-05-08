@@ -54,8 +54,12 @@ import {
 
 import { BasicInvocationSettingsBuilder } from './interior/configuration/invocation'
 
+import type { ClientPluginBuilder } from './plugin'
+
 export class BitfluxClientBuilder {
   private readonly url: string | URL
+
+  private readonly pluginBuilders: ClientPluginBuilder[]
 
   private readonly communicationSettingsBuilder: CommunicationSettingsBuilder
 
@@ -68,6 +72,7 @@ export class BitfluxClientBuilder {
   public constructor(url: string | URL)
   public constructor(
     url: string | URL,
+    pluginBuilders: ClientPluginBuilder[],
     communicationSettingsBuilder: CommunicationSettingsBuilder,
     reconnectionSettingsBuilder: ReconnectionSettingsBuilder,
     invocationSettingsBuilder: InvocationSettingsBuilder,
@@ -75,16 +80,24 @@ export class BitfluxClientBuilder {
   )
   public constructor(
     url: string | URL,
+    pluginBuilders: ClientPluginBuilder[] = [],
     communicationSettingsBuilder: CommunicationSettingsBuilder = new BasicCommunicationSettingsBuilder(),
     reconnectionSettingsBuilder: ReconnectionSettingsBuilder = new BasicReconnectionSettingsBuilder(),
     invocationSettingsBuilder: InvocationSettingsBuilder = new BasicInvocationSettingsBuilder(),
     loggingSettingsBuilder: LoggingSettingsBuilder = new BasicLoggingSettingsBuilder(),
   ) {
     this.url = url
+    this.pluginBuilders = pluginBuilders
     this.communicationSettingsBuilder = communicationSettingsBuilder
     this.reconnectionSettingsBuilder = reconnectionSettingsBuilder
     this.invocationSettingsBuilder = invocationSettingsBuilder
     this.loggingSettingsBuilder = loggingSettingsBuilder
+  }
+
+  public use(builder: ClientPluginBuilder): this {
+    this.pluginBuilders.push(builder)
+
+    return this
   }
 
   public configureCommunication(
@@ -242,7 +255,7 @@ export class BitfluxClientBuilder {
       invocationSettings.retryDelayScheme,
     )
 
-    return new BasicBitfluxClient(
+    const client = new BasicBitfluxClient(
       connectingEventChannel,
       connectedEventChannel,
       disconnectingEventChannel,
@@ -260,11 +273,16 @@ export class BitfluxClientBuilder {
       handlerMapper,
       invocationBuilderFactory,
     )
+
+    this.pluginBuilders.forEach((builder) => client.use(builder))
+
+    return client
   }
 
   public clone(url: string | URL): BitfluxClientBuilder {
     return new BitfluxClientBuilder(
       url,
+      this.pluginBuilders.slice(),
       this.communicationSettingsBuilder.clone(),
       this.reconnectionSettingsBuilder.clone(),
       this.invocationSettingsBuilder.clone(),
