@@ -85,7 +85,7 @@ export class BasicInvocationBuilderFactory implements InvocationBuilderFactory {
       new AbortController(),
       this.rejectionDelay,
       this.attemptRejectionDelay,
-      this.retryControl,
+      this.retryControl.clone(),
       this.retryDelayScheme.clone(),
     )
   }

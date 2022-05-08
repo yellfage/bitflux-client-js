@@ -4,4 +4,8 @@ export class BasicRetryControl implements RetryControl {
   public confirm(): boolean {
     return false
   }
+
+  public clone(): RetryControl {
+    return new BasicRetryControl()
+  }
 }
