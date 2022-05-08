@@ -117,6 +117,18 @@ export class BasicBitfluxClient implements BitfluxClient {
     this.registerBridgeEventHandlers()
   }
 
+  public use(builder: ClientPluginBuilder): this {
+    builder.build().initialize(this)
+
+    return this
+  }
+
+  public map(handlerName: string, handler: InvocationHandler): this {
+    this.handlerMapper.map(handlerName, handler)
+
+    return this
+  }
+
   public connect(url?: string | URL): Promise<void> {
     return this.bridge.connect(url)
   }
@@ -127,14 +139,6 @@ export class BasicBitfluxClient implements BitfluxClient {
 
   public disconnect(reason?: string): Promise<void> {
     return this.bridge.disconnect(reason)
-  }
-
-  public use(builder: ClientPluginBuilder): void {
-    builder.build().initialize(this)
-  }
-
-  public map(handlerName: string, handler: InvocationHandler): void {
-    this.handlerMapper.map(handlerName, handler)
   }
 
   public invoke<TResult>(

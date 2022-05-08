@@ -29,6 +29,10 @@ export interface BitfluxClient {
   readonly reply: ReplyEventPool
   readonly retry: RetryEventPool
 
+  use(builder: ClientPluginBuilder): this
+
+  map(handlerName: string, handler: InvocationHandler): this
+
   /**
    * @throws {@link AbortError}
    */
@@ -41,10 +45,6 @@ export interface BitfluxClient {
    * @throws {@link AbortError}
    */
   disconnect(reason?: string): Promise<void>
-
-  use(builder: ClientPluginBuilder)
-
-  map(handlerName: string, handler: InvocationHandler): void
 
   invoke<TResult>(
     handlerName: string,
