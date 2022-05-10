@@ -17,8 +17,8 @@ import { SampleInvocationPluginBuilder } from './sample-invocation-plugin-builde
 const client = new BitfluxClientBuilder('https://localhost:5001/ws')
   .configureCommunication((builder) =>
     builder
-      .addProtocolBuilder(new JsonProtocolBuilder())
-      .addTransportBuilder(new WebSocketTransportBuilder().setUrlScheme('wss')),
+      .addProtocol(new JsonProtocolBuilder())
+      .addTransport(new WebSocketTransportBuilder().setUrlScheme('wss')),
   )
   .configureReconnection((builder) =>
     builder
