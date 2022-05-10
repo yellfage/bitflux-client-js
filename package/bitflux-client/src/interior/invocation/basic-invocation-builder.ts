@@ -1,5 +1,7 @@
 import type { InvocationBuilder } from '../../invocation'
 
+import type { Items } from '../../items'
+
 import type { InvocationPluginBuilder } from '../../plugin'
 
 import type { RetryControl, RetryDelayScheme } from '../../retry'
@@ -36,9 +38,9 @@ export class BasicInvocationBuilder<TResult>
 
   private readonly bridge: Bridge
 
-  private readonly pluginBuilders: InvocationPluginBuilder[] = []
-
   private abortController: AbortController
+
+  private readonly items: Items
 
   private rejectionDelay: number
 
@@ -47,6 +49,8 @@ export class BasicInvocationBuilder<TResult>
   private readonly retryControl: RetryControl
 
   private readonly retryDelayScheme: RetryDelayScheme
+
+  private readonly pluginBuilders: InvocationPluginBuilder[] = []
 
   public constructor(
     invocationFactory: InvocationFactory,
@@ -58,6 +62,7 @@ export class BasicInvocationBuilder<TResult>
     retryingEventFactory: RetryingEventFactory,
     bridge: Bridge,
     abortController: AbortController,
+    items: Items,
     rejectionDelay: number,
     attempRejectionDelay: number,
     retryControl: RetryControl,
@@ -72,6 +77,7 @@ export class BasicInvocationBuilder<TResult>
     this.retryingEventFactory = retryingEventFactory
     this.bridge = bridge
     this.abortController = abortController
+    this.items = items
     this.rejectionDelay = rejectionDelay
     this.attemptRejectionDelay = attempRejectionDelay
     this.retryControl = retryControl
@@ -104,10 +110,11 @@ export class BasicInvocationBuilder<TResult>
 
   public async perform(): Promise<TResult> {
     const invocation = this.invocationFactory.create(
+      this.abortController,
+      this.items,
       this.invocatingEventChannel,
       this.replyingEventChannel,
       this.retryingEventChannel,
-      this.abortController,
       this.invocatingEventFactory,
       this.replyingEventFactory,
       this.retryingEventFactory,

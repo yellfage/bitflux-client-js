@@ -1,5 +1,7 @@
 import type { Invocation } from '../../../invocation'
 
+import type { Items } from '../../../items'
+
 import type { RetryControl, RetryDelayScheme } from '../../../retry'
 
 import type { Bridge } from '../../communication'
@@ -28,10 +30,11 @@ export class RegularInvocationFactory implements InvocationFactory {
   }
 
   public create(
+    abortController: AbortController,
+    items: Items,
     invocatingEventChannel: InvocatingEventChannel,
     replyingEventChannel: ReplyingEventChannel,
     retryingEventChannel: RetryingEventChannel,
-    abortController: AbortController,
     invocatingEventFactory: InvocatingEventFactory,
     replyingEventFactory: ReplyingEventFactory,
     retryingEventFactory: RetryingEventFactory,
@@ -44,10 +47,11 @@ export class RegularInvocationFactory implements InvocationFactory {
     return new RegularInvocation(
       this.handlerName,
       this.args,
+      abortController,
+      items,
       invocatingEventChannel,
       replyingEventChannel,
       retryingEventChannel,
-      abortController,
       invocatingEventFactory,
       replyingEventFactory,
       retryingEventFactory,

@@ -10,6 +10,8 @@ import { IncomingMessageType } from '../../../communication'
 
 import type { Invocation } from '../../../invocation'
 
+import type { Items } from '../../../items'
+
 import type { RetryControl, RetryDelayScheme } from '../../../retry'
 
 import type {
@@ -38,13 +40,15 @@ export class RegularInvocation implements Invocation {
 
   public readonly args: unknown[]
 
+  public readonly abortController: AbortController
+
+  public readonly items: Items
+
   public readonly invocating: InvocatingEventChannel
 
   public readonly replying: ReplyingEventChannel
 
   public readonly retrying: RetryingEventChannel
-
-  public readonly abortController: AbortController
 
   private readonly invocatingEventFactory: InvocatingEventFactory
 
@@ -73,10 +77,11 @@ export class RegularInvocation implements Invocation {
   public constructor(
     handlerName: string,
     args: unknown[],
+    abortController: AbortController,
+    items: Items,
     invocatingEventChannel: InvocatingEventChannel,
     replyingEventChannel: ReplyingEventChannel,
     retryingEventChannel: RetryingEventChannel,
-    abortController: AbortController,
     invocatingEventFactory: InvocatingEventFactory,
     replyingEventFactory: ReplyingEventFactory,
     retryingEventFactory: RetryingEventFactory,
@@ -88,10 +93,11 @@ export class RegularInvocation implements Invocation {
   ) {
     this.handlerName = handlerName
     this.args = args
+    this.abortController = abortController
+    this.items = items
     this.invocating = invocatingEventChannel
     this.replying = replyingEventChannel
     this.retrying = retryingEventChannel
-    this.abortController = abortController
     this.invocatingEventFactory = invocatingEventFactory
     this.replyingEventFactory = replyingEventFactory
     this.retryingEventFactory = retryingEventFactory

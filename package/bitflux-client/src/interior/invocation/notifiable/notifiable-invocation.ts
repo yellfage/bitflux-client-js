@@ -2,6 +2,8 @@ import { AbortError } from '../../../abort-error'
 
 import type { Invocation } from '../../../invocation'
 
+import type { Items } from '../../../items'
+
 import type { RetryControl, RetryDelayScheme } from '../../../retry'
 
 import type { Bridge } from '../../communication'
@@ -30,6 +32,8 @@ export class NotifiableInvocation implements Invocation {
 
   public readonly abortController: AbortController
 
+  public readonly items: Items
+
   private readonly invocatingEventFactory: InvocatingEventFactory
 
   private readonly replyingEventFactory: ReplyingEventFactory
@@ -49,10 +53,11 @@ export class NotifiableInvocation implements Invocation {
   public constructor(
     handlerName: string,
     args: unknown[],
+    abortController: AbortController,
+    items: Items,
     invocatingEventChannel: InvocatingEventChannel,
     replyingEventChannel: ReplyingEventChannel,
     retryingEventChannel: RetryingEventChannel,
-    abortController: AbortController,
     invocatingEventFactory: InvocatingEventFactory,
     replyingEventFactory: ReplyingEventFactory,
     retryingEventFactory: RetryingEventFactory,
@@ -64,10 +69,11 @@ export class NotifiableInvocation implements Invocation {
   ) {
     this.handlerName = handlerName
     this.args = args
+    this.abortController = abortController
+    this.items = items
     this.invocating = invocatingEventChannel
     this.replying = replyingEventChannel
     this.retrying = retryingEventChannel
-    this.abortController = abortController
     this.invocatingEventFactory = invocatingEventFactory
     this.replyingEventFactory = replyingEventFactory
     this.retryingEventFactory = retryingEventFactory

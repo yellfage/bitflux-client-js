@@ -1,5 +1,7 @@
 import type { Invocation } from '../../invocation'
 
+import type { Items } from '../../items'
+
 import type { RetryControl, RetryDelayScheme } from '../../retry'
 
 import type { Bridge } from '../communication'
@@ -15,10 +17,11 @@ import type {
 
 export interface InvocationFactory {
   create(
+    abortController: AbortController,
+    items: Items,
     invocatingEventChannel: InvocatingEventChannel,
     replyingEventChannel: ReplyingEventChannel,
     retryingEventChannel: RetryingEventChannel,
-    abortController: AbortController,
     invocatingEventFactory: InvocatingEventFactory,
     replyingEventFactory: ReplyingEventFactory,
     retryingEventFactory: RetryingEventFactory,

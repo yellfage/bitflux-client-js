@@ -2,6 +2,8 @@ import type { InvocationBuilder } from '../../invocation'
 
 import type { RetryControl, RetryDelayScheme } from '../../retry'
 
+import { BasicItems } from '../basic-items'
+
 import type { Bridge } from '../communication'
 
 import type {
@@ -81,6 +83,7 @@ export class BasicInvocationBuilderFactory implements InvocationBuilderFactory {
       this.retryingEventFactory,
       this.bridge,
       new AbortController(),
+      new BasicItems(),
       this.rejectionDelay,
       this.attemptRejectionDelay,
       this.retryControl.clone(),

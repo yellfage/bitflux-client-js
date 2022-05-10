@@ -13,5 +13,6 @@ export * from './plugin'
 
 export * from './abort-error'
 export * from './state'
+export * from './items'
 export * from './bitflux-client-builder'
 export * from './bitflux-client'
