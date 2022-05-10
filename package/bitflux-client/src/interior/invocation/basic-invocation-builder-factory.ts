@@ -1,8 +1,6 @@
-import type {
-  InvocationBuilder,
-  RetryControl,
-  RetryDelayScheme,
-} from '../../invocation'
+import type { InvocationBuilder } from '../../invocation'
+
+import type { RetryControl, RetryDelayScheme } from '../../retry'
 
 import type { Bridge } from '../communication'
 

@@ -1,10 +1,8 @@
 import { AbortError } from '../../../abort-error'
 
-import type {
-  Invocation,
-  RetryControl,
-  RetryDelayScheme,
-} from '../../../invocation'
+import type { Invocation } from '../../../invocation'
+
+import type { RetryControl, RetryDelayScheme } from '../../../retry'
 
 import type { Bridge } from '../../communication'
 

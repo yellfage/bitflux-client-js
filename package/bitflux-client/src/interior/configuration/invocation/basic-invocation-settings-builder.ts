@@ -6,12 +6,12 @@ import type {
 import type {
   RetryControlBuilder,
   RetryDelaySchemeBuilder,
-} from '../../../invocation'
+} from '../../../retry'
 
 import {
   BasicRetryControlBuilder,
   BasicRetryDelaySchemeBuilder,
-} from '../../../invocation'
+} from '../../../retry'
 
 import { BasicInvocationSettings } from './basic-invocation-settings'
 

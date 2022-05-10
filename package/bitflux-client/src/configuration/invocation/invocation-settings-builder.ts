@@ -1,7 +1,4 @@
-import type {
-  RetryControlBuilder,
-  RetryDelaySchemeBuilder,
-} from '../../invocation'
+import type { RetryControlBuilder, RetryDelaySchemeBuilder } from '../../retry'
 
 import type { InvocationSettings } from './invocation-settings'
 

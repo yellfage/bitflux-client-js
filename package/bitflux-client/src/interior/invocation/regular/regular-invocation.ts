@@ -8,11 +8,9 @@ import type { IncomingMessage } from '../../../communication'
 
 import { IncomingMessageType } from '../../../communication'
 
-import type {
-  Invocation,
-  RetryControl,
-  RetryDelayScheme,
-} from '../../../invocation'
+import type { Invocation } from '../../../invocation'
+
+import type { RetryControl, RetryDelayScheme } from '../../../retry'
 
 import type {
   Bridge,

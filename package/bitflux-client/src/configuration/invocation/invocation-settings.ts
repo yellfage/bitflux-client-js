@@ -1,4 +1,4 @@
-import type { RetryControl, RetryDelayScheme } from '../../invocation'
+import type { RetryControl, RetryDelayScheme } from '../../retry'
 
 export interface InvocationSettings {
   readonly rejectionDelay: number

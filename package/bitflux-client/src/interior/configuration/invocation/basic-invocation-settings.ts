@@ -1,6 +1,6 @@
 import type { InvocationSettings } from '../../../configuration'
 
-import type { RetryControl, RetryDelayScheme } from '../../../invocation'
+import type { RetryControl, RetryDelayScheme } from '../../../retry'
 
 export class BasicInvocationSettings implements InvocationSettings {
   public readonly rejectionDelay: number

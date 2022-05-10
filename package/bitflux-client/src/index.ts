@@ -2,12 +2,13 @@ import 'core-js/web/url'
 
 import 'abort-controller/polyfill'
 
-export * from './communication'
 export * from './configuration'
-export * from './invocation'
 export * from './logging'
+export * from './communication'
 export * from './reconnection'
 export * from './event'
+export * from './invocation'
+export * from './retry'
 export * from './plugin'
 
 export * from './abort-error'
