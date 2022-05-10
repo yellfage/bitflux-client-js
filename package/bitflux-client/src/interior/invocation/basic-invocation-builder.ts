@@ -9,12 +9,12 @@ import type { InvocationPluginBuilder } from '../../plugin'
 import type { Bridge } from '../communication'
 
 import type {
-  InquiryEventChannel,
-  InquiryEventFactory,
-  ReplyEventChannel,
-  ReplyEventFactory,
-  RetryEventChannel,
-  RetryEventFactory,
+  InvocatingEventChannel,
+  InvocatingEventFactory,
+  ReplyingEventChannel,
+  ReplyingEventFactory,
+  RetryingEventChannel,
+  RetryingEventFactory,
 } from '../event'
 
 import type { InvocationFactory } from './invocation-factory'
@@ -24,17 +24,17 @@ export class BasicInvocationBuilder<TResult>
 {
   private readonly invocationFactory: InvocationFactory
 
-  private readonly inquiryEventChannel: InquiryEventChannel
+  private readonly invocatingEventChannel: InvocatingEventChannel
 
-  private readonly replyEventChannel: ReplyEventChannel
+  private readonly replyingEventChannel: ReplyingEventChannel
 
-  private readonly retryEventChannel: RetryEventChannel
+  private readonly retryingEventChannel: RetryingEventChannel
 
-  private readonly inquiryEventFactory: InquiryEventFactory
+  private readonly invocatingEventFactory: InvocatingEventFactory
 
-  private readonly replyEventFactory: ReplyEventFactory
+  private readonly replyingEventFactory: ReplyingEventFactory
 
-  private readonly retryEventFactory: RetryEventFactory
+  private readonly retryingEventFactory: RetryingEventFactory
 
   private readonly bridge: Bridge
 
@@ -52,12 +52,12 @@ export class BasicInvocationBuilder<TResult>
 
   public constructor(
     invocationFactory: InvocationFactory,
-    inquiryEventChannel: InquiryEventChannel,
-    replyEventChannel: ReplyEventChannel,
-    retryEventChannel: RetryEventChannel,
-    inquiryEventFactory: InquiryEventFactory,
-    replyEventFactory: ReplyEventFactory,
-    retryEventFactory: RetryEventFactory,
+    invocatingEventChannel: InvocatingEventChannel,
+    replyingEventChannel: ReplyingEventChannel,
+    retryingEventChannel: RetryingEventChannel,
+    invocatingEventFactory: InvocatingEventFactory,
+    replyingEventFactory: ReplyingEventFactory,
+    retryingEventFactory: RetryingEventFactory,
     bridge: Bridge,
     abortController: AbortController,
     rejectionDelay: number,
@@ -66,12 +66,12 @@ export class BasicInvocationBuilder<TResult>
     retryDelayScheme: RetryDelayScheme,
   ) {
     this.invocationFactory = invocationFactory
-    this.inquiryEventChannel = inquiryEventChannel
-    this.replyEventChannel = replyEventChannel
-    this.retryEventChannel = retryEventChannel
-    this.inquiryEventFactory = inquiryEventFactory
-    this.replyEventFactory = replyEventFactory
-    this.retryEventFactory = retryEventFactory
+    this.invocatingEventChannel = invocatingEventChannel
+    this.replyingEventChannel = replyingEventChannel
+    this.retryingEventChannel = retryingEventChannel
+    this.invocatingEventFactory = invocatingEventFactory
+    this.replyingEventFactory = replyingEventFactory
+    this.retryingEventFactory = retryingEventFactory
     this.bridge = bridge
     this.abortController = abortController
     this.rejectionDelay = rejectionDelay
@@ -106,13 +106,13 @@ export class BasicInvocationBuilder<TResult>
 
   public async perform(): Promise<TResult> {
     const invocation = this.invocationFactory.create(
-      this.inquiryEventChannel,
-      this.replyEventChannel,
-      this.retryEventChannel,
+      this.invocatingEventChannel,
+      this.replyingEventChannel,
+      this.retryingEventChannel,
       this.abortController,
-      this.inquiryEventFactory,
-      this.replyEventFactory,
-      this.retryEventFactory,
+      this.invocatingEventFactory,
+      this.replyingEventFactory,
+      this.retryingEventFactory,
       this.bridge,
       this.rejectionDelay,
       this.attemptRejectionDelay,

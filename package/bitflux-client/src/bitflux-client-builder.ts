@@ -19,19 +19,19 @@ import type {
   DisconnectedEventChannel,
   DisconnectingBridgeEventChannel,
   DisconnectingEventChannel,
-  InquiryEventChannel,
+  InvocatingEventChannel,
   MessageBridgeEventChannel,
   ReconnectingBridgeEventChannel,
   ReconnectingEventChannel,
-  ReplyEventChannel,
-  RetryEventChannel,
+  ReplyingEventChannel,
+  RetryingEventChannel,
 } from './interior'
 
 import {
-  BasicRetryEventFactory,
+  BasicInvocatingEventFactory,
+  BasicReplyingEventFactory,
+  BasicRetryingEventFactory,
   BasicInvocationBuilderFactory,
-  BasicInquiryEventFactory,
-  BasicReplyEventFactory,
   BasicBitfluxClient,
   BasicBridge,
   BasicCommunicationSettingsBuilder,
@@ -59,8 +59,6 @@ import type { ClientPluginBuilder } from './plugin'
 export class BitfluxClientBuilder {
   private readonly url: string | URL
 
-  private readonly pluginBuilders: ClientPluginBuilder[]
-
   private readonly communicationSettingsBuilder: CommunicationSettingsBuilder
 
   private readonly reconnectionSettingsBuilder: ReconnectionSettingsBuilder
@@ -69,29 +67,31 @@ export class BitfluxClientBuilder {
 
   private readonly loggingSettingsBuilder: LoggingSettingsBuilder
 
+  private readonly pluginBuilders: ClientPluginBuilder[]
+
   public constructor(url: string | URL)
   public constructor(
     url: string | URL,
-    pluginBuilders: ClientPluginBuilder[],
     communicationSettingsBuilder: CommunicationSettingsBuilder,
     reconnectionSettingsBuilder: ReconnectionSettingsBuilder,
     invocationSettingsBuilder: InvocationSettingsBuilder,
     loggingSettingsBuilder: LoggingSettingsBuilder,
+    pluginBuilders: ClientPluginBuilder[],
   )
   public constructor(
     url: string | URL,
-    pluginBuilders: ClientPluginBuilder[] = [],
     communicationSettingsBuilder: CommunicationSettingsBuilder = new BasicCommunicationSettingsBuilder(),
     reconnectionSettingsBuilder: ReconnectionSettingsBuilder = new BasicReconnectionSettingsBuilder(),
     invocationSettingsBuilder: InvocationSettingsBuilder = new BasicInvocationSettingsBuilder(),
     loggingSettingsBuilder: LoggingSettingsBuilder = new BasicLoggingSettingsBuilder(),
+    pluginBuilders: ClientPluginBuilder[] = [],
   ) {
     this.url = url
-    this.pluginBuilders = pluginBuilders
     this.communicationSettingsBuilder = communicationSettingsBuilder
     this.reconnectionSettingsBuilder = reconnectionSettingsBuilder
     this.invocationSettingsBuilder = invocationSettingsBuilder
     this.loggingSettingsBuilder = loggingSettingsBuilder
+    this.pluginBuilders = pluginBuilders
   }
 
   public use(builder: ClientPluginBuilder): this {
@@ -217,11 +217,12 @@ export class BitfluxClientBuilder {
     const reconnectingEventChannel: ReconnectingEventChannel =
       new BasicEventChannel()
 
-    const inquiryEventChannel: InquiryEventChannel = new BasicEventChannel()
+    const invocatingEventChannel: InvocatingEventChannel =
+      new BasicEventChannel()
 
-    const replyEventChannel: ReplyEventChannel = new BasicEventChannel()
+    const replyingEventChannel: ReplyingEventChannel = new BasicEventChannel()
 
-    const retryEventChannel: RetryEventChannel = new BasicEventChannel()
+    const retryingEventChannel: RetryingEventChannel = new BasicEventChannel()
 
     const connectingEventFactory = new BasicConnectingEventFactory()
 
@@ -233,21 +234,21 @@ export class BitfluxClientBuilder {
 
     const reconnectingEventFactory = new BasicReconnectingEventFactory()
 
-    const inquiryEventFactory = new BasicInquiryEventFactory()
+    const invocatingEventFactory = new BasicInvocatingEventFactory()
 
-    const replyEventFactory = new BasicReplyEventFactory()
+    const replyingEventFactory = new BasicReplyingEventFactory()
 
-    const retryEventFactory = new BasicRetryEventFactory()
+    const retryingEventFactory = new BasicRetryingEventFactory()
 
     const handlerMapper = new BasicHandlerMapper(bridge, loggingSettings.logger)
 
     const invocationBuilderFactory = new BasicInvocationBuilderFactory(
-      inquiryEventChannel,
-      replyEventChannel,
-      retryEventChannel,
-      inquiryEventFactory,
-      replyEventFactory,
-      retryEventFactory,
+      invocatingEventChannel,
+      replyingEventChannel,
+      retryingEventChannel,
+      invocatingEventFactory,
+      replyingEventFactory,
+      retryingEventFactory,
       bridge,
       invocationSettings.rejectionDelay,
       invocationSettings.attemptRejectionDelay,
@@ -261,9 +262,9 @@ export class BitfluxClientBuilder {
       disconnectingEventChannel,
       disconnectedEventChannel,
       reconnectingEventChannel,
-      inquiryEventChannel,
-      replyEventChannel,
-      retryEventChannel,
+      invocatingEventChannel,
+      replyingEventChannel,
+      retryingEventChannel,
       connectingEventFactory,
       connectedEventFactory,
       disconnectingEventFactory,
@@ -282,11 +283,11 @@ export class BitfluxClientBuilder {
   public clone(url: string | URL): BitfluxClientBuilder {
     return new BitfluxClientBuilder(
       new URL(url),
-      this.pluginBuilders.slice(),
       this.communicationSettingsBuilder.clone(),
       this.reconnectionSettingsBuilder.clone(),
       this.invocationSettingsBuilder.clone(),
       this.loggingSettingsBuilder.clone(),
+      this.pluginBuilders.slice(),
     )
   }
 

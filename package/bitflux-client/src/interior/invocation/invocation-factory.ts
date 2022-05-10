@@ -7,23 +7,23 @@ import type {
 import type { Bridge } from '../communication'
 
 import type {
-  InquiryEventChannel,
-  InquiryEventFactory,
-  ReplyEventChannel,
-  ReplyEventFactory,
-  RetryEventChannel,
-  RetryEventFactory,
+  InvocatingEventChannel,
+  InvocatingEventFactory,
+  ReplyingEventChannel,
+  ReplyingEventFactory,
+  RetryingEventChannel,
+  RetryingEventFactory,
 } from '../event'
 
 export interface InvocationFactory {
   create(
-    inquiryEventChannel: InquiryEventChannel,
-    replyEventChannel: ReplyEventChannel,
-    retryEventChannel: RetryEventChannel,
+    invocatingEventChannel: InvocatingEventChannel,
+    replyingEventChannel: ReplyingEventChannel,
+    retryingEventChannel: RetryingEventChannel,
     abortController: AbortController,
-    inquiryEventFactory: InquiryEventFactory,
-    replyEventFactory: ReplyEventFactory,
-    retryEventFactory: RetryEventFactory,
+    invocatingEventFactory: InvocatingEventFactory,
+    replyingEventFactory: ReplyingEventFactory,
+    retryingEventFactory: RetryingEventFactory,
     bridge: Bridge,
     rejectionDelay: number,
     attempRejectionDelay: number,

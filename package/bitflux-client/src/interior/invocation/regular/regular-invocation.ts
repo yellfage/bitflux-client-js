@@ -27,12 +27,12 @@ import { OutgoingRegularInvocationMessage } from '../../communication'
 import { DeferredPromise } from '../../deferred-promise'
 
 import type {
-  InquiryEventChannel,
-  InquiryEventFactory,
-  ReplyEventChannel,
-  ReplyEventFactory,
-  RetryEventChannel,
-  RetryEventFactory,
+  InvocatingEventChannel,
+  InvocatingEventFactory,
+  ReplyingEventChannel,
+  ReplyingEventFactory,
+  RetryingEventChannel,
+  RetryingEventFactory,
 } from '../../event'
 
 export class RegularInvocation implements Invocation {
@@ -40,19 +40,19 @@ export class RegularInvocation implements Invocation {
 
   public readonly args: unknown[]
 
-  public readonly inquiry: InquiryEventChannel
+  public readonly invocating: InvocatingEventChannel
 
-  public readonly reply: ReplyEventChannel
+  public readonly replying: ReplyingEventChannel
 
-  public readonly retry: RetryEventChannel
+  public readonly retrying: RetryingEventChannel
 
   public readonly abortController: AbortController
 
-  private readonly inquiryEventFactory: InquiryEventFactory
+  private readonly invocatingEventFactory: InvocatingEventFactory
 
-  private readonly replyEventFactory: ReplyEventFactory
+  private readonly replyingEventFactory: ReplyingEventFactory
 
-  private readonly retryEventFactory: RetryEventFactory
+  private readonly retryingEventFactory: RetryingEventFactory
 
   private readonly bridge: Bridge
 
@@ -75,13 +75,13 @@ export class RegularInvocation implements Invocation {
   public constructor(
     handlerName: string,
     args: unknown[],
-    inquiryEventChannel: InquiryEventChannel,
-    replyEventChannel: ReplyEventChannel,
-    retryEventChannel: RetryEventChannel,
+    invocatingEventChannel: InvocatingEventChannel,
+    replyingEventChannel: ReplyingEventChannel,
+    retryingEventChannel: RetryingEventChannel,
     abortController: AbortController,
-    inquiryEventFactory: InquiryEventFactory,
-    replyEventFactory: ReplyEventFactory,
-    retryEventFactory: RetryEventFactory,
+    invocatingEventFactory: InvocatingEventFactory,
+    replyingEventFactory: ReplyingEventFactory,
+    retryingEventFactory: RetryingEventFactory,
     bridge: Bridge,
     rejectionDelay: number,
     attemptRejectionDelay: number,
@@ -90,13 +90,13 @@ export class RegularInvocation implements Invocation {
   ) {
     this.handlerName = handlerName
     this.args = args
-    this.inquiry = inquiryEventChannel
-    this.reply = replyEventChannel
-    this.retry = retryEventChannel
+    this.invocating = invocatingEventChannel
+    this.replying = replyingEventChannel
+    this.retrying = retryingEventChannel
     this.abortController = abortController
-    this.inquiryEventFactory = inquiryEventFactory
-    this.replyEventFactory = replyEventFactory
-    this.retryEventFactory = retryEventFactory
+    this.invocatingEventFactory = invocatingEventFactory
+    this.replyingEventFactory = replyingEventFactory
+    this.retryingEventFactory = retryingEventFactory
     this.bridge = bridge
     this.rejectionDelay = rejectionDelay
     this.attemptRejectionDelay = attemptRejectionDelay
@@ -117,9 +117,9 @@ export class RegularInvocation implements Invocation {
 
     this.runRejectionTimeout()
 
-    const inquiryEvent = this.inquiryEventFactory.create(this)
+    const invocatingEvent = this.invocatingEventFactory.create(this)
 
-    await this.inquiry.emit(inquiryEvent)
+    await this.invocating.emit(invocatingEvent)
 
     if (this.abortController.signal.aborted) {
       throw new AbortError('The invocation has been aborted')
@@ -128,11 +128,11 @@ export class RegularInvocation implements Invocation {
     try {
       const result = await this.performAttempt()
 
-      const replyEvent = this.replyEventFactory.create(this, result)
+      const replyingEvent = this.replyingEventFactory.create(this, result)
 
-      await this.reply.emit(replyEvent)
+      await this.replying.emit(replyingEvent)
 
-      return replyEvent.result
+      return replyingEvent.result
     } finally {
       this.clearRejectionTimeout()
 
@@ -163,9 +163,9 @@ export class RegularInvocation implements Invocation {
   private async parformRetry(): Promise<unknown> {
     const retryDelay = this.retryDelayScheme.moveNext()
 
-    const event = this.retryEventFactory.create(this, retryDelay)
+    const retryingEvent = this.retryingEventFactory.create(this, retryDelay)
 
-    await this.retry.emit(event)
+    await this.retrying.emit(retryingEvent)
 
     try {
       await delay(retryDelay, {

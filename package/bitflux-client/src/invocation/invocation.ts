@@ -1,14 +1,17 @@
-import type { InquiryEventPool, ReplyEventPool, RetryEventPool } from '../event'
+import type {
+  InvocatingEventPool,
+  ReplyingEventPool,
+  RetryingEventPool,
+} from '../event'
 
 export interface Invocation {
   readonly handlerName: string
   readonly args: unknown[]
-
-  readonly inquiry: InquiryEventPool
-  readonly reply: ReplyEventPool
-  readonly retry: RetryEventPool
-
   readonly abortController: AbortController
+
+  readonly invocating: InvocatingEventPool
+  readonly replying: ReplyingEventPool
+  readonly retrying: RetryingEventPool
 
   perform(): Promise<unknown>
 }

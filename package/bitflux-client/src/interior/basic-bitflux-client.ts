@@ -22,11 +22,11 @@ import type {
   DisconnectedEventFactory,
   DisconnectingEventChannel,
   DisconnectingEventFactory,
-  InquiryEventChannel,
+  InvocatingEventChannel,
   ReconnectingEventChannel,
   ReconnectingEventFactory,
-  ReplyEventChannel,
-  RetryEventChannel,
+  ReplyingEventChannel,
+  RetryingEventChannel,
 } from './event'
 
 import type { InvocationBuilderFactory } from './invocation'
@@ -57,11 +57,11 @@ export class BasicBitfluxClient implements BitfluxClient {
 
   public readonly reconnecting: ReconnectingEventChannel
 
-  public readonly inquiry: InquiryEventChannel
+  public readonly invocating: InvocatingEventChannel
 
-  public readonly reply: ReplyEventChannel
+  public readonly replying: ReplyingEventChannel
 
-  public readonly retry: RetryEventChannel
+  public readonly retrying: RetryingEventChannel
 
   private readonly connectingEventFactory: ConnectingEventFactory
 
@@ -85,9 +85,9 @@ export class BasicBitfluxClient implements BitfluxClient {
     disconnectingEventChannel: DisconnectingEventChannel,
     disconnectedEventChannel: DisconnectedEventChannel,
     reconnectingEventChannel: ReconnectingEventChannel,
-    inquiryEventChannel: InquiryEventChannel,
-    replyEventChannel: ReplyEventChannel,
-    retryEventChannel: RetryEventChannel,
+    invocatingEventChannel: InvocatingEventChannel,
+    replyingEventChannel: ReplyingEventChannel,
+    retryingEventChannel: RetryingEventChannel,
     connectingEventFactory: ConnectingEventFactory,
     connectedEventFactory: ConnectedEventFactory,
     disconnectingEventFactory: DisconnectingEventFactory,
@@ -102,9 +102,9 @@ export class BasicBitfluxClient implements BitfluxClient {
     this.disconnecting = disconnectingEventChannel
     this.disconnected = disconnectedEventChannel
     this.reconnecting = reconnectingEventChannel
-    this.inquiry = inquiryEventChannel
-    this.reply = replyEventChannel
-    this.retry = retryEventChannel
+    this.invocating = invocatingEventChannel
+    this.replying = replyingEventChannel
+    this.retrying = retryingEventChannel
     this.connectingEventFactory = connectingEventFactory
     this.connectedEventFactory = connectedEventFactory
     this.disconnectingEventFactory = disconnectingEventFactory

@@ -7,12 +7,12 @@ import type {
 import type { Bridge } from '../../communication'
 
 import type {
-  InquiryEventChannel,
-  InquiryEventFactory,
-  ReplyEventChannel,
-  ReplyEventFactory,
-  RetryEventChannel,
-  RetryEventFactory,
+  InvocatingEventChannel,
+  InvocatingEventFactory,
+  ReplyingEventChannel,
+  ReplyingEventFactory,
+  RetryingEventChannel,
+  RetryingEventFactory,
 } from '../../event'
 
 import type { InvocationFactory } from '../invocation-factory'
@@ -30,13 +30,13 @@ export class NotifiableInvocationFactory implements InvocationFactory {
   }
 
   public create(
-    inquiryEventChannel: InquiryEventChannel,
-    replyEventChannel: ReplyEventChannel,
-    retryEventChannel: RetryEventChannel,
+    invocatingEventChannel: InvocatingEventChannel,
+    replyingEventChannel: ReplyingEventChannel,
+    retryingEventChannel: RetryingEventChannel,
     abortController: AbortController,
-    inquiryEventFactory: InquiryEventFactory,
-    replyEventFactory: ReplyEventFactory,
-    retryEventFactory: RetryEventFactory,
+    invocatingEventFactory: InvocatingEventFactory,
+    replyingEventFactory: ReplyingEventFactory,
+    retryingEventFactory: RetryingEventFactory,
     bridge: Bridge,
     rejectionDelay: number,
     attempRejectionDelay: number,
@@ -46,13 +46,13 @@ export class NotifiableInvocationFactory implements InvocationFactory {
     return new NotifiableInvocation(
       this.handlerName,
       this.args,
-      inquiryEventChannel,
-      replyEventChannel,
-      retryEventChannel,
+      invocatingEventChannel,
+      replyingEventChannel,
+      retryingEventChannel,
       abortController,
-      inquiryEventFactory,
-      replyEventFactory,
-      retryEventFactory,
+      invocatingEventFactory,
+      replyingEventFactory,
+      retryingEventFactory,
       bridge,
       rejectionDelay,
       attempRejectionDelay,

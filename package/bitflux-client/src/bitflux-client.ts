@@ -3,10 +3,10 @@ import type {
   ConnectingEventPool,
   DisconnectedEventPool,
   DisconnectingEventPool,
-  InquiryEventPool,
+  InvocatingEventPool,
   ReconnectingEventPool,
-  ReplyEventPool,
-  RetryEventPool,
+  ReplyingEventPool,
+  RetryingEventPool,
 } from './event'
 
 import type { InvocationBuilder, InvocationHandler } from './invocation'
@@ -25,9 +25,9 @@ export interface BitfluxClient {
   readonly disconnected: DisconnectedEventPool
   readonly reconnecting: ReconnectingEventPool
 
-  readonly inquiry: InquiryEventPool
-  readonly reply: ReplyEventPool
-  readonly retry: RetryEventPool
+  readonly invocating: InvocatingEventPool
+  readonly replying: ReplyingEventPool
+  readonly retrying: RetryingEventPool
 
   use(builder: ClientPluginBuilder): this
 
