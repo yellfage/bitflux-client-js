@@ -2,9 +2,9 @@ import { DisconnectionCode } from '@yellfage/bitflux-client'
 
 import type {
   Transport,
-  TransportMessageEventHandler,
-  TransportCloseEventHandler,
-  TransportOpenEventHandler,
+  TransportClosingEventHandler,
+  TransportMessagingEventHandler,
+  TransportOpeningEventHandler,
 } from '@yellfage/bitflux-client'
 
 import type { WebSocketUrlScheme } from '../web-socket-url-scheme'
@@ -14,11 +14,11 @@ import { WebSocketDisconnectionCode } from './web-socket-disconnection-code'
 export class WebSocketTransport implements Transport {
   public readonly name = 'web-socket'
 
-  public onopen: TransportOpenEventHandler | null
+  public onopening: TransportOpeningEventHandler | null
 
-  public onclose: TransportCloseEventHandler | null
+  public onclosing: TransportClosingEventHandler | null
 
-  public onmessage: TransportMessageEventHandler | null = null
+  public onmessaging: TransportMessagingEventHandler | null
 
   private readonly urlScheme: WebSocketUrlScheme
 
@@ -56,11 +56,11 @@ export class WebSocketTransport implements Transport {
   }
 
   private readonly handleOpenEvent = async (): Promise<void> => {
-    if (!this.onopen) {
+    if (!this.onopening) {
       return
     }
 
-    return this.onopen({
+    return this.onopening({
       target: this,
       protocol: this.webSocket?.protocol ?? null,
     })
@@ -70,7 +70,7 @@ export class WebSocketTransport implements Transport {
     code,
     reason,
   }: CloseEvent): Promise<void> => {
-    if (!this.onclose) {
+    if (!this.onclosing) {
       return
     }
 
@@ -79,16 +79,16 @@ export class WebSocketTransport implements Transport {
         ? DisconnectionCode.Normal
         : DisconnectionCode.Abnormal
 
-    return this.onclose({ target: this, code: finalCode, reason })
+    return this.onclosing({ target: this, code: finalCode, reason })
   }
 
   private readonly handleMessageEvent = async ({
     data,
   }: MessageEvent<string | Blob>): Promise<void> => {
-    if (!this.onmessage) {
+    if (!this.onmessaging) {
       return
     }
 
-    return this.onmessage({ target: this, message: data })
+    return this.onmessaging({ target: this, message: data })
   }
 }
