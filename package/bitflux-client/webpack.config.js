@@ -1,6 +1,5 @@
 const path = require('path')
 const { SourceMapDevToolPlugin } = require('webpack')
-const ForkTsCheckerPlugin = require('fork-ts-checker-webpack-plugin')
 
 const { NODE_ENV } = process.env
 
@@ -45,6 +44,5 @@ module.exports = {
     new SourceMapDevToolPlugin({
       filename: '[file].map',
     }),
-    new ForkTsCheckerPlugin(),
   ],
 }
