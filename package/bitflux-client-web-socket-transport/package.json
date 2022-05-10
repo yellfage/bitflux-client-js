@@ -23,7 +23,7 @@
     "directory": "package/bitflux-client-web-socket-transport"
   },
   "peerDependencies": {
-    "@yellfage/bitflux-client": "^1.0.0-beta.3"
+    "@yellfage/bitflux-client": "^1.0.0-beta.6"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
