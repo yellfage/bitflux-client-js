@@ -16,7 +16,7 @@ export class BasicLoggingSettingsBuilder implements LoggingSettingsBuilder {
     this.loggerBuilder = loggerBuilder
   }
 
-  public setLoggerBuilder(builder: LoggerBuilder): this {
+  public setLogger(builder: LoggerBuilder): this {
     this.loggerBuilder = builder
 
     return this

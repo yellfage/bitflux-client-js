@@ -27,13 +27,13 @@ export class BasicCommunicationSettingsBuilder
     this.protocolBuilders = protocolBuilders
   }
 
-  public addTransportBuilder(builder: TransportBuilder): this {
+  public addTransport(builder: TransportBuilder): this {
     this.transportBuilders.push(builder)
 
     return this
   }
 
-  public addProtocolBuilder(builder: ProtocolBuilder): this {
+  public addProtocol(builder: ProtocolBuilder): this {
     this.protocolBuilders.push(builder)
 
     return this
