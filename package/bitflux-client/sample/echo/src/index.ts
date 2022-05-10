@@ -36,8 +36,8 @@ client.connected.add((event) => console.log('Connected', event))
 client.reconnecting.add((event) => console.log('Reconnecting', event))
 client.disconnecting.add((event) => console.log('Disconnecting', event))
 client.disconnected.add((event) => console.log('Disconnected', event))
-client.inquiry.add((event) => console.log('Inquiry', event))
-client.reply.add((event) => console.log('Reply', event))
+client.invocating.add((event) => console.log('Invocating', event))
+client.replying.add((event) => console.log('Replying', event))
 
 client.map('Notify', (message: string) => {
   console.log(`The incoming message: ${message}`)

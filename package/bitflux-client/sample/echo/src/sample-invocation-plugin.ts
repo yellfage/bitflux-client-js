@@ -2,8 +2,14 @@ import type { InvocationPlugin, Invocation } from '@yellfage/bitflux-client'
 
 export class SampleInvocationPlugin implements InvocationPlugin {
   public initialize(invocation: Invocation): void {
-    invocation.inquiry.add((event) => console.log('Local inquiry event', event))
-    invocation.reply.add((event) => console.log('Local reply event', event))
-    invocation.retry.add((event) => console.log('Local retry event', event))
+    invocation.invocating.add((event) =>
+      console.log('Local invocating event', event),
+    )
+    invocation.replying.add((event) =>
+      console.log('Local replying event', event),
+    )
+    invocation.retrying.add((event) =>
+      console.log('Local retrying event', event),
+    )
   }
 }
