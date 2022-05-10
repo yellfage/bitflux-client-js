@@ -4,9 +4,9 @@ import type { Logger } from '../logger'
 
 import type { LoggerBuilder } from '../logger-builder'
 
-import { ConsoleLogger } from './console-logger'
+import { BasicLogger } from './basic-logger'
 
-export class ConsoleLoggerBuilder implements LoggerBuilder {
+export class BasicLoggerBuilder implements LoggerBuilder {
   private level: LogLevel
 
   public constructor(level = LogLevel.Trace) {
@@ -20,6 +20,6 @@ export class ConsoleLoggerBuilder implements LoggerBuilder {
   }
 
   public build(): Logger {
-    return new ConsoleLogger(this.level)
+    return new BasicLogger(this.level)
   }
 }

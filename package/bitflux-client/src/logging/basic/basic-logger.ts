@@ -3,7 +3,7 @@ import { LogLevel } from '../log-level'
 
 import type { Logger } from '../logger'
 
-export class ConsoleLogger implements Logger {
+export class BasicLogger implements Logger {
   private readonly level: LogLevel
 
   public constructor(level: LogLevel) {

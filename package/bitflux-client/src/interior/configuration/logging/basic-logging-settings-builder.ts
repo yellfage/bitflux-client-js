@@ -5,16 +5,14 @@ import type {
 
 import type { LoggerBuilder } from '../../../logging'
 
-import { ConsoleLoggerBuilder } from '../../../logging'
+import { BasicLoggerBuilder } from '../../../logging'
 
 import { BasicLoggingSettings } from './basic-logging-settings'
 
 export class BasicLoggingSettingsBuilder implements LoggingSettingsBuilder {
   private loggerBuilder: LoggerBuilder
 
-  public constructor(
-    loggerBuilder: LoggerBuilder = new ConsoleLoggerBuilder(),
-  ) {
+  public constructor(loggerBuilder: LoggerBuilder = new BasicLoggerBuilder()) {
     this.loggerBuilder = loggerBuilder
   }
 

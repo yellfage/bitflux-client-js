@@ -1,4 +1,4 @@
-export * from './console'
+export * from './basic'
 
 export * from './log-level'
 export * from './logger'
