@@ -1,8 +1,8 @@
+import type { ReconnectionControl } from '../reconnection-control'
+
+import type { ReconnectionControlBuilder } from '../reconnection-control-builder'
+
 import { BasicReconnectionControl } from './basic-reconnection-control'
-
-import type { ReconnectionControl } from './reconnection-control'
-
-import type { ReconnectionControlBuilder } from './reconnection-control-builder'
 
 export class BasicReconnectionControlBuilder
   implements ReconnectionControlBuilder

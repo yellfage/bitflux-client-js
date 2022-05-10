@@ -1,10 +1,12 @@
-import { BasicRetryDelayScheme } from './basic-retry-delay-scheme'
+import type { ReconnectionDelayScheme } from '../reconnection-delay-scheme'
 
-import type { RetryDelayScheme } from './retry-delay-scheme'
+import type { ReconnectionDelaySchemeBuilder } from '../reconnection-delay-scheme-builder'
 
-import type { RetryDelaySchemeBuilder } from './retry-delay-scheme-builder'
+import { BasicReconnectionDelayScheme } from './basic-reconnection-delay-scheme'
 
-export class BasicRetryDelaySchemeBuilder implements RetryDelaySchemeBuilder {
+export class BasicReconnectionDelaySchemeBuilder
+  implements ReconnectionDelaySchemeBuilder
+{
   private delays: number[]
 
   private minDelayOffset: number
@@ -45,8 +47,8 @@ export class BasicRetryDelaySchemeBuilder implements RetryDelaySchemeBuilder {
     return this
   }
 
-  public build(): RetryDelayScheme {
-    return new BasicRetryDelayScheme(
+  public build(): ReconnectionDelayScheme {
+    return new BasicReconnectionDelayScheme(
       this.delays,
       this.minDelayOffset,
       this.maxDelayOffset,

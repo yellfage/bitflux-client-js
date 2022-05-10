@@ -1,10 +1,10 @@
+import { LogLevel } from '../log-level'
+
+import type { Logger } from '../logger'
+
+import type { LoggerBuilder } from '../logger-builder'
+
 import { ConsoleLogger } from './console-logger'
-
-import { LogLevel } from './log-level'
-
-import type { Logger } from './logger'
-
-import type { LoggerBuilder } from './logger-builder'
 
 export class ConsoleLoggerBuilder implements LoggerBuilder {
   private level: LogLevel

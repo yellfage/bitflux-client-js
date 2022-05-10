@@ -1,8 +1,8 @@
-import type { TransportCloseEventHandler } from './transport-close-event-handler'
-
-import type { TransportMessageEventHandler } from './transport-message-event-handler'
-
-import type { TransportOpenEventHandler } from './transport-open-event-handler'
+import type {
+  TransportCloseEventHandler,
+  TransportMessageEventHandler,
+  TransportOpenEventHandler,
+} from './event'
 
 export interface Transport {
   readonly name: string

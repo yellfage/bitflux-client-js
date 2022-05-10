@@ -1,9 +1,4 @@
+export * from './event'
+
 export * from './transport'
 export * from './transport-builder'
-export * from './transport-event'
-export * from './transport-open-event'
-export * from './transport-open-event-handler'
-export * from './transport-close-event'
-export * from './transport-close-event-handler'
-export * from './transport-message-event'
-export * from './transport-message-event-handler'

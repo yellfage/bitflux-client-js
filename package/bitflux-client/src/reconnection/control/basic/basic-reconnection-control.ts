@@ -1,4 +1,4 @@
-import type { ReconnectionControl } from './reconnection-control'
+import type { ReconnectionControl } from '../reconnection-control'
 
 export class BasicReconnectionControl implements ReconnectionControl {
   private readonly maxAttempts: number

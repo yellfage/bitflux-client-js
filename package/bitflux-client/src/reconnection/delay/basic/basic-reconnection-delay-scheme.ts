@@ -1,4 +1,4 @@
-import type { ReconnectionDelayScheme } from './reconnection-delay-scheme'
+import type { ReconnectionDelayScheme } from '../reconnection-delay-scheme'
 
 const DEFAULT_DELAY_INDEX = -1
 

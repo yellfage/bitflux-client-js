@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
-import { LogLevel } from './log-level'
+import { LogLevel } from '../log-level'
 
-import type { Logger } from './logger'
+import type { Logger } from '../logger'
 
 export class ConsoleLogger implements Logger {
   private readonly level: LogLevel

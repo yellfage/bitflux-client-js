@@ -1,4 +1,4 @@
-import type { Transport } from './transport'
+import type { Transport } from '../transport'
 
 export interface TransportEvent {
   readonly target: Transport

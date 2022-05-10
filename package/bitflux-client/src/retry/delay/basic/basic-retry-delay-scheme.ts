@@ -1,4 +1,4 @@
-import type { RetryDelayScheme } from './retry-delay-scheme'
+import type { RetryDelayScheme } from '../retry-delay-scheme'
 
 export class BasicRetryDelayScheme implements RetryDelayScheme {
   private readonly delays: number[]
