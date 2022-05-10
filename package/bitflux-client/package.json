@@ -33,8 +33,6 @@
   },
   "dependencies": {
     "@yellfage/events": "^1.0.0-beta.1",
-    "abort-controller": "^3.0.0",
-    "core-js": "^3.22.2",
     "delay": "^5.0.0",
     "nanoid": "^3.3.3"
   }

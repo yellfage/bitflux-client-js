@@ -1,7 +1,3 @@
-import 'core-js/web/url'
-
-import 'abort-controller/polyfill'
-
 export * from './configuration'
 export * from './logging'
 export * from './communication'
