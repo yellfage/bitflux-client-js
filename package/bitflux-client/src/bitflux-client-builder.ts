@@ -11,6 +11,12 @@ import type {
 } from './configuration'
 
 import type {
+  InvocatingEventHandler,
+  ReplyingEventHandler,
+  RetryingEventHandler,
+} from './event'
+
+import type {
   ConnectedBridgeEventChannel,
   ConnectedEventChannel,
   ConnectingBridgeEventChannel,
@@ -19,12 +25,9 @@ import type {
   DisconnectedEventChannel,
   DisconnectingBridgeEventChannel,
   DisconnectingEventChannel,
-  InvocatingEventChannel,
   MessageBridgeEventChannel,
   ReconnectingBridgeEventChannel,
   ReconnectingEventChannel,
-  ReplyingEventChannel,
-  RetryingEventChannel,
 } from './interior'
 
 import {
@@ -217,12 +220,12 @@ export class BitfluxClientBuilder {
     const reconnectingEventChannel: ReconnectingEventChannel =
       new BasicEventChannel()
 
-    const invocatingEventChannel: InvocatingEventChannel =
-      new BasicEventChannel()
+    const invocatingEventChannel =
+      new BasicEventChannel<InvocatingEventHandler>()
 
-    const replyingEventChannel: ReplyingEventChannel = new BasicEventChannel()
+    const replyingEventChannel = new BasicEventChannel<ReplyingEventHandler>()
 
-    const retryingEventChannel: RetryingEventChannel = new BasicEventChannel()
+    const retryingEventChannel = new BasicEventChannel<RetryingEventHandler>()
 
     const connectingEventFactory = new BasicConnectingEventFactory()
 
