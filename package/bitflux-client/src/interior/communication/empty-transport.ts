@@ -1,8 +1,8 @@
 import type {
   Transport,
-  TransportCloseEventHandler,
-  TransportMessageEventHandler,
-  TransportOpenEventHandler,
+  TransportClosingEventHandler,
+  TransportMessagingEventHandler,
+  TransportOpeningEventHandler,
 } from '../../communication'
 
 const ERROR_MESSAGE = 'Unable to acceess to the empty transport'
@@ -12,11 +12,11 @@ export class EmptyTransport implements Transport {
     throw new Error(ERROR_MESSAGE)
   }
 
-  public onopen: TransportOpenEventHandler | null = null
+  public onopening: TransportOpeningEventHandler | null = null
 
-  public onclose: TransportCloseEventHandler | null = null
+  public onclosing: TransportClosingEventHandler | null = null
 
-  public onmessage: TransportMessageEventHandler | null = null
+  public onmessaging: TransportMessagingEventHandler | null = null
 
   public survey(): boolean {
     throw new Error(ERROR_MESSAGE)

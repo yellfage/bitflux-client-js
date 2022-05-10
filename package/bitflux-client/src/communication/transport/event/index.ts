@@ -1,5 +1,5 @@
-export * from './open'
-export * from './close'
-export * from './message'
+export * from './opening'
+export * from './closing'
+export * from './messaging'
 
 export * from './transport-event'

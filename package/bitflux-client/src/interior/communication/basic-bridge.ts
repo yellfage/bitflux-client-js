@@ -6,11 +6,11 @@ import { DisconnectionCode } from '../../communication'
 
 import type {
   OutgoingMessage,
-  TransportMessageEvent,
   Transport,
   Protocol,
-  TransportCloseEvent,
-  TransportOpenEvent,
+  TransportClosingEvent,
+  TransportMessagingEvent,
+  TransportOpeningEvent,
 } from '../../communication'
 
 import type { Logger } from '../../logging'
@@ -387,15 +387,15 @@ export class BasicBridge implements Bridge {
   }
 
   private registerTransportEvents(): void {
-    this.transport.onopen = this.handleOpenEvent
-    this.transport.onclose = this.handleCloseEvent
-    this.transport.onmessage = this.handleMessageEvent
+    this.transport.onopening = this.handleOpeningEvent
+    this.transport.onclosing = this.handleClosingEvent
+    this.transport.onmessaging = this.handleMessagingEvent
   }
 
   private unregisterTransportEvents(): void {
-    this.transport.onopen = null
-    this.transport.onclose = null
-    this.transport.onmessage = null
+    this.transport.onopening = null
+    this.transport.onclosing = null
+    this.transport.onmessaging = null
   }
 
   private setUrlConnectionParams(): void {
@@ -413,9 +413,9 @@ export class BasicBridge implements Bridge {
     )
   }
 
-  private readonly handleOpenEvent = async ({
+  private readonly handleOpeningEvent = async ({
     protocol: protocolName,
-  }: TransportOpenEvent): Promise<void> => {
+  }: TransportOpeningEvent): Promise<void> => {
     if (protocolName == null) {
       this.rejectConnectionPromise(
         new Error(
@@ -449,10 +449,10 @@ export class BasicBridge implements Bridge {
     this.resolveConnectionPromise()
   }
 
-  private readonly handleCloseEvent = async ({
+  private readonly handleClosingEvent = async ({
     code,
     reason,
-  }: TransportCloseEvent): Promise<void> => {
+  }: TransportClosingEvent): Promise<void> => {
     this.unregisterTransportEvents()
 
     this.deleteUrlConnectionParams()
@@ -506,9 +506,9 @@ export class BasicBridge implements Bridge {
     this.rejectConnectionPromise(new AbortError('Connection has been aborted'))
   }
 
-  private readonly handleMessageEvent = async ({
+  private readonly handleMessagingEvent = async ({
     message,
-  }: TransportMessageEvent): Promise<void> => {
+  }: TransportMessagingEvent): Promise<void> => {
     const rawMessage = message instanceof Blob ? await message.text() : message
 
     const finalMessage = this.protocol.deserialize(rawMessage)

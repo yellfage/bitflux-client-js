@@ -1,15 +1,15 @@
 import type {
-  TransportCloseEventHandler,
-  TransportMessageEventHandler,
-  TransportOpenEventHandler,
+  TransportClosingEventHandler,
+  TransportMessagingEventHandler,
+  TransportOpeningEventHandler,
 } from './event'
 
 export interface Transport {
   readonly name: string
 
-  onopen: TransportOpenEventHandler | null
-  onclose: TransportCloseEventHandler | null
-  onmessage: TransportMessageEventHandler | null
+  onopening: TransportOpeningEventHandler | null
+  onclosing: TransportClosingEventHandler | null
+  onmessaging: TransportMessagingEventHandler | null
 
   survey(): boolean
 
