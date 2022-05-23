@@ -11,23 +11,23 @@ import type {
 } from './configuration'
 
 import type {
+  ConnectedEventHandler,
+  ConnectingEventHandler,
+  DisconnectedEventHandler,
+  DisconnectingEventHandler,
   InvocatingEventHandler,
+  ReconnectingEventHandler,
   ReplyingEventHandler,
   RetryingEventHandler,
 } from './event'
 
 import type {
-  ConnectedBridgeEventChannel,
-  ConnectedEventChannel,
-  ConnectingBridgeEventChannel,
-  ConnectingEventChannel,
-  DisconnectedBridgeEventChannel,
-  DisconnectedEventChannel,
-  DisconnectingBridgeEventChannel,
-  DisconnectingEventChannel,
-  MessageBridgeEventChannel,
-  ReconnectingBridgeEventChannel,
-  ReconnectingEventChannel,
+  ConnectedBridgeEventHandler,
+  ConnectingBridgeEventHandler,
+  DisconnectedBridgeEventHandler,
+  DisconnectingBridgeEventHandler,
+  MessageBridgeEventHandler,
+  ReconnectingBridgeEventHandler,
 } from './interior'
 
 import {
@@ -151,23 +151,23 @@ export class BitfluxClientBuilder {
 
     const state = new MutableState()
 
-    const connectingBridgeEventChannel: ConnectingBridgeEventChannel =
-      new BasicEventChannel()
+    const connectingBridgeEventChannel =
+      new BasicEventChannel<ConnectingBridgeEventHandler>()
 
-    const connectedBridgeEventChannel: ConnectedBridgeEventChannel =
-      new BasicEventChannel()
+    const connectedBridgeEventChannel =
+      new BasicEventChannel<ConnectedBridgeEventHandler>()
 
-    const disconnectingBridgeEventChannel: DisconnectingBridgeEventChannel =
-      new BasicEventChannel()
+    const disconnectingBridgeEventChannel =
+      new BasicEventChannel<DisconnectingBridgeEventHandler>()
 
-    const disconnectedBridgeEventChannel: DisconnectedBridgeEventChannel =
-      new BasicEventChannel()
+    const disconnectedBridgeEventChannel =
+      new BasicEventChannel<DisconnectedBridgeEventHandler>()
 
-    const reconnectingBridgeEventChannel: ReconnectingBridgeEventChannel =
-      new BasicEventChannel()
+    const reconnectingBridgeEventChannel =
+      new BasicEventChannel<ReconnectingBridgeEventHandler>()
 
-    const messageBridgeEventChannel: MessageBridgeEventChannel =
-      new BasicEventChannel()
+    const messageBridgeEventChannel =
+      new BasicEventChannel<MessageBridgeEventHandler>()
 
     const connectingBridgeEventFactory = new BasicConnectingBridgeEventFactory()
 
@@ -206,19 +206,19 @@ export class BitfluxClientBuilder {
       loggingSettings.logger,
     )
 
-    const connectingEventChannel: ConnectingEventChannel =
-      new BasicEventChannel()
+    const connectingEventChannel =
+      new BasicEventChannel<ConnectingEventHandler>()
 
-    const connectedEventChannel: ConnectedEventChannel = new BasicEventChannel()
+    const connectedEventChannel = new BasicEventChannel<ConnectedEventHandler>()
 
-    const disconnectingEventChannel: DisconnectingEventChannel =
-      new BasicEventChannel()
+    const disconnectingEventChannel =
+      new BasicEventChannel<DisconnectingEventHandler>()
 
-    const disconnectedEventChannel: DisconnectedEventChannel =
-      new BasicEventChannel()
+    const disconnectedEventChannel =
+      new BasicEventChannel<DisconnectedEventHandler>()
 
-    const reconnectingEventChannel: ReconnectingEventChannel =
-      new BasicEventChannel()
+    const reconnectingEventChannel =
+      new BasicEventChannel<ReconnectingEventHandler>()
 
     const invocatingEventChannel =
       new BasicEventChannel<InvocatingEventHandler>()
