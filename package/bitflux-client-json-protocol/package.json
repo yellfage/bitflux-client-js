@@ -6,12 +6,12 @@
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
-    "build": "npm-run-all clear:dist compile:prod create:declarations",
-    "compile:prod": "cross-env NODE_ENV=production webpack --config ./webpack.config.js",
-    "create:declarations": "tsc --project ./tsconfig.json --outDir './dist' --emitDeclarationOnly",
-    "clear:dist": "rimraf -rf ./dist/*",
-    "eslint": "eslint ./ --ext .js,.ts --ignore-path=../../.eslintignore --report-unused-disable-directives",
-    "eslint:fix": "npm run eslint -- --fix",
+    "build": "npm-run-all clear compile declare",
+    "compile": "cross-env NODE_ENV=production webpack --config ./webpack.config.js",
+    "declare": "tsc --project ./tsconfig.json --outDir './dist' --emitDeclarationOnly",
+    "clear": "rimraf -rf ./dist/*",
+    "eslint:src": "eslint ./src --ext .js,.ts --ignore-path=../../.eslintignore --report-unused-disable-directives",
+    "eslint:src:fix": "npm run eslint:src -- --fix",
     "prepublishOnly": "npm-run-all eslint:fix build"
   },
   "files": [
