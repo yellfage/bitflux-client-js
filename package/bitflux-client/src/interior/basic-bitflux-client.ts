@@ -141,21 +141,15 @@ export class BasicBitfluxClient implements BitfluxClient {
     return this.bridge.disconnect(reason)
   }
 
-  public invoke<TResult>(
-    handlerName: string,
-    ...args: unknown[]
-  ): InvocationBuilder<TResult> {
+  public invoke<TResult>(handlerName: string): InvocationBuilder<TResult> {
     return this.invocationBuilderFactory.create(
-      new RegularInvocationFactory(handlerName, args),
+      new RegularInvocationFactory(handlerName),
     )
   }
 
-  public notify(
-    handlerName: string,
-    ...args: unknown[]
-  ): InvocationBuilder<void> {
+  public notify(handlerName: string): InvocationBuilder<void> {
     return this.invocationBuilderFactory.create(
-      new NotifiableInvocationFactory(handlerName, args),
+      new NotifiableInvocationFactory(handlerName),
     )
   }
 

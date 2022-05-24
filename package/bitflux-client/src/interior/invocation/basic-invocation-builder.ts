@@ -38,6 +38,8 @@ export class BasicInvocationBuilder<TResult>
 
   private readonly bridge: Bridge
 
+  private args: unknown[] = []
+
   private abortController: AbortController
 
   private readonly items: Items
@@ -90,6 +92,12 @@ export class BasicInvocationBuilder<TResult>
     return this
   }
 
+  public setArgs(...args: unknown[]): this {
+    this.args = args
+
+    return this
+  }
+
   public setAbortController(controller: AbortController): this {
     this.abortController = controller
 
@@ -110,6 +118,7 @@ export class BasicInvocationBuilder<TResult>
 
   public async perform(): Promise<TResult> {
     const invocation = this.invocationFactory.create(
+      this.args,
       this.abortController,
       this.items,
       this.invocatingEventChannel,

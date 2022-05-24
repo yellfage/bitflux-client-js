@@ -46,10 +46,7 @@ export interface BitfluxClient {
    */
   disconnect(reason?: string): Promise<void>
 
-  invoke<TResult>(
-    handlerName: string,
-    ...args: unknown[]
-  ): InvocationBuilder<TResult>
+  invoke<TResult>(handlerName: string): InvocationBuilder<TResult>
 
-  notify(handlerName: string, ...args: unknown[]): InvocationBuilder<void>
+  notify(handlerName: string): InvocationBuilder<void>
 }

@@ -22,14 +22,12 @@ import { NotifiableInvocation } from './notifiable-invocation'
 export class NotifiableInvocationFactory implements InvocationFactory {
   private readonly handlerName: string
 
-  private readonly args: unknown[]
-
-  public constructor(handlerName: string, args: unknown[]) {
+  public constructor(handlerName: string) {
     this.handlerName = handlerName
-    this.args = args
   }
 
   public create(
+    args: unknown[],
     abortController: AbortController,
     items: Items,
     invocatingEventChannel: InvocatingEventChannel,
@@ -46,7 +44,7 @@ export class NotifiableInvocationFactory implements InvocationFactory {
   ): Invocation {
     return new NotifiableInvocation(
       this.handlerName,
-      this.args,
+      args,
       abortController,
       items,
       invocatingEventChannel,

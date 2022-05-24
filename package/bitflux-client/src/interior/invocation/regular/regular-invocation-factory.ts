@@ -22,14 +22,12 @@ import { RegularInvocation } from './regular-invocation'
 export class RegularInvocationFactory implements InvocationFactory {
   private readonly handlerName: string
 
-  private readonly args: unknown[]
-
-  public constructor(handlerName: string, args: unknown[]) {
+  public constructor(handlerName: string) {
     this.handlerName = handlerName
-    this.args = args
   }
 
   public create(
+    args: unknown[],
     abortController: AbortController,
     items: Items,
     invocatingEventChannel: InvocatingEventChannel,
@@ -46,7 +44,7 @@ export class RegularInvocationFactory implements InvocationFactory {
   ): Invocation {
     return new RegularInvocation(
       this.handlerName,
-      this.args,
+      args,
       abortController,
       items,
       invocatingEventChannel,

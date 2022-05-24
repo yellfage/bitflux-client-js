@@ -17,6 +17,7 @@ import type {
 
 export interface InvocationFactory {
   create(
+    args: unknown[],
     abortController: AbortController,
     items: Items,
     invocatingEventChannel: InvocatingEventChannel,
