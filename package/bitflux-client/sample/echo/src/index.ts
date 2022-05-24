@@ -46,7 +46,8 @@ client.map('Notify', (message: string) => {
 //
 ;(async () => {
   await client
-    .notify('Notify', {
+    .notify('Notify')
+    .setArgs({
       message: 'The cached notifiable invocation message',
     })
     .perform()
@@ -56,7 +57,8 @@ client.map('Notify', (message: string) => {
   await client.invoke('Authenticate').perform()
 
   const result = await client
-    .invoke<string>('Echo', {
+    .invoke<string>('Echo')
+    .setArgs({
       message: 'The regular invocation message',
     })
     .use(new SampleInvocationPluginBuilder())
@@ -65,19 +67,22 @@ client.map('Notify', (message: string) => {
   console.log(`The invocation result: ${result}`)
 
   await client
-    .notify('Notify', {
+    .notify('Notify')
+    .setArgs({
       message: 'The notifiable invocation message #1',
     })
     .perform()
 
   await client
-    .notify('Notify', {
+    .notify('Notify')
+    .setArgs({
       message: 'The notifiable invocation message #2',
     })
     .perform()
 
   await client
-    .notify('Notify', {
+    .notify('Notify')
+    .setArgs({
       message: 'The notifiable invocation message #3',
     })
     .perform()
